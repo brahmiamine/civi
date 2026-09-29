@@ -14,7 +14,8 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
+      // 'prompt': the new version is applied by src/update.js when no test or form is on screen.
+      registerType: 'prompt',
       includeAssets: ['brand-icon.svg', 'favicon-32x32.png', 'apple-touch-icon.png'],
       manifest: {
         id: base,

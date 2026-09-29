@@ -3,7 +3,7 @@ import { ic } from '../Icon.jsx';
 export const Corners = () => (<><i className="corner tl" /><i className="corner tr" /><i className="corner bl" /><i className="corner br" /></>);
 
 export const Bar = ({ w, h = 8 }) => (
-  <div role="progressbar" style={{ height: h, background: 'var(--surface2)', borderRadius: h / 2, overflow: 'hidden' }}>
+  <div role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(parseFloat(w)) || 0} style={{ height: h, background: 'var(--surface2)', borderRadius: h / 2, overflow: 'hidden' }}>
     <div style={{ height: '100%', width: w, background: 'var(--primary)', borderRadius: h / 2, transition: 'width .6s ease' }} />
   </div>
 );

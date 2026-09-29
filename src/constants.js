@@ -35,5 +35,6 @@ export const fmt = (t) => {
   return Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0');
 };
 
-export const APP_VERSION = __APP_VERSION__;
-export const BRAND_ICON = import.meta.env.BASE_URL + 'brand-icon.svg';
+// Guarded so that the pure modules (stats, bank checks) can also run under Node for the tests.
+export const APP_VERSION = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : 'dev';
+export const BRAND_ICON = (import.meta.env?.BASE_URL ?? '/') + 'brand-icon.svg';

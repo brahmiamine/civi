@@ -13,16 +13,35 @@ export const passMark = (total) => Math.ceil(total * PASS_RATE);
 
 export const emptyProfile = () => ({ stats: {}, errors: [], favs: [], history: [], days: {}, settings: {}, quiz: null });
 
+// A right answer only moves the question up a box when it was due: answering it again the same day
+// does not push it weeks away. A wrong answer always sends it back to box 0 (due again right away).
 export function recordAnswer(p, id, ok, now = Date.now()) {
   const prev = p.stats[id] || { n: 0, ok: 0, s: 0, b: 0 };
-  const b = ok ? Math.min(prev.b + 1, BOX_DAYS.length - 1) : 0;
-  const st = { n: prev.n + 1, ok: prev.ok + (ok ? 1 : 0), s: ok ? prev.s + 1 : 0, b, t: now, d: now + BOX_DAYS[b] * DAY };
+  const due = !prev.n || !(prev.d > now);
+  const b = !ok ? 0 : due ? Math.min(prev.b + 1, BOX_DAYS.length - 1) : prev.b;
+  const d = ok && !due ? prev.d : now + BOX_DAYS[b] * DAY;
+  const st = { n: prev.n + 1, ok: prev.ok + (ok ? 1 : 0), s: ok ? prev.s + 1 : 0, b, t: now, d };
   const k = dayKey(new Date(now));
   return { ...p, stats: { ...p.stats, [id]: st }, days: { ...p.days, [k]: (p.days[k] || 0) + 1 } };
 }
 
-// Mastered: last answer right, and either never missed or right twice in a row since.
-export const isMastered = (st) => !!st && (st.s >= 2 || (st.s >= 1 && st.ok === st.n));
+// Mastered: right at least twice in a row (a single right answer can be a lucky guess).
+export const isMastered = (st) => !!st && st.s >= 2;
+
+// « Mes erreurs » after an answer: a wrong answer is added (when automatic revision is on),
+// a question leaves the list once it is mastered, or as soon as it is answered right in « Mes erreurs » mode.
+export function updateErrors(p, id, ok, chosen, { auto, errorsMode }) {
+  const has = p.errors.some((e) => e.id === id);
+  if (!ok) {
+    if (!auto && !has) return p;
+    return { ...p, errors: has ? p.errors.map((e) => (e.id === id ? { id, chosen } : e)) : p.errors.concat([{ id, chosen }]) };
+  }
+  if (has && (errorsMode || isMastered(p.stats[id]))) return { ...p, errors: p.errors.filter((e) => e.id !== id) };
+  return p;
+}
+
+// Seconds left in a timed quiz: the deadline is absolute, so time keeps running when the app is closed.
+export const secondsLeft = (q, now = Date.now()) => (q && q.timed ? Math.max(0, Math.ceil((q.endsAt - now) / 1000)) : 0);
 
 export function themeStats(bank, p) {
   const out = {};
@@ -38,10 +57,12 @@ export function themeStats(bank, p) {
   return out;
 }
 
+// Calendar days (not 24 h steps), so daylight saving changes never skip or repeat a day.
 export function streakDays(days, now = new Date()) {
-  let d = new Date(now), n = 0;
-  if (!days[dayKey(d)]) d = new Date(d.getTime() - DAY); // today not started yet: the streak is still alive
-  while (days[dayKey(d)]) { n++; d = new Date(d.getTime() - DAY); }
+  const d = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 12);
+  let n = 0;
+  if (!days[dayKey(d)]) d.setDate(d.getDate() - 1); // today not started yet: the streak is still alive
+  while (days[dayKey(d)]) { n++; d.setDate(d.getDate() - 1); }
   return n;
 }
 
@@ -112,14 +133,24 @@ export function hardPool(bank, p) {
   return bank.questions.filter((q) => q.trap || (S[q.id] && S[q.id].n > S[q.id].ok && S[q.id].ok / S[q.id].n < 0.6));
 }
 
+// Number of questions per theme for an exam of n questions: the official split scaled with the largest remainder
+// method, so the counts always add up to n and stay as close as possible to the official proportions.
+export function examSplit(n) {
+  const total = Object.values(EXAM_DIST).reduce((a, b) => a + b, 0);
+  const raw = THEMES.map((t) => ({ id: t.id, x: (EXAM_DIST[t.id] * n) / total }));
+  const out = {}; let used = 0;
+  raw.forEach((r) => { out[r.id] = Math.floor(r.x); used += out[r.id]; });
+  raw.slice().sort((a, b) => (b.x - Math.floor(b.x)) - (a.x - Math.floor(a.x))).slice(0, n - used).forEach((r) => { out[r.id]++; });
+  return out;
+}
+
 // Exam: follows the official split by theme, scaled to the requested length; gaps are filled from other themes.
 export function pickExam(bank, n) {
   n = Math.min(n, bank.questions.length);
-  const total = Object.values(EXAM_DIST).reduce((a, b) => a + b, 0);
+  const split = examSplit(n);
   const by = {}; THEMES.forEach((t) => { by[t.id] = shuffle(bank.questions.filter((q) => q.t === t.id)); });
   let pick = [];
-  THEMES.forEach((t) => { pick = pick.concat(by[t.id].splice(0, Math.round((EXAM_DIST[t.id] * n) / total))); });
-  if (pick.length > n) pick = shuffle(pick).slice(0, n);
+  THEMES.forEach((t) => { pick = pick.concat(by[t.id].splice(0, split[t.id])); });
   const rest = shuffle(THEMES.flatMap((t) => by[t.id]));
   pick = pick.concat(rest.slice(0, n - pick.length));
   return shuffle(pick).map((q) => q.id);

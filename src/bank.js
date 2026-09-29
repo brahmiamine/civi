@@ -5,10 +5,11 @@ import { THEMES, LET } from './constants.js';
 
 const profileFiles = import.meta.glob('./data/*/profil.json', { eager: true, import: 'default' });
 // Question files are separate chunks (lazy loaders); they are all fetched once at startup and cached offline by the service worker.
-const lotLoaders = import.meta.glob('./data/*/*.json', { import: 'default' });
+const lotLoaders = import.meta.glob(['./data/*/*.json', '!./data/*/profil.json'], { import: 'default' });
 const lotFiles = Object.fromEntries(await Promise.all(Object.entries(lotLoaders).map(async ([path, load]) => [path, await load()])));
 
-// Files that make up the pool used by every mode except « Tester → Lots » (which only uses lot-*.json).
+// Bank files (read first). Questions that only appear in a lot-*.json also join the bank, so that everything
+// the learner answers counts in the progress, the smart revision and the mock exam.
 const POOL = { questions: {}, pieges: { piege: true }, situations: { situation: true } };
 
 const THEME_IDS = new Set(THEMES.map((t) => t.id));
@@ -55,7 +56,7 @@ function buildPreps() {
     const questions = [], byId = new Map(), lots = [];
     const paths = Object.keys(lotFiles).filter((p) => folderOf(p) === id && fileOf(p) !== 'profil').sort(byName);
     const listOf = (file) => (Array.isArray(file) ? file : file?.questions);
-    // Pool files first (banque, pièges, situations), then the lots, which reuse a question when its id already exists.
+    // Bank files first (banque, pièges, situations), then the lots, which reuse a question when its id already exists.
     const load = (path, file, defaults, inPool) => {
       const list = listOf(file), name = fileOf(path), qs = [];
       if (!Array.isArray(list)) { console.warn('[Civi] Fichier ignoré, pas de tableau « questions » : ' + path); return qs; }
@@ -67,8 +68,7 @@ function buildPreps() {
           if (inPool) { console.warn('[Civi] Identifiant en double « ' + q.id + ' » ignoré dans ' + path); return; }
           qs.push(q.id); return;
         }
-        q.lot = name; byId.set(q.id, q); qs.push(q.id);
-        if (inPool) questions.push(q);
+        q.lot = name; byId.set(q.id, q); qs.push(q.id); questions.push(q);
       });
       return qs;
     };
@@ -77,8 +77,6 @@ function buildPreps() {
       const file = lotFiles[path], qs = load(path, file, {}, false);
       if (qs.length) lots.push({ id: fileOf(path), title: file.titre ?? file.title ?? fileOf(path), description: file.description ?? '', qs });
     });
-    // No pool files: every lot question counts as before.
-    if (!questions.length) byId.forEach((q) => questions.push(q));
     if (!questions.length) return;
     const facts = {};
     THEMES.forEach((t) => { facts[t.id] = meta.essentiel?.[t.id] ?? []; });

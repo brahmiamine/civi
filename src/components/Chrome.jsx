@@ -1,4 +1,7 @@
+import { useEffect, useRef } from 'react';
 import { btnPrimary, iconBtn, field, ImagePicker } from './ui.jsx';
+
+const FOCUSABLE = 'button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
 
 export function TopBar({ bar }) {
   return (
@@ -13,7 +16,7 @@ export function TopBar({ bar }) {
 export function QuizBar({ b }) {
   return (
     <div style={{ flex: 'none', padding: '0 20px 8px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-      <div role="progressbar" aria-label="Progression du test" style={{ height: 4, background: 'var(--surface2)', borderRadius: 2, overflow: 'hidden' }}>
+      <div role="progressbar" aria-label="Progression du test" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(parseFloat(b.pct))} style={{ height: 4, background: 'var(--surface2)', borderRadius: 2, overflow: 'hidden' }}>
         <div style={{ height: '100%', width: b.pct, background: 'var(--primary)', borderRadius: 2, transition: 'width .35s ease' }} />
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: 22, fontSize: 14, color: 'var(--text2)' }}>
@@ -46,11 +49,26 @@ export function Nav({ tabs }) {
   );
 }
 
+// Modal sheet: focus moves into it when it opens, Tab stays inside, and focus returns to the trigger when it closes.
 export function Sheet({ sheet, onClose, onDown, onMove, onUp }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    const before = document.activeElement;
+    ref.current?.focus();
+    return () => { if (before && before.focus && document.contains(before)) before.focus(); };
+  }, []);
+  const onKeyDown = (e) => {
+    if (e.key !== 'Tab' || !ref.current) return;
+    const items = [...ref.current.querySelectorAll(FOCUSABLE)];
+    if (!items.length) return e.preventDefault();
+    const first = items[0], last = items[items.length - 1];
+    if (e.shiftKey && (document.activeElement === first || document.activeElement === ref.current)) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  };
   return (
     <div style={{ position: 'absolute', inset: 0, zIndex: 40, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
       <div onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'var(--scrim)', opacity: sheet.scrimOp, transition: 'opacity .2s', animation: 'tcFade .2s' }} />
-      <div role="dialog" aria-modal="true" aria-label={sheet.title} style={{ position: 'relative', background: 'var(--sheet)', borderRadius: '16px 16px 0 0', paddingBottom: 'calc(14px + max(24px, var(--safe-bottom)))', transform: sheet.transform, transition: sheet.transition, animation: 'tcUp .28s cubic-bezier(.2,.8,.2,1)', maxHeight: '86%', display: 'flex', flexDirection: 'column' }}>
+      <div ref={ref} tabIndex={-1} onKeyDown={onKeyDown} role="dialog" aria-modal="true" aria-label={sheet.title} style={{ position: 'relative', background: 'var(--sheet)', borderRadius: '16px 16px 0 0', paddingBottom: 'calc(14px + max(24px, var(--safe-bottom)))', transform: sheet.transform, transition: sheet.transition, animation: 'tcUp .28s cubic-bezier(.2,.8,.2,1)', maxHeight: '86%', display: 'flex', flexDirection: 'column' }}>
         <div onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp} style={{ touchAction: 'none', cursor: 'grab', padding: '10px 20px 8px', display: 'flex', flexDirection: 'column', gap: 6 }}>
           <span style={{ alignSelf: 'center', width: 40, height: 5, borderRadius: 3, background: 'var(--line)', marginBottom: 12 }} />
           <div style={{ font: '600 25px/1.15 var(--font-heading)' }}>{sheet.title}</div>
