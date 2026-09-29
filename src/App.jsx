@@ -28,28 +28,33 @@ const APP_VERSION = __APP_VERSION__;
 const examMinutes = (n) => Math.max(1, Math.round((EXAM_SECONDS / 60) * (n / 40)));
 // « Signaler » sends the report by e-mail to the maintainer through Web3Forms (public key, it can only send to that inbox).
 const WEB3FORMS_KEY = '8acd26cf-61e8-4f4c-9075-d0c2d884ba57';
+const BUG_REASONS = ['L’application plante ou se bloque', 'Problème d’affichage', 'Mauvais calcul (score, progression…)', 'Autre'];
 const REPORT_REASONS = ['Réponse incorrecte', 'Énoncé ambigu', 'Faute ou coquille', 'Information périmée', 'Autre'];
-// ctx: { prep, where, mode, chosen (original answer index or null), revealed }
-function sendReport(ctx, q, reason, comment) {
+// ctx: { prep, where, mode, chosen (original answer index or null), revealed }. q is null for a general bug report.
+async function sendReport(ctx, q, reason, comment, img) {
+  const imageUrl = img ? await uploadImage(img, CLOUDINARY.reportPreset) : null;
   const L = (i) => LET[i] + '. ' + q.a[i];
-  const chosen = ctx.chosen == null ? 'pas encore répondu' : L(ctx.chosen) + (ctx.chosen === q.c ? ' (juste)' : ' (fausse)');
-  const lines = [
-    '=== SIGNALEMENT ===', 'Motif : ' + reason, 'Commentaire : ' + (comment || '—'), '',
-    '=== QUESTION ===', 'Identifiant : ' + q.id, 'Préparation : ' + ctx.prep, 'Fichier : ' + (q.lot || '—') + '.json',
-    'Thème : ' + thById(q.t).name, 'Type : ' + ([q.situation && 'mise en situation', q.trap && 'piège'].filter(Boolean).join(', ') || 'classique'), '',
-    'Énoncé :', q.q, '', 'Réponses :', ...q.a.map((_, i) => L(i) + (i === q.c ? '  ✅ bonne réponse' : '')), '',
-    'À retenir :', q.x || '—', '',
-    '=== CONTEXTE ===', 'Écran : ' + ctx.where + (ctx.mode ? ' (' + ctx.mode + ')' : ''), 'Réponse choisie : ' + chosen,
-    'Correction affichée : ' + (ctx.revealed ? 'oui' : 'non'), 'Version : ' + APP_VERSION,
-    'Date : ' + new Date().toLocaleString('fr-FR'), 'Appareil : ' + navigator.userAgent, 'Écran : ' + window.innerWidth + '×' + window.innerHeight,
-  ];
-  return fetch('https://api.web3forms.com/submit', {
+  const lines = ['=== SIGNALEMENT ===', 'Motif : ' + reason, 'Commentaire : ' + (comment || '—'), 'Capture : ' + (imageUrl || 'aucune'), ''];
+  if (q) {
+    const chosen = ctx.chosen == null ? 'pas encore répondu' : L(ctx.chosen) + (ctx.chosen === q.c ? ' (juste)' : ' (fausse)');
+    lines.push(
+      '=== QUESTION ===', 'Identifiant : ' + q.id, 'Préparation : ' + ctx.prep, 'Fichier : ' + (q.lot || '—') + '.json',
+      'Thème : ' + thById(q.t).name, 'Type : ' + ([q.situation && 'mise en situation', q.trap && 'piège'].filter(Boolean).join(', ') || 'classique'), '',
+      'Énoncé :', q.q, '', 'Réponses :', ...q.a.map((_, i) => L(i) + (i === q.c ? '  ✅ bonne réponse' : '')), '',
+      'À retenir :', q.x || '—', '', '=== CONTEXTE ===', 'Écran : ' + ctx.where + (ctx.mode ? ' (' + ctx.mode + ')' : ''), 'Réponse choisie : ' + chosen,
+      'Correction affichée : ' + (ctx.revealed ? 'oui' : 'non'),
+    );
+  } else lines.push('=== CONTEXTE ===', 'Préparation : ' + ctx.prep);
+  lines.push('Version : ' + APP_VERSION, 'Date : ' + new Date().toLocaleString('fr-FR'), 'Appareil : ' + navigator.userAgent, 'Écran : ' + window.innerWidth + '×' + window.innerHeight);
+  const subject = 'Civi · ' + (q ? 'Signalement ' + q.id : 'Bug') + ' · ' + reason + (imageUrl ? ' · avec capture' : '');
+  const j = await fetch('https://api.web3forms.com/submit', {
     method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-    body: JSON.stringify({ access_key: WEB3FORMS_KEY, subject: 'Civi · Signalement ' + q.id + ' · ' + reason, from_name: 'Civi · ' + ctx.prep, message: lines.join('\n') }),
-  }).then((r) => r.json()).then((j) => { if (!j.success) throw new Error(j.message); });
+    body: JSON.stringify({ access_key: WEB3FORMS_KEY, subject, from_name: 'Civi · ' + ctx.prep, message: lines.join('\n') }),
+  }).then((r) => r.json());
+  if (!j.success) throw new Error(j.message);
 }
 // « Proposer une question » : optional image goes to Cloudinary (unsigned preset, folder civi-propositions), then the whole proposal is e-mailed via Web3Forms.
-const CLOUDINARY = { cloud: 'dapzqelui', preset: 'civi_propositions' };
+const CLOUDINARY = { cloud: 'dapzqelui', preset: 'civi_propositions', reportPreset: 'civi_signales' };
 const EMPTY_PROPOSAL = () => ({ prep: null, theme: '', q: '', a: ['', '', '', ''], c: null, x: '', note: '', img: null, preview: null, sending: false });
 // Shrinks photos before upload (max 1600 px, JPEG) to stay fast on mobile data and small on the free plan.
 function shrinkImage(file, max = 1600) {
@@ -65,14 +70,14 @@ function shrinkImage(file, max = 1600) {
     img.src = url;
   });
 }
+async function uploadImage(file, preset) {
+  const fd = new FormData(); fd.append('file', await shrinkImage(file)); fd.append('upload_preset', preset);
+  const r = await fetch('https://api.cloudinary.com/v1_1/' + CLOUDINARY.cloud + '/image/upload', { method: 'POST', body: fd }).then((x) => x.json());
+  if (!r.secure_url) throw new Error(r.error?.message || 'upload');
+  return r.secure_url;
+}
 async function sendProposal(p, prepName) {
-  let imageUrl = null;
-  if (p.img) {
-    const fd = new FormData(); fd.append('file', await shrinkImage(p.img)); fd.append('upload_preset', CLOUDINARY.preset);
-    const r = await fetch('https://api.cloudinary.com/v1_1/' + CLOUDINARY.cloud + '/image/upload', { method: 'POST', body: fd }).then((x) => x.json());
-    if (!r.secure_url) throw new Error(r.error?.message || 'upload');
-    imageUrl = r.secure_url;
-  }
+  const imageUrl = p.img ? await uploadImage(p.img, CLOUDINARY.preset) : null;
   const answers = p.a.map((t, i) => [t.trim(), i]).filter(([t]) => t);
   const lines = [
     '=== PROPOSITION DE QUESTION ===', 'Préparation : ' + prepName, 'Thème : ' + (p.theme ? thById(p.theme).name : '—'), '',
@@ -455,6 +460,17 @@ export default class App extends Component {
     return { ...ctx, where: c.from ? 'question (' + c.from + ')' : 'question', chosen: c.chosen ?? null };
   }
 
+  openReport(q) {
+    this.reportQ = q; if (this.state.reportImg) URL.revokeObjectURL(this.state.reportImg.preview);
+    this.setState({ reportReason: null, reportText: '', reportImg: null }); this.openSheet('report');
+  }
+  pickReportImage(file) {
+    const old = this.state.reportImg; if (old) URL.revokeObjectURL(old.preview);
+    if (!file) return this.setState({ reportImg: null });
+    if (!file.type.startsWith('image/')) return this.toast('Choisis une image');
+    if (file.size > 15e6) return this.toast('Image trop lourde (15 Mo max)');
+    this.setState({ reportImg: { file, preview: URL.createObjectURL(file) } });
+  }
   openPropose() { this.setState({ pf: { ...EMPTY_PROPOSAL(), prep: this.state.prep } }); this.push({ s: 'propose' }); }
   setPf(patch) { this.setState((s) => ({ pf: { ...s.pf, ...patch } })); }
   pickImage(file) {
@@ -506,17 +522,22 @@ export default class App extends Component {
       case 'time': return { title: 'Heure du rappel', options: pick('time', [['08:00', '08:00', 'Le matin'], ['12:30', '12:30', 'À midi'], ['19:00', '19:00', 'En soirée'], ['21:00', '21:00', 'Avant de dormir']]) };
       case 'examLength': return { title: 'Longueur de l’examen blanc', sub: 'L’examen officiel compte 40 questions en 45 minutes.', options: pick('examLength', [[40, '40 questions', 'Conditions réelles · 45 min'], [20, '20 questions', 'Entraînement court · ' + examMinutes(20) + ' min'], [10, '10 questions', 'Démo · ' + examMinutes(10) + ' min']]) };
       case 'report': {
-        const q = this.reportQ; if (!q) return null;
-        const reason = s.reportReason, text = s.reportText || '';
+        const q = this.reportQ, reason = s.reportReason, text = s.reportText || '', img = s.reportImg;
         const send = () => {
           this.closeSheet();
           if (!navigator.onLine) return this.toast('Pas de connexion : réessaie plus tard');
-          sendReport(this.reportCtx(bank, q), q, reason, text.trim().slice(0, 1000)).then(() => this.toast('Merci, signalement envoyé'), () => this.toast('Échec de l’envoi, réessaie plus tard'));
+          if (img) this.toast('Envoi en cours…');
+          sendReport(q ? this.reportCtx(bank, q) : { prep: bank.name }, q, reason, text.trim().slice(0, 1000), img?.file)
+            .then(() => this.toast('Merci, signalement envoyé'), () => this.toast('Échec de l’envoi, réessaie plus tard'));
         };
         return {
-          title: 'Signaler cette question', sub: 'Choisis le problème. Le signalement est envoyé anonymement à l’auteur de l’application.',
-          options: REPORT_REASONS.map((r) => opt(r, null, r === reason, () => this.setState({ reportReason: r }), ic('alert'))),
-          form: { value: text, placeholder: 'Précise le problème (facultatif)', onChange: (e) => this.setState({ reportText: e.target.value }), send: { label: 'Envoyer le signalement', disabled: !reason, onClick: send } },
+          title: q ? 'Signaler cette question' : 'Signaler un bug', sub: 'Choisis le problème. Le signalement est envoyé anonymement à l’auteur de l’application.',
+          options: (q ? REPORT_REASONS : BUG_REASONS).map((r) => opt(r, null, r === reason, () => this.setState({ reportReason: r }), ic('alert'))),
+          form: {
+            value: text, placeholder: q ? 'Précise le problème (facultatif)' : 'Décris ce qui s’est passé (facultatif)', onChange: (e) => this.setState({ reportText: e.target.value }),
+            image: { preview: img?.preview, label: 'Ajouter une capture d’écran', icon: ic('download', 18), onPick: (f) => this.pickReportImage(f) },
+            send: { label: 'Envoyer le signalement', disabled: !reason, onClick: send },
+          },
         };
       }
       case 'installHelp': return { title: 'Installer l’application', sub: installHelp() };
@@ -548,7 +569,7 @@ export default class App extends Component {
     const primary = (label, onClick, o) => Object.assign({ label, onClick, dir: 'column', op: 1 }, o || {});
     const fsQ = { Petite: '20px', Normale: '23px', Grande: '26px' }[st.text], fsA = { Petite: '15px', Normale: '16px', Grande: '18px' }[st.text];
     const buildQv = (q, states, onPick, disabled, explain, order = q.a.map((_, i) => i)) => ({
-      theme: thById(q.t).short + (q.situation ? ' · Mise en situation' : ''), text: q.q, fs: fsQ, afs: fsA, explain, onReport: () => { this.reportQ = q; this.setState({ reportReason: null, reportText: '' }); this.openSheet('report'); },
+      theme: thById(q.t).short + (q.situation ? ' · Mise en situation' : ''), text: q.q, fs: fsQ, afs: fsA, explain, onReport: () => this.openReport(q),
       answers: order.map((orig, i) => {
         const k = states[orig]; const m = {
           normal: { bg: 'var(--surface)', border: '2px solid var(--divider)', badgeBg: 'var(--surface2)', badgeColor: 'var(--text)', op: 1 },
@@ -657,6 +678,7 @@ export default class App extends Component {
         largeTitle = 'Profil'; profile = { initials: bank.initials, name: bank.name, sub: O.pct + ' % de préparation · ' + plural(O.total, 'question') };
         const rows = [
           row({ icon: 'target', title: 'Type de préparation', sub: plural(O.total, 'question') + ' · ' + plural(bank.lots.length, 'lot'), value: bank.short, chev: true, onClick: () => this.openSheet('prep') }),
+          row({ icon: 'alert', title: 'Signaler un bug', sub: 'Avec une capture d’écran si besoin', chev: true, onClick: () => this.openReport(null) }),
           row({ icon: 'sparkles', title: 'Proposer une question', sub: 'Texte ou photo, envoyé à l’auteur', chev: true, onClick: () => this.openPropose() }),
           row({ icon: 'sliders', title: 'Paramètres', chev: true, onClick: () => this.push({ s: 'settings' }) }),
           canNotify && row({ icon: 'bell', title: 'Notifications', value: remOn ? st.time : 'Désactivées', chev: true, onClick: () => this.push({ s: 'notifications' }) }),
@@ -1232,6 +1254,9 @@ function Sheet({ sheet, onClose, onDown, onMove, onUp }) {
         {sheet.form && (
           <div style={{ padding: '12px 20px 0', display: 'flex', flexDirection: 'column', gap: 10 }}>
             <textarea value={sheet.form.value} onChange={sheet.form.onChange} placeholder={sheet.form.placeholder} maxLength={1000} rows={3} aria-label={sheet.form.placeholder} style={{ resize: 'none', padding: 12, borderRadius: 10, border: '1px solid var(--line)', background: 'var(--surface)', color: 'var(--text)', font: '400 16px/1.4 var(--font-body)' }} />
+            {sheet.form.image && (sheet.form.image.preview
+              ? <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}><img src={sheet.form.image.preview} alt="Capture" style={{ width: 56, height: 56, objectFit: 'cover', borderRadius: 8 }} /><span style={{ flex: 1, fontSize: 15, color: 'var(--text2)' }}>Capture jointe</span><button type="button" onClick={() => sheet.form.image.onPick(null)} style={{ padding: '8px 12px', border: 'none', borderRadius: 8, background: 'var(--surface2)', color: 'var(--text)', font: '600 14px/1 var(--font-body)', cursor: 'pointer' }}>Retirer</button></div>
+              : <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, minHeight: 48, borderRadius: 10, border: '1px dashed var(--line)', color: 'var(--primaryText)', fontWeight: 600, fontSize: 15, cursor: 'pointer' }}>{sheet.form.image.icon}{sheet.form.image.label}<input type="file" accept="image/*" onChange={(e) => sheet.form.image.onPick(e.target.files[0])} style={{ display: 'none' }} /></label>)}
             <button className="p-btn" onClick={sheet.form.send.onClick} disabled={sheet.form.send.disabled} style={{ ...btnPrimary, height: 54, opacity: sheet.form.send.disabled ? 0.45 : 1, cursor: sheet.form.send.disabled ? 'default' : 'pointer' }}>{sheet.form.send.label}</button>
           </div>
         )}
