@@ -1,0 +1,121 @@
+@import '@fontsource/barlow/400.css';
+@import '@fontsource/barlow/500.css';
+@import '@fontsource/barlow/600.css';
+@import '@fontsource/barlow/700.css';
+@import '@fontsource/barlow-condensed/400.css';
+@import '@fontsource/barlow-condensed/600.css';
+
+:root {
+  --font-heading: 'Barlow Condensed', system-ui, sans-serif;
+  --font-body: 'Barlow', system-ui, sans-serif;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body, #root { height: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg, #F5F6F8);
+  color: var(--text, #141821);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+  overscroll-behavior: none;
+  transition: background .25s;
+}
+
+h1, h2, h3 { font-family: var(--font-heading); font-weight: 600; }
+
+button { font: inherit; color: inherit; -webkit-tap-highlight-color: transparent; }
+button:disabled { cursor: default; }
+:focus { outline: none; }
+button:focus-visible, [role=button]:focus-visible, [role=switch]:focus-visible { outline: 2px solid #5980a6; outline-offset: 2px; }
+a { color: var(--primary); }
+
+@keyframes tcFade { from { opacity: 0 } to { opacity: 1 } }
+@keyframes tcUp { from { transform: translateY(100%) } to { transform: translateY(0) } }
+@keyframes tcRise { from { transform: translateY(8px); opacity: 0 } to { transform: none; opacity: 1 } }
+@keyframes tcShimmer { 0%, 100% { opacity: .5 } 50% { opacity: 1 } }
+@keyframes tcSpin { to { transform: rotate(360deg) } }
+
+/* Industry design system — blueprint frame with registration marks */
+.blueprint {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: 0;
+}
+.blueprint > .corner {
+  position: absolute; width: 11px; height: 11px;
+  color: color-mix(in srgb, var(--text) 55%, transparent);
+}
+.blueprint > .corner::before, .blueprint > .corner::after { content: ''; position: absolute; background: currentColor; }
+.blueprint > .corner::before { left: 5px; top: 0; width: 1px; height: 100%; }
+.blueprint > .corner::after { top: 5px; left: 0; width: 100%; height: 1px; }
+.blueprint > .corner.tl { top: -6px; left: -6px; }
+.blueprint > .corner.tr { top: -6px; right: -6px; }
+.blueprint > .corner.bl { bottom: -6px; left: -6px; }
+.blueprint > .corner.br { bottom: -6px; right: -6px; }
+
+/* App shell */
+.app {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  height: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  overflow: hidden;
+  transition: background .25s;
+}
+@media (min-width: 520px) {
+  .app { box-shadow: 0 0 0 1px var(--divider), 0 30px 60px rgba(0, 0, 0, .08); }
+}
+.safe-top { flex: none; height: max(var(--safe-top), 10px); }
+.safe-bottom { flex: none; height: max(var(--safe-bottom), 4px); }
+.scroller {
+  flex: 1; min-height: 0;
+  overflow-y: auto; overflow-x: hidden;
+  scrollbar-width: none;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+.scroller::-webkit-scrollbar, .chips::-webkit-scrollbar { display: none; }
+.chips { scrollbar-width: none; }
+
+.spinner {
+  width: 18px; height: 18px; border-radius: 50%;
+  border: 2px solid currentColor; border-right-color: transparent;
+  animation: tcSpin .7s linear infinite;
+}
+.spinner.sm { width: 16px; height: 16px; }
+
+/* Pressed states (design: style-active) */
+.p-bg2:active { background: var(--surface2) !important; }
+.p-star:active { transform: scale(.88); background: var(--surface2) !important; }
+.p-btn { transition: transform .1s, background .15s, opacity .15s; }
+.p-btn:not(:disabled):active { transform: scale(.98); background: var(--btnPressed) !important; }
+.p-empty:active { transform: scale(.97); background: var(--btnPressed) !important; }
+.p-tile { transition: transform .1s; }
+.p-tile:active { transform: scale(.97); background: var(--surface2) !important; }
+.p-card:active { transform: scale(.985); }
+.p-answer:not(:disabled):active { transform: scale(.985); }
+.p-chip:active { transform: scale(.96); }
+.p-row[role=button]:active, .p-row[role=switch]:active { background: var(--surface2); }
+.p-outline:not(:disabled):active { background: var(--tint) !important; transform: scale(.98); }
+.p-secondary:active { background: var(--surface2) !important; transform: scale(.98); }
+.p-tab:active { transform: scale(.92); }
+.p-danger:active { transform: scale(.98); filter: brightness(.92); }
+.p-cancel:active { transform: scale(.98); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
