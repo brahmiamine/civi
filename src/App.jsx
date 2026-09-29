@@ -12,7 +12,7 @@ const DEFAULT_SETTINGS = {
   text: 'Normale', instant: true, shuffle: true, sound: false, vibration: true, examLength: 40,
 };
 const IDENTITY = [0, 1, 2, 3];
-const darkQuery = typeof window !== 'undefined' && window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+const darkQuery = typeof window !== 'undefined' && window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;\nconst BRAND_ICON = import.meta.env.BASE_URL + 'brand-icon.svg';
 
 export default class App extends Component {
   constructor(p) {
@@ -516,12 +516,13 @@ function QuizBar({ b }) {
 function Home({ h }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
-      <div style={{ padding: '6px 20px 0', display: 'flex', flexDirection: 'column', gap: 6 }}>
-        <div style={{ display: 'flex', gap: 3, marginBottom: 6 }} aria-hidden="true">
-          <span style={{ width: 16, height: 4, background: 'var(--primary)' }} /><span style={{ width: 16, height: 4, background: 'var(--tcMid)' }} /><span style={{ width: 16, height: 4, background: 'var(--red)' }} />
+      <div style={{ padding: '6px 20px 0', display: 'flex', alignItems: 'center', gap: 13 }}>
+        <img src={BRAND_ICON} alt="" aria-hidden="true" style={{ width: 52, height: 52, flex: 'none', objectFit: 'contain', filter: 'drop-shadow(0 6px 12px rgba(20,55,130,.12))' }} />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--primaryText)' }}>Civi · Test Civique</div>
+          <h1 style={{ margin: 0, font: '600 32px/1.05 var(--font-heading)' }}>Bonjour 👋</h1>
+          <p style={{ margin: 0, fontSize: 15, color: 'var(--text2)' }}>Continue ta préparation</p>
         </div>
-        <h1 style={{ margin: 0, font: '600 32px/1.1 var(--font-heading)' }}>Bonjour 👋</h1>
-        <p style={{ margin: 0, fontSize: 16, color: 'var(--text2)' }}>Continue ta préparation</p>
       </div>
       <div style={{ padding: '0 20px' }}>
         <div className="blueprint" style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 14 }}>
