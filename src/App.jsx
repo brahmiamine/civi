@@ -29,14 +29,23 @@ const examMinutes = (n) => Math.max(1, Math.round((EXAM_SECONDS / 60) * (n / 40)
 // « Signaler » sends the report by e-mail to the maintainer through Web3Forms (public key, it can only send to that inbox).
 const WEB3FORMS_KEY = '8acd26cf-61e8-4f4c-9075-d0c2d884ba57';
 const REPORT_REASONS = ['Réponse incorrecte', 'Énoncé ambigu', 'Faute ou coquille', 'Information périmée', 'Autre'];
-function sendReport(prep, q, reason, comment) {
+// ctx: { prep, where, mode, chosen (original answer index or null), revealed }
+function sendReport(ctx, q, reason, comment) {
+  const L = (i) => LET[i] + '. ' + q.a[i];
+  const chosen = ctx.chosen == null ? 'pas encore répondu' : L(ctx.chosen) + (ctx.chosen === q.c ? ' (juste)' : ' (fausse)');
   const lines = [
-    'Préparation : ' + prep, 'Question : ' + q.id, 'Version : ' + APP_VERSION, 'Motif : ' + reason, 'Commentaire : ' + (comment || '—'), '',
-    q.q, ...q.a.map((a, i) => LET[i] + '. ' + a + (i === q.c ? '  ✅' : '')),
+    '=== SIGNALEMENT ===', 'Motif : ' + reason, 'Commentaire : ' + (comment || '—'), '',
+    '=== QUESTION ===', 'Identifiant : ' + q.id, 'Préparation : ' + ctx.prep, 'Fichier : ' + (q.lot || '—') + '.json',
+    'Thème : ' + thById(q.t).name, 'Type : ' + ([q.situation && 'mise en situation', q.trap && 'piège'].filter(Boolean).join(', ') || 'classique'), '',
+    'Énoncé :', q.q, '', 'Réponses :', ...q.a.map((_, i) => L(i) + (i === q.c ? '  ✅ bonne réponse' : '')), '',
+    'À retenir :', q.x || '—', '',
+    '=== CONTEXTE ===', 'Écran : ' + ctx.where + (ctx.mode ? ' (' + ctx.mode + ')' : ''), 'Réponse choisie : ' + chosen,
+    'Correction affichée : ' + (ctx.revealed ? 'oui' : 'non'), 'Version : ' + APP_VERSION,
+    'Date : ' + new Date().toLocaleString('fr-FR'), 'Appareil : ' + navigator.userAgent, 'Écran : ' + window.innerWidth + '×' + window.innerHeight,
   ];
   return fetch('https://api.web3forms.com/submit', {
     method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-    body: JSON.stringify({ access_key: WEB3FORMS_KEY, subject: 'Civi · Signalement ' + q.id + ' · ' + reason, from_name: 'Civi', message: lines.join('\n') }),
+    body: JSON.stringify({ access_key: WEB3FORMS_KEY, subject: 'Civi · Signalement ' + q.id + ' · ' + reason, from_name: 'Civi · ' + ctx.prep, message: lines.join('\n') }),
   }).then((r) => r.json()).then((j) => { if (!j.success) throw new Error(j.message); });
 }
 const plural = (n, word) => n + ' ' + word + (n > 1 ? 's' : '');
@@ -398,6 +407,16 @@ export default class App extends Component {
     }, 300);
   }
 
+  // Where the report comes from: quiz (answer picked or validated) or a question opened from errors, favourites, history…
+  reportCtx(bank, q) {
+    const c = this.cur(), z = this.prof().quiz, ctx = { prep: bank.name, where: 'question', mode: null, chosen: null, revealed: true };
+    if (c.s === 'quiz' && z && z.qs[z.idx] === q.id) {
+      const ans = z.validated ? z.answers[z.answers.length - 1] : null;
+      return { ...ctx, where: 'test', mode: z.title, chosen: ans ? ans.chosen : z.sel ?? null, revealed: !!(z.validated && z.instant) };
+    }
+    return { ...ctx, where: c.from ? 'question (' + c.from + ')' : 'question', chosen: c.chosen ?? null };
+  }
+
   sheetData() {
     const s = this.state, st = this.settings(), bank = this.bank(), P = this.prof(), TS = themeStats(bank, P);
     const opt = (label, sub, sel, fn, icon) => ({ label, sub, onClick: fn, icon, check: sel ? ic('check', 20, 2) : null, color: sel ? 'var(--primaryText)' : 'var(--text)', weight: sel ? 600 : 500, bg: sel ? 'var(--tint)' : 'transparent' });
@@ -436,7 +455,7 @@ export default class App extends Component {
           if (comment === null) return;
           this.closeSheet();
           if (!navigator.onLine) return this.toast('Pas de connexion : réessaie plus tard');
-          sendReport(bank.name, q, reason, (comment || '').slice(0, 1000)).then(() => this.toast('Merci, signalement envoyé'), () => this.toast('Échec de l’envoi, réessaie plus tard'));
+          sendReport(this.reportCtx(bank, q), q, reason, (comment || '').slice(0, 1000)).then(() => this.toast('Merci, signalement envoyé'), () => this.toast('Échec de l’envoi, réessaie plus tard'));
         };
         return { title: 'Signaler cette question', sub: 'Choisis le problème. Le signalement est envoyé anonymement à l’auteur de l’application.', options: REPORT_REASONS.map((r) => opt(r, null, false, () => send(r), ic('alert'))) };
       }
