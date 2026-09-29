@@ -3,8 +3,9 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   emptyProfile, recordAnswer, isMastered, updateErrors, secondsLeft, streakDays, dayKey, examSplit, pickExam, overview, passMark,
+  pickPool, examPool, resultEntry, answersPrint,
 } from '../src/stats.js';
-import { normProfile } from '../src/storage.js';
+import { normProfile, normSettings } from '../src/storage.js';
 
 const DAY = 864e5;
 const T0 = new Date(2026, 0, 10, 10).getTime();
@@ -47,10 +48,10 @@ test('answers count towards the day they were given', () => {
 
 test('« Mes erreurs » follows the answers', () => {
   let p = recordAnswer(emptyProfile(), 'x', false, T0);
-  p = updateErrors(p, 'x', false, 2, { auto: true, errorsMode: false });
-  assert.deepEqual(p.errors, [{ id: 'x', chosen: 2 }]);
+  p = updateErrors(p, 'x', false, 'Réponse C', { auto: true, errorsMode: false });
+  assert.deepEqual(p.errors, [{ id: 'x', pick: 'Réponse C' }]);
   // Automatic revision off: nothing is added.
-  assert.deepEqual(updateErrors(emptyProfile(), 'y', false, 1, { auto: false, errorsMode: false }).errors, []);
+  assert.deepEqual(updateErrors(emptyProfile(), 'y', false, 'b', { auto: false, errorsMode: false }).errors, []);
   // A single right answer outside « Mes erreurs » keeps it; answering it right in « Mes erreurs » removes it.
   let r = recordAnswer(p, 'x', true, T0 + 1);
   assert.equal(updateErrors(r, 'x', true, 0, { auto: true, errorsMode: false }).errors.length, 1);
@@ -101,6 +102,8 @@ test('overview counts only mastered questions in the preparation %', () => {
 });
 
 test('corrupted saved data is normalised instead of crashing', () => {
+  const old = normProfile({ errors: [{ id: 'a', chosen: 2 }, { id: 'b', pick: 'Oui' }] });
+  assert.deepEqual(old.errors, [{ id: 'a', pick: null }, { id: 'b', pick: 'Oui' }]); // old positions are dropped
   const p = normProfile({ stats: { a: { n: 2, ok: 5 }, b: 'x' }, errors: null, favs: [1, 'q'], history: [{ id: 1, score: 3, total: 4 }, { nope: true }], days: { '2026-01-01': 2, bad: 3 } }, { qs: [], idx: 0 });
   assert.deepEqual(p.stats, { a: { n: 2, ok: 2, s: 0, b: 0, t: 0, d: 0 } });
   assert.deepEqual(p.errors, []);
@@ -110,4 +113,56 @@ test('corrupted saved data is normalised instead of crashing', () => {
   assert.deepEqual(p.days, { '2026-01-01': 2 });
   assert.equal(p.quiz, null);
   assert.deepEqual(normProfile(null, null), emptyProfile());
+});
+
+test('theme and hard quizzes are capped, least mastered first', () => {
+  const b = bank(30);
+  let p = emptyProfile();
+  const pool = b.questions.filter((q) => q.t === 'valeurs');
+  pool.slice(0, 25).forEach((q) => { p = recordAnswer(recordAnswer(p, q.id, true, T0), q.id, true, T0 + 2 * DAY); });
+  const ids = pickPool(pool, p, 20);
+  assert.equal(ids.length, 20);
+  // The 5 questions not mastered come first.
+  assert.deepEqual(new Set(ids.slice(0, 5)), new Set(pool.slice(25).map((q) => q.id)));
+});
+
+test('questions that only exist in a lot are never drawn in the mock exam', () => {
+  const b = bank(20);
+  b.questions.filter((q) => q.t === 'valeurs').forEach((q) => { q.lotOnly = true; });
+  assert.equal(examPool(b).length, 80);
+  for (let i = 0; i < 20; i++) assert.ok(pickExam(b, 40).every((id) => !b.byId.get(id).lotOnly));
+});
+
+test('best exam score only compares exams of the full length', () => {
+  const h = (id, score, total) => ({ id, at: id, mode: 'exam', score, total, passed: score >= passMark(total), wrong: [], themes: {} });
+  const p = { ...emptyProfile(), history: [h(1, 10, 10), h(2, 38, 40), h(3, 30, 40)] };
+  const o = overview(bank(2), p);
+  assert.equal(o.best.score, 38);
+  assert.equal(o.best.total, 40);
+});
+
+test('result entry of a timed test that ran out of time', () => {
+  const b = bank(2), qs = ['valeurs0', 'droits0', 'histoire0'];
+  const q = { mode: 'exam', title: 'Examen blanc', qs, timed: true, limit: 60, endsAt: T0, answers: [{ id: 'valeurs0', chosen: 0, pick: 'a', ok: true }, { id: 'droits0', chosen: 1, pick: 'b', ok: false }] };
+  const e = resultEntry(b, q, T0 + 3600e3);
+  assert.equal(e.score, 1);
+  assert.equal(e.total, 3);
+  assert.equal(e.answered, 2);
+  assert.equal(e.used, 60);
+  assert.equal(e.passed, false);
+  assert.deepEqual(e.wrong, [{ id: 'droits0', pick: 'b' }, { id: 'histoire0', pick: null }]);
+  assert.deepEqual(e.themes, { valeurs: [1, 1], droits: [0, 1], histoire: [0, 1] });
+});
+
+test('the answers fingerprint changes when answers are reordered', () => {
+  const b = bank(1), before = answersPrint(b, ['valeurs0']);
+  const q = b.byId.get('valeurs0');
+  q.a = ['b', 'a', 'c', 'd']; q.c = 1;
+  assert.notEqual(answersPrint(b, ['valeurs0']), before);
+});
+
+test('invalid settings are dropped', () => {
+  assert.deepEqual(normSettings({ goal: 'abc', examLength: 40, theme: 'rose', text: 'Grande', time: '25:00', sound: 'yes', auto: false, prep: 'x', other: 1 }),
+    { examLength: 40, text: 'Grande', auto: false, prep: 'x' });
+  assert.deepEqual(normSettings(null), {});
 });

@@ -30,6 +30,10 @@ jobs:
       - run: npm run validate:data
       - run: npm test
       - run: npm run build
+      # Browser tests on the build (served at /), then the build for GitHub Pages (/civi/).
+      - run: npx playwright install --with-deps chromium
+      - run: npm run e2e
+      - run: npm run build
         env:
           BASE_PATH: /civi/
       - run: cp dist/index.html dist/404.html
