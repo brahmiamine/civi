@@ -1,0 +1,61 @@
+{
+  "nom": "Carte de séjour pluriannuelle",
+  "court": "Séjour pluriannuel",
+  "initiales": "SP",
+  "ordre": 1,
+  "description": "Les connaissances de base sur la République, la vie quotidienne et les situations courantes.",
+  "essentiel": {
+    "valeurs": [
+      "Devise : Liberté, Égalité, Fraternité.",
+      "Symboles : drapeau bleu, blanc, rouge, Marianne, La Marseillaise et le 14 juillet.",
+      "La laïcité : l’État est neutre et chacun est libre de croire ou de ne pas croire.",
+      "Les femmes et les hommes ont les mêmes droits."
+    ],
+    "institutions": [
+      "Le président de la République est élu au suffrage universel direct pour 5 ans.",
+      "Le Parlement (Assemblée nationale et Sénat) vote la loi.",
+      "Le maire dirige la commune.",
+      "Le préfet représente l’État dans le département et délivre les titres de séjour."
+    ],
+    "droits": [
+      "On est majeur à 18 ans.",
+      "L’instruction est obligatoire de 3 à 16 ans, pour les filles comme pour les garçons.",
+      "Payer ses impôts et respecter la loi sont des devoirs.",
+      "Les violences, dans le couple comme envers les enfants, sont punies par la loi (écoute : 3919)."
+    ],
+    "histoire": [
+      "1789 : début de la Révolution française.",
+      "Le 14 juillet est la fête nationale.",
+      "Paris est la capitale ; la Seine la traverse.",
+      "La France utilise l’euro et est un membre fondateur de l’Union européenne."
+    ],
+    "societe": [
+      "Urgences : 15 SAMU, 17 police, 18 pompiers, 112 numéro européen.",
+      "La Sécurité sociale rembourse une partie des frais de santé (carte Vitale).",
+      "L’école publique est gratuite et laïque.",
+      "Le français est la langue de la République."
+    ]
+  },
+  "dates": [
+    [
+      "1789",
+      "Révolution française et Déclaration des droits de l’homme et du citoyen"
+    ],
+    [
+      "1905",
+      "Loi de séparation des Églises et de l’État"
+    ],
+    [
+      "1944",
+      "Droit de vote des femmes"
+    ],
+    [
+      "1958",
+      "Constitution de la Ve République"
+    ],
+    [
+      "2002",
+      "L’euro remplace le franc"
+    ]
+  ]
+}

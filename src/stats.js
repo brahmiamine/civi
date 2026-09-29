@@ -1,0 +1,126 @@
+// Progress computed from what the learner actually answered, per profile.
+// stats[id] = { n: attempts, ok: correct answers, s: current streak of correct answers, b: Leitner box, t: last answer, d: next review }
+import { THEMES, EXAM_DIST, PASS_RATE, shuffle } from './constants.js';
+
+const DAY = 24 * 60 * 60 * 1000;
+// Spaced repetition: days before a question comes back, by box.
+const BOX_DAYS = [0, 1, 3, 7, 14, 30];
+
+export const pad = (n) => String(n).padStart(2, '0');
+export const dayKey = (d = new Date()) => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+const dayNum = (key) => { const [y, m, d] = key.split('-').map(Number); return Math.round(Date.UTC(y, m - 1, d) / DAY); };
+export const passMark = (total) => Math.ceil(total * PASS_RATE);
+
+export const emptyProfile = () => ({ stats: {}, errors: [], favs: [], history: [], days: {}, settings: {}, quiz: null });
+
+export function recordAnswer(p, id, ok, now = Date.now()) {
+  const prev = p.stats[id] || { n: 0, ok: 0, s: 0, b: 0 };
+  const b = ok ? Math.min(prev.b + 1, BOX_DAYS.length - 1) : 0;
+  const st = { n: prev.n + 1, ok: prev.ok + (ok ? 1 : 0), s: ok ? prev.s + 1 : 0, b, t: now, d: now + BOX_DAYS[b] * DAY };
+  const k = dayKey(new Date(now));
+  return { ...p, stats: { ...p.stats, [id]: st }, days: { ...p.days, [k]: (p.days[k] || 0) + 1 } };
+}
+
+// Mastered: last answer right, and either never missed or right twice in a row since.
+export const isMastered = (st) => !!st && (st.s >= 2 || (st.s >= 1 && st.ok === st.n));
+
+export function themeStats(bank, p) {
+  const out = {};
+  THEMES.forEach((t) => { out[t.id] = { total: 0, mastered: 0, seen: 0, n: 0, ok: 0 }; });
+  bank.questions.forEach((q) => {
+    const o = out[q.t], st = p.stats[q.id]; o.total++;
+    if (st) { o.seen++; o.n += st.n; o.ok += st.ok; if (isMastered(st)) o.mastered++; }
+  });
+  Object.values(out).forEach((o) => {
+    o.pct = o.total ? Math.round((o.mastered / o.total) * 100) : 0;
+    o.acc = o.n ? Math.round((o.ok / o.n) * 100) : null;
+  });
+  return out;
+}
+
+export function streakDays(days, now = new Date()) {
+  let d = new Date(now), n = 0;
+  if (!days[dayKey(d)]) d = new Date(d.getTime() - DAY); // today not started yet: the streak is still alive
+  while (days[dayKey(d)]) { n++; d = new Date(d.getTime() - DAY); }
+  return n;
+}
+
+export const lastActiveDay = (days) => Object.keys(days).filter((k) => days[k] > 0).sort().pop() || null;
+export const daysSince = (key, now = new Date()) => (key ? dayNum(dayKey(now)) - dayNum(key) : Infinity);
+
+export function overview(bank, p, now = Date.now()) {
+  let mastered = 0, seen = 0, n = 0, ok = 0, due = 0;
+  bank.questions.forEach((q) => {
+    const st = p.stats[q.id]; if (!st) return;
+    seen++; n += st.n; ok += st.ok; if (isMastered(st)) mastered++; if (st.d <= now) due++;
+  });
+  const total = bank.questions.length;
+  const exams = p.history.filter((h) => h.mode === 'exam');
+  const best = exams.reduce((b, h) => (!b || h.score / h.total > b.score / b.total ? h : b), null);
+  return {
+    total, mastered, seen, unseen: total - seen, due, attempts: n, correct: ok,
+    pct: total ? Math.round((mastered / total) * 100) : 0,
+    accuracy: n ? Math.round((ok / n) * 100) : null,
+    exams: exams.length, passed: exams.filter((h) => h.passed).length, best, lastExam: exams[0] || null,
+    today: p.days[dayKey(new Date(now))] || 0, streak: streakDays(p.days, new Date(now)),
+  };
+}
+
+// Weakest themes first: lowest mastery, then lowest accuracy. Fully mastered themes are never "weak".
+export function weakThemes(bank, p, k = 3) {
+  const ts = themeStats(bank, p);
+  return THEMES.filter((t) => ts[t.id].total && ts[t.id].pct < 100)
+    .sort((a, b) => ts[a.id].pct - ts[b.id].pct || (ts[a.id].acc ?? 101) - (ts[b.id].acc ?? 101))
+    .slice(0, k)
+    .map((t) => ({ ...t, ...ts[t.id] }));
+}
+
+// Smart revision: questions due for review (spaced repetition) first, then new questions from the weakest themes,
+// then the questions seen the longest time ago.
+export function pickSmart(bank, p, n, now = Date.now()) {
+  const ts = themeStats(bank, p), S = p.stats;
+  const due = bank.questions.filter((q) => S[q.id] && S[q.id].d <= now).sort((a, b) => S[a.id].b - S[b.id].b || S[a.id].d - S[b.id].d);
+  const fresh = shuffle(bank.questions.filter((q) => !S[q.id])).sort((a, b) => ts[a.t].pct - ts[b.t].pct);
+  const later = bank.questions.filter((q) => S[q.id] && S[q.id].d > now).sort((a, b) => S[a.id].t - S[b.id].t);
+  const nDue = Math.min(due.length, Math.max(1, Math.ceil(n * 0.7)));
+  let pick = due.slice(0, nDue);
+  pick = pick.concat(fresh.slice(0, n - pick.length));
+  pick = pick.concat(due.slice(nDue, nDue + n - pick.length));
+  pick = pick.concat(later.slice(0, n - pick.length));
+  return shuffle(pick).map((q) => q.id);
+}
+
+export function smartPlan(bank, p, n, now = Date.now()) {
+  const S = p.stats; let due = 0, fresh = 0;
+  bank.questions.forEach((q) => { if (!S[q.id]) fresh++; else if (S[q.id].d <= now) due++; });
+  const d = Math.min(due, Math.max(1, Math.ceil(n * 0.7)));
+  const f = Math.min(fresh, n - d);
+  return { due, fresh, dueNow: d, freshNow: f, size: Math.min(n, bank.questions.length) };
+}
+
+// Weak points: unmastered questions of the weakest themes, missed ones first.
+export function pickWeak(bank, p, n = 10) {
+  const themes = weakThemes(bank, p).map((t) => t.id), S = p.stats;
+  const acc = (q) => (S[q.id] ? S[q.id].ok / S[q.id].n : 0.5);
+  const pool = bank.questions.filter((q) => themes.includes(q.t) && !isMastered(S[q.id]));
+  return shuffle(pool).sort((a, b) => acc(a) - acc(b)).slice(0, n).map((q) => q.id);
+}
+
+// Hard questions: those flagged as traps plus those the learner misses most often.
+export function hardPool(bank, p) {
+  const S = p.stats;
+  return bank.questions.filter((q) => q.trap || (S[q.id] && S[q.id].n > S[q.id].ok && S[q.id].ok / S[q.id].n < 0.6));
+}
+
+// Exam: follows the official split by theme, scaled to the requested length; gaps are filled from other themes.
+export function pickExam(bank, n) {
+  n = Math.min(n, bank.questions.length);
+  const total = Object.values(EXAM_DIST).reduce((a, b) => a + b, 0);
+  const by = {}; THEMES.forEach((t) => { by[t.id] = shuffle(bank.questions.filter((q) => q.t === t.id)); });
+  let pick = [];
+  THEMES.forEach((t) => { pick = pick.concat(by[t.id].splice(0, Math.round((EXAM_DIST[t.id] * n) / total))); });
+  if (pick.length > n) pick = shuffle(pick).slice(0, n);
+  const rest = shuffle(THEMES.flatMap((t) => by[t.id]));
+  pick = pick.concat(rest.slice(0, n - pick.length));
+  return shuffle(pick).map((q) => q.id);
+}

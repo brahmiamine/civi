@@ -1,19 +1,45 @@
 import { Component, createRef } from 'react';
 import { ic } from './Icon.jsx';
+import { THEMES, LET, MODE_T, TABS, PAL, EXAM_SECONDS, thById, shuffle, fmt } from './constants.js';
+import { PREPS, prepById, hasPrep } from './bank.js';
 import {
-  THEMES, Q, FACTS, DATES, HISTORY, TRAPS, INIT_ERR, LET, MODE_T, TABS, PAL, EXAM_SECONDS,
-  qById, thById, shuffle, fmt,
-} from './data.js';
-import { loadSaved, save } from './storage.js';
-import { canInstall, isIOS, isStandalone, onInstallChange, promptInstall } from './install.js';
+  emptyProfile, recordAnswer, isMastered, themeStats, overview, weakThemes, pickSmart, smartPlan, pickWeak, hardPool, pickExam,
+  passMark, dayKey, lastActiveDay,
+} from './stats.js';
+import { loadSettings, saveSettings, loadProfile, saveProfile, saveQuiz } from './storage.js';
+import { canInstall, isIOS, isStandalone, onInstallChange, promptInstall, installHelp } from './install.js';
+import { notifSupported, notifPermission, askPermission, pushConfig, checkReminders, testNotification, onReminderMessage } from './notify.js';
 
-const DEFAULT_SETTINGS = {
-  theme: 'system', prep: 'Carte de résident', goal: 10, auto: true, reminder: true, time: '19:00', streak: true,
-  text: 'Normale', instant: true, shuffle: true, sound: false, vibration: true, examLength: 40,
+// Device-wide settings; the preparation-specific ones live in each profile.
+const DEVICE_DEFAULTS = {
+  theme: 'system', text: 'Normale', instant: true, shuffle: true, sound: false, vibration: true,
+  reminder: false, time: '19:00', streak: false, installDismissed: false,
 };
-const IDENTITY = [0, 1, 2, 3];
+const PROFILE_DEFAULTS = { goal: 10, auto: true, examLength: 40 };
+const PROFILE_KEYS = Object.keys(PROFILE_DEFAULTS);
+const DEFAULT_PREP = 'carte-resident';
+const EMPTY_STACKS = () => ({ home: [], revise: [], test: [], progress: [], profile: [] });
+const EMPTY_MSG = { weak: 'Aucun point faible détecté pour l’instant', hard: 'Aucune question difficile pour l’instant', errors: 'Aucune erreur à revoir' };
 const darkQuery = typeof window !== 'undefined' && window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
 const BRAND_ICON = import.meta.env.BASE_URL + 'brand-icon.svg';
+const APP_VERSION = __APP_VERSION__;
+
+// The official exam gives 45 minutes for 40 questions; shorter tests get proportional time.
+const examMinutes = (n) => Math.max(1, Math.round((EXAM_SECONDS / 60) * (n / 40)));
+const plural = (n, word) => n + ' ' + word + (n > 1 ? 's' : '');
+const fmtWhen = (ts) => {
+  const d = new Date(ts);
+  return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) + ' · ' + d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+};
+const bestOf = (list) => list.reduce((b, h) => (!b || h.score / h.total > b.score / b.total ? h : b), null);
+
+// Drops references to questions that no longer exist in the bank (lot files edited or removed).
+function cleanProfile(bank, p) {
+  const has = (id) => bank.byId.has(id);
+  let quiz = p.quiz;
+  if (quiz && (!Array.isArray(quiz.qs) || !quiz.qs.length || !quiz.qs.every(has))) quiz = null;
+  return { ...p, errors: p.errors.filter((e) => has(e.id)), favs: p.favs.filter(has), quiz };
+}
 
 export default class App extends Component {
   constructor(p) {
@@ -25,13 +51,25 @@ export default class App extends Component {
     this.pendingY = null;
     this.sig = '';
     this.dragY = null;
-    const saved = loadSaved();
+    const saved = loadSettings();
+    this.firstRun = !saved || !hasPrep(saved.prep);
+    const { prep: savedPrep, ...device } = saved || {};
+    const prep = hasPrep(savedPrep) ? savedPrep : (hasPrep(DEFAULT_PREP) ? DEFAULT_PREP : PREPS[0].id);
+    const profiles = {};
+    PREPS.forEach((b) => { profiles[b.id] = cleanProfile(b, loadProfile(b.id)); });
+    // A quiz that was on screen when the page was closed or reloaded is reopened where it was.
+    const stacks = EMPTY_STACKS();
+    let tab = 'home';
+    const q = profiles[prep].quiz;
+    if (q && q.open) {
+      tab = stacks[q.tab] ? q.tab : 'test';
+      stacks[tab] = [{ s: 'quiz' }];
+      profiles[prep] = { ...profiles[prep], quiz: { ...q, endsAt: q.timed ? Date.now() + q.timeLeft * 1000 : 0 } };
+    }
     this.state = {
-      tab: 'home', stacks: { home: [], revise: [], test: [], progress: [], profile: [] }, dir: 'tab', quiz: null,
-      sheet: null, closing: false, drag: 0, dragging: false, toast: null, loading: null,
-      favs: saved?.favs ?? [], errors: saved?.errors ?? INIT_ERR.slice(), last: null, skeleton: false, flip: false, fc: 0,
-      reset: saved?.reset ?? false, systemDark: darkQuery ? darkQuery.matches : false, installable: canInstall(),
-      settings: { ...DEFAULT_SETTINGS, ...(saved?.settings || {}) },
+      tab, stacks, dir: 'tab', prep, profiles, device: { ...DEVICE_DEFAULTS, ...device },
+      sheet: null, closing: false, drag: 0, dragging: false, toast: null, loading: null, skeleton: false, flip: false, fc: 0,
+      systemDark: darkQuery ? darkQuery.matches : false, installable: canInstall(), notif: notifPermission(),
     };
     this.applyChrome();
   }
@@ -40,9 +78,16 @@ export default class App extends Component {
     this.sig = this.sigOf();
     this.onScheme = (e) => this.setState({ systemDark: e.matches });
     darkQuery?.addEventListener?.('change', this.onScheme);
-    this.offInstall = onInstallChange(() => this.setState({ installable: canInstall() }));
+    this.offInstall = onInstallChange(() => {
+      const installable = canInstall();
+      if (this.state.installable && !installable && isStandalone()) this.toast('Application installée');
+      this.setState({ installable });
+    });
+    this.offReminder = onReminderMessage((m) => this.toast(m.title + ' — ' + m.body, 5000, 'bell'));
+    // Shortcuts from the installed app icon (see manifest shortcuts).
+    const go = new URLSearchParams(location.search).get('go');
     // Android / browser back button drives the in-app navigation stack.
-    history.replaceState({ tc: 'root' }, '');
+    history.replaceState({ tc: 'root' }, '', location.pathname + location.hash);
     history.pushState({ tc: 'guard' }, '');
     this.onPop = () => {
       const s = this.state;
@@ -59,23 +104,49 @@ export default class App extends Component {
     window.addEventListener('popstate', this.onPop);
     this.onKey = (e) => { if (e.key === 'Escape') { e.preventDefault(); this.back(); } };
     window.addEventListener('keydown', this.onKey);
+    this.onVisible = () => {
+      if (document.visibilityState !== 'visible') return;
+      this.setState({ notif: notifPermission() });
+      this.tick();
+      checkReminders();
+    };
+    document.addEventListener('visibilitychange', this.onVisible);
     this.applyChrome();
+    saveSettings({ ...this.state.device, prep: this.state.prep });
+    const q = this.prof().quiz;
+    if (q && q.open) this.startTimer(q);
+    else if (this.firstRun) this.openSheet('prep');
+    else if (go === 'exam') this.push({ s: 'examIntro' });
+    else if (go === 'smart') this.startQuiz('smart');
+    else if (go === 'resume' && q) this.resumeQuiz();
+    this.syncReminders();
+    this.remTimer = setInterval(() => checkReminders(), 60 * 1000);
   }
 
   componentWillUnmount() {
-    clearInterval(this.timer); clearTimeout(this.tt); clearTimeout(this.sk); clearTimeout(this.cs);
+    clearInterval(this.timer); clearInterval(this.remTimer); clearTimeout(this.tt); clearTimeout(this.sk); clearTimeout(this.cs); clearTimeout(this.rs);
     darkQuery?.removeEventListener?.('change', this.onScheme);
     this.offInstall?.();
+    this.offReminder?.();
     window.removeEventListener('popstate', this.onPop);
     window.removeEventListener('keydown', this.onKey);
+    document.removeEventListener('visibilitychange', this.onVisible);
   }
 
   componentDidUpdate(_, ps) {
     const s = this.state;
-    if (ps.settings !== s.settings || ps.errors !== s.errors || ps.favs !== s.favs || ps.reset !== s.reset) {
-      save({ settings: s.settings, errors: s.errors, favs: s.favs, reset: s.reset });
+    if (ps.device !== s.device || ps.prep !== s.prep) saveSettings({ ...s.device, prep: s.prep });
+    if (ps.profiles !== s.profiles) {
+      Object.keys(s.profiles).forEach((id) => {
+        const a = ps.profiles[id], b = s.profiles[id];
+        if (a === b) return;
+        if (['stats', 'errors', 'favs', 'history', 'days', 'settings'].some((k) => a[k] !== b[k])) saveProfile(id, b);
+        if (a.quiz !== b.quiz) saveQuiz(id, b.quiz);
+      });
     }
-    if (ps.settings.theme !== s.settings.theme || ps.systemDark !== s.systemDark) this.applyChrome();
+    const pa = ps.profiles[s.prep], pb = s.profiles[s.prep];
+    if (ps.device !== s.device || ps.prep !== s.prep || ps.notif !== s.notif || pa.days !== pb.days || pa.settings !== pb.settings) this.syncReminders();
+    if (ps.device.theme !== s.device.theme || ps.systemDark !== s.systemDark) this.applyChrome();
     if (this.pendingY != null && this.scrollRef.current) { this.scrollRef.current.scrollTop = this.pendingY; this.pendingY = null; }
     const sig = this.sigOf();
     if (sig !== this.sig) {
@@ -90,7 +161,7 @@ export default class App extends Component {
   }
 
   isDark() {
-    const t = this.state.settings.theme;
+    const t = this.state.device.theme;
     return t === 'system' ? this.state.systemDark : t === 'dark';
   }
 
@@ -103,7 +174,15 @@ export default class App extends Component {
     document.querySelectorAll('meta[name=theme-color]').forEach((m) => m.setAttribute('content', P.bg));
   }
 
-  sigOf() { const c = this.cur(); return this.state.tab + '/' + c.s + '/' + (c.id || ''); }
+  // Active preparation = the "signed-in" profile: its own questions, stats, history, errors, favourites and quiz.
+  bank() { return prepById(this.state.prep); }
+  prof() { return this.state.profiles[this.state.prep]; }
+  // Values migrated from the first version (goal, exam length…) act as defaults for every profile.
+  settings() { return { ...PROFILE_DEFAULTS, ...this.state.device, ...this.prof().settings }; }
+  updP(fn) { this.setState((s) => ({ profiles: { ...s.profiles, [s.prep]: fn(s.profiles[s.prep]) } })); }
+  setQuiz(q) { this.updP((p) => ({ ...p, quiz: q })); }
+
+  sigOf() { const c = this.cur(); return this.state.prep + '/' + this.state.tab + '/' + c.s + '/' + (c.id || c.hid || ''); }
   cur() { const st = this.state.stacks[this.state.tab]; return st.length ? st[st.length - 1] : { s: this.state.tab }; }
   y() { const el = this.scrollRef.current; return el ? el.scrollTop : 0; }
 
@@ -138,51 +217,84 @@ export default class App extends Component {
   goHome() { const { tab, stacks } = this.state; const st = stacks[tab].slice(); st.pop(); this.pendingY = this.rootY.home = 0; this.setState({ stacks: { ...stacks, [tab]: st, home: [] }, tab: 'home', dir: 'tab' }); }
   pushTheme(id) { this.push({ s: 'theme', id }); this.setState({ skeleton: true }); clearTimeout(this.sk); this.sk = setTimeout(() => this.setState({ skeleton: false }), 480); }
 
+  // Switching preparation is like switching account: everything shown is reloaded from that profile.
+  switchPrep(id) {
+    this.closeSheet();
+    this.firstRun = false;
+    if (id === this.state.prep) return;
+    clearInterval(this.timer);
+    this.rootY = {}; this.pendingY = 0;
+    this.setState((s) => {
+      const old = s.profiles[s.prep];
+      const profiles = old.quiz?.open ? { ...s.profiles, [s.prep]: { ...old, quiz: { ...old.quiz, open: false } } } : s.profiles;
+      return { prep: id, profiles, stacks: EMPTY_STACKS(), fc: 0, flip: false, dir: 'tab' };
+    });
+    this.toast('Préparation : ' + prepById(id).name);
+  }
+
   buildQuiz(mode, arg) {
-    const st = this.state.settings;
-    let pool = Q, n = 10;
-    if (mode === 'theme') { pool = Q.filter((q) => q.t === arg); n = pool.length; }
-    if (mode === 'hard') { pool = Q.filter((q) => TRAPS.includes(q.id)); n = pool.length; }
-    if (mode === 'weak' || mode === 'smart') { pool = Q.filter((q) => ['hist', 'soc', 'inst'].includes(q.t)); n = mode === 'smart' ? 6 : pool.length; }
-    if (mode === 'errors') { pool = Q.filter((q) => this.state.errors.some((e) => e.id === q.id)); n = pool.length; }
-    if (mode === 'quick') n = arg;
-    if (mode === 'exam') n = st.examLength;
-    let qs = []; while (qs.length < n) qs = qs.concat(shuffle(pool)); qs = qs.slice(0, n).map((q) => q.id);
+    const st = this.settings(), bank = this.bank(), P = this.prof();
+    const ids = (list) => list.map((q) => q.id);
+    let qs = [], title = MODE_T[mode], timed = false, lot = null;
+    if (mode === 'theme') { qs = ids(shuffle(bank.questions.filter((q) => q.t === arg))); title = 'Quiz · ' + thById(arg).short; }
+    if (mode === 'hard') qs = ids(shuffle(hardPool(bank, P)));
+    if (mode === 'weak') qs = pickWeak(bank, P, 10);
+    if (mode === 'smart') qs = pickSmart(bank, P, Math.max(5, st.goal));
+    if (mode === 'errors') qs = shuffle(P.errors.map((e) => e.id));
+    if (mode === 'quick') qs = ids(shuffle(bank.questions).slice(0, arg));
+    if (mode === 'exam') { qs = pickExam(bank, st.examLength); timed = true; }
+    if (mode === 'lot') {
+      const L = bank.lots.find((l) => l.id === arg.id);
+      if (L) { qs = L.qs.slice(); lot = L.id; title = L.title + (arg.timed ? ' · examen' : ''); timed = !!arg.timed; }
+    }
+    if (!qs.length) return null;
     const orders = {};
-    if (st.shuffle) qs.forEach((id) => { if (!orders[id]) orders[id] = shuffle(IDENTITY); });
-    const exam = mode === 'exam';
+    if (st.shuffle) qs.forEach((id) => { orders[id] = shuffle(bank.byId.get(id).a.map((_, i) => i)); });
+    const limit = timed ? examMinutes(qs.length) * 60 : 0;
     return {
-      mode, title: mode === 'theme' ? 'Quiz · ' + thById(arg).short : MODE_T[mode], qs, orders, idx: 0, sel: null, validated: false, answers: [],
-      timed: exam, endsAt: exam ? Date.now() + EXAM_SECONDS * 1000 : 0, timeLeft: exam ? EXAM_SECONDS : 0, instant: !exam && st.instant,
+      mode, lot, title, qs, orders, idx: 0, sel: null, validated: false, answers: [], instant: !timed && st.instant,
+      timed, limit, timeLeft: limit, endsAt: timed ? Date.now() + limit * 1000 : 0, startedAt: Date.now(), open: true, tab: this.state.tab,
     };
   }
-  startQuiz(mode, arg, load) {
+  startQuiz(mode, arg, load, force) {
     if (this.state.loading) return;
+    if (this.prof().quiz && !force) { this.pending = [mode, arg, load]; return this.openSheet('replace'); }
     if (this.state.sheet) this.closeSheet();
     const go = () => {
       const q = this.buildQuiz(mode, arg);
-      this.setState({ loading: null, quiz: q }); this.push({ s: 'quiz' });
-      clearInterval(this.timer); if (q.timed) this.timer = setInterval(() => this.tick(), 1000);
+      this.setState({ loading: null });
+      if (!q) return this.toast(EMPTY_MSG[mode] || 'Aucune question disponible');
+      this.setQuiz(q); this.push({ s: 'quiz' }); this.startTimer(q);
     };
     if (load) { this.setState({ loading: load }); setTimeout(go, 550); } else go();
   }
+  resumeQuiz() {
+    const q = this.prof().quiz; if (!q) return;
+    if (this.state.sheet) this.closeSheet();
+    const nq = { ...q, open: true, tab: this.state.tab, endsAt: q.timed ? Date.now() + q.timeLeft * 1000 : 0 };
+    this.setQuiz(nq); this.push({ s: 'quiz' }); this.startTimer(nq);
+  }
+  startTimer(q) { clearInterval(this.timer); if (q.timed) this.timer = setInterval(() => this.tick(), 1000); }
   // Time is derived from a deadline so the countdown stays correct when the app is backgrounded.
+  // It is paused when the test is left (saved) or the page is closed, and resumes where it stopped.
   tick() {
-    const q = this.state.quiz; if (!q || !q.timed) return clearInterval(this.timer);
+    const q = this.prof().quiz; if (!q || !q.timed || !q.open) return clearInterval(this.timer);
     const left = Math.max(0, Math.ceil((q.endsAt - Date.now()) / 1000));
     if (left <= 0) return this.finish({ ...q, timeLeft: 0 });
-    if (left !== q.timeLeft) this.setState({ quiz: { ...q, timeLeft: left } });
+    if (left !== q.timeLeft) this.updP((p) => (p.quiz ? { ...p, quiz: { ...p.quiz, timeLeft: left } } : p));
   }
-  select(i) { const q = this.state.quiz; if (!q || q.validated) return; this.setState({ quiz: { ...q, sel: i } }); }
+  select(i) { const q = this.prof().quiz; if (!q || q.validated) return; this.setQuiz({ ...q, sel: i }); }
   primaryQuiz() {
-    const q = this.state.quiz; if (!q) return; if (q.validated) return this.nextQ(); if (q.sel == null) return;
-    const id = q.qs[q.idx]; const ok = qById(id).c === q.sel; const answers = q.answers.concat([{ id, chosen: q.sel, ok }]);
+    const q = this.prof().quiz; if (!q) return; if (q.validated) return this.nextQ(); if (q.sel == null) return;
+    const id = q.qs[q.idx]; const ok = this.bank().byId.get(id).c === q.sel; const answers = q.answers.concat([{ id, chosen: q.sel, ok }]);
     this.feedback(ok, q.instant);
-    if (q.instant) this.setState({ quiz: { ...q, answers, validated: true } });
-    else { const nq = { ...q, answers }; if (q.idx + 1 >= q.qs.length) this.finish(nq); else this.setState({ quiz: { ...nq, idx: q.idx + 1, sel: null } }); }
+    if (q.instant) return this.updP((p) => ({ ...recordAnswer(p, id, ok), quiz: { ...q, answers, validated: true } }));
+    const nq = { ...q, answers };
+    if (q.idx + 1 >= q.qs.length) { this.updP((p) => recordAnswer(p, id, ok)); this.finish(nq); }
+    else this.updP((p) => ({ ...recordAnswer(p, id, ok), quiz: { ...nq, idx: q.idx + 1, sel: null } }));
   }
   feedback(ok, instant) {
-    const st = this.state.settings;
+    const st = this.settings();
     if (!instant) return;
     if (st.vibration && navigator.vibrate) navigator.vibrate(ok ? 18 : [30, 60, 30]);
     if (st.sound) {
@@ -195,73 +307,145 @@ export default class App extends Component {
       } catch { /* audio unavailable */ }
     }
   }
-  nextQ() { const q = this.state.quiz; if (q.idx + 1 >= q.qs.length) return this.finish(q); this.setState({ quiz: { ...q, idx: q.idx + 1, sel: null, validated: false } }); }
+  nextQ() { const q = this.prof().quiz; if (q.idx + 1 >= q.qs.length) return this.finish(q); this.setQuiz({ ...q, idx: q.idx + 1, sel: null, validated: false }); }
+  // Every finished test is kept in the profile history, with its wrong answers and per-theme score.
   finish(q) {
-    clearInterval(this.timer);
-    const score = q.answers.filter((a) => a.ok).length, total = q.qs.length; const seen = {};
-    const wrong = q.answers.filter((a) => !a.ok && !seen[a.id] && (seen[a.id] = 1));
-    let errs = this.state.errors.slice();
-    if (q.mode === 'errors') errs = errs.filter((e) => !q.answers.some((a) => a.id === e.id && a.ok));
-    wrong.forEach((w) => { if (!errs.some((e) => e.id === w.id)) errs.push({ id: w.id, chosen: w.chosen }); });
-    this.setState({ quiz: null, errors: errs, last: { mode: q.mode, title: q.title, score, total, wrong, used: q.timed ? EXAM_SECONDS - q.timeLeft : null } });
-    this.replaceTop({ s: 'result' });
+    clearInterval(this.timer); if (this.state.sheet) this.closeSheet();
+    const bank = this.bank(), st = this.settings(), now = Date.now();
+    const byId = new Map(q.answers.map((a) => [a.id, a]));
+    const score = q.answers.filter((a) => a.ok).length, total = q.qs.length;
+    const wrong = q.qs.filter((id) => !byId.get(id)?.ok).map((id) => ({ id, chosen: byId.has(id) ? byId.get(id).chosen : null }));
+    const themes = {};
+    q.qs.forEach((id) => { const t = bank.byId.get(id).t; const o = themes[t] || (themes[t] = [0, 0]); o[1]++; if (byId.get(id)?.ok) o[0]++; });
+    const entry = {
+      id: now, at: now, mode: q.mode, title: q.title, lot: q.lot || null, score, total, answered: q.answers.length,
+      used: q.timed ? q.limit - q.timeLeft : null, passed: score >= passMark(total), wrong, themes,
+    };
+    this.updP((p) => {
+      let errs = p.errors;
+      if (q.mode === 'errors') errs = errs.filter((e) => !byId.get(e.id)?.ok);
+      if (st.auto) {
+        q.answers.filter((a) => !a.ok).forEach((a) => {
+          errs = errs.some((e) => e.id === a.id) ? errs.map((e) => (e.id === a.id ? { id: a.id, chosen: a.chosen } : e)) : errs.concat([{ id: a.id, chosen: a.chosen }]);
+        });
+      }
+      return { ...p, quiz: null, errors: errs, history: [entry].concat(p.history).slice(0, 200) };
+    });
+    this.replaceTop({ s: 'result', hid: entry.id, fresh: true });
   }
-  quitQuiz() {
+  quitQuiz(keep) {
     clearInterval(this.timer); this.closeSheet();
+    const q = this.prof().quiz;
+    this.setQuiz(keep && q ? { ...q, open: false } : null);
     const { tab, stacks } = this.state; const st = stacks[tab].slice(); st.pop(); const top = st[st.length - 1];
     this.pendingY = top ? (top.y || 0) : (this.rootY[tab] || 0);
-    this.setState({ quiz: null, stacks: { ...stacks, [tab]: st }, dir: 'pop' });
+    this.setState({ stacks: { ...stacks, [tab]: st }, dir: 'pop' });
+    this.toast(keep ? 'Test sauvegardé : tu peux le reprendre' : 'Test abandonné');
   }
   openSheet(t) { this.setState({ sheet: t, closing: false, drag: 0 }); }
   closeSheet() { if (!this.state.sheet) return; this.setState({ closing: true }); clearTimeout(this.cs); this.cs = setTimeout(() => this.setState({ sheet: null, closing: false, drag: 0 }), 210); }
-  setS(k, v, msg) { this.setState((s) => ({ settings: { ...s.settings, [k]: v } })); this.toast(msg || 'Paramètre enregistré'); }
-  toast(m) { clearTimeout(this.tt); this.setState({ toast: { m } }); this.tt = setTimeout(() => this.setState({ toast: null }), 1900); }
-  toggleFav(id) { const f = this.state.favs; const has = f.includes(id); this.setState({ favs: has ? f.filter((x) => x !== id) : f.concat([id]) }); this.toast(has ? 'Retiré des favoris' : 'Ajouté aux favoris'); }
+  setS(k, v, msg) {
+    if (PROFILE_KEYS.includes(k)) this.updP((p) => ({ ...p, settings: { ...p.settings, [k]: v } }));
+    else this.setState((s) => ({ device: { ...s.device, [k]: v } }));
+    if (msg !== false) this.toast(msg || 'Paramètre enregistré');
+  }
+  toast(m, ms = 1900, icon = 'check') { clearTimeout(this.tt); this.setState({ toast: { m, icon } }); this.tt = setTimeout(() => this.setState({ toast: null }), ms); }
+  toggleFav(id) { const has = this.prof().favs.includes(id); this.updP((p) => ({ ...p, favs: has ? p.favs.filter((x) => x !== id) : p.favs.concat([id]) })); this.toast(has ? 'Retiré des favoris' : 'Ajouté aux favoris'); }
+  resetProfile() {
+    clearInterval(this.timer);
+    this.updP((p) => ({ ...emptyProfile(), settings: p.settings }));
+    this.closeSheet(); this.toast('Progression réinitialisée');
+  }
   async install() {
-    if (isIOS()) return this.openSheet('installIOS');
+    if (!this.state.installable) return this.openSheet('installHelp');
     const outcome = await promptInstall();
-    if (outcome === 'accepted') this.toast('Application installée');
+    if (outcome === 'accepted') this.toast('Installation en cours…');
     this.setState({ installable: canInstall() });
   }
 
+  // Reminders need the browser permission; they are only switched on once it is granted.
+  async toggleReminder(k) {
+    const on = !(this.settings()[k] && this.state.notif === 'granted');
+    if (on) {
+      let perm = notifPermission();
+      if (perm === 'default') perm = await askPermission();
+      this.setState({ notif: perm });
+      if (perm !== 'granted') return this.toast(perm === 'denied' ? 'Notifications bloquées dans le navigateur' : 'Autorisation non accordée', 3200, 'x');
+    }
+    this.setS(k, on, on ? 'Rappel activé' : 'Rappel désactivé');
+  }
+  syncReminders() {
+    clearTimeout(this.rs);
+    this.rs = setTimeout(() => {
+      const st = this.settings(), P = this.prof(), today = dayKey(), granted = this.state.notif === 'granted';
+      pushConfig({
+        reminder: granted && st.reminder, streak: granted && st.streak, time: st.time, goal: st.goal, prep: this.bank().name,
+        days: { [today]: P.days[today] || 0 }, lastActive: lastActiveDay(P.days),
+      }).then(() => checkReminders());
+    }, 300);
+  }
+
   sheetData() {
-    const s = this.state, st = s.settings, pctOf = (t) => (s.reset ? 0 : t.p);
+    const s = this.state, st = this.settings(), bank = this.bank(), P = this.prof(), TS = themeStats(bank, P);
     const opt = (label, sub, sel, fn, icon) => ({ label, sub, onClick: fn, icon, check: sel ? ic('check', 20, 2) : null, color: sel ? 'var(--primaryText)' : 'var(--text)', weight: sel ? 600 : 500, bg: sel ? 'var(--tint)' : 'transparent' });
     const pick = (k, list) => list.map((o) => opt(o[1], o[2], st[k] === o[0], () => { this.setS(k, o[0]); this.closeSheet(); }));
+    const n = bank.questions.length;
     switch (s.sheet) {
-      case 'count': return { title: 'Quiz rapide', sub: 'Combien de questions ?', options: [[5, 3], [10, 6], [20, 12], [40, 24]].map(([n, m]) => opt(n + ' questions', '≈ ' + m + ' min', false, () => this.startQuiz('quick', n))) };
-      case 'theme': return { title: 'Quiz par thème', sub: 'Choisis un thème', options: THEMES.map((t) => opt(t.name, pctOf(t) + ' % maîtrisé', false, () => this.startQuiz('theme', t.id), ic(t.icon))) };
-      case 'quit': return { title: 'Quitter le test ?', sub: 'Votre progression actuelle sera perdue.', confirm: { ok: 'Quitter', cancel: 'Annuler', onOk: () => this.quitQuiz() } };
-      case 'reset': return { title: 'Réinitialiser ma progression ?', sub: 'Tes statistiques, erreurs et favoris seront effacés. Cette action est définitive.', confirm: { ok: 'Réinitialiser', cancel: 'Annuler', onOk: () => { this.setState({ reset: true, errors: [], favs: [] }); this.closeSheet(); this.toast('Progression réinitialisée'); } } };
+      case 'count': {
+        const counts = [5, 10, 20, 40].filter((c) => c <= n);
+        if (!counts.length || n < 40) counts.push(n);
+        return { title: 'Quiz rapide', sub: 'Combien de questions ?', options: [...new Set(counts)].map((c) => opt(c === n ? 'Toutes les questions (' + c + ')' : c + ' questions', '≈ ' + Math.max(1, Math.round(c * 0.6)) + ' min', false, () => this.startQuiz('quick', c))) };
+      }
+      case 'theme': return { title: 'Quiz par thème', sub: 'Choisis un thème', options: THEMES.filter((t) => TS[t.id].total).map((t) => opt(t.name, TS[t.id].pct + ' % maîtrisé · ' + plural(TS[t.id].total, 'question'), false, () => this.startQuiz('theme', t.id), ic(t.icon))) };
+      case 'quit': return { title: 'Quitter le test ?', sub: 'Ta progression est sauvegardée sur cet appareil : tu pourras reprendre ce test plus tard, même après avoir fermé l’application.', confirm: { alt: { label: 'Sauvegarder et quitter', onClick: () => this.quitQuiz(true) }, ok: 'Abandonner le test', onOk: () => this.quitQuiz(false), cancel: 'Continuer le test' } };
+      case 'replace': {
+        const q = P.quiz; if (!q) return null;
+        return { title: 'Un test est en cours', sub: q.title + ' · question ' + (q.idx + 1) + ' / ' + q.qs.length, options: [
+          opt('Reprendre ce test', 'Là où tu t’étais arrêté', false, () => this.resumeQuiz(), ic('rotate')),
+          opt('Commencer le nouveau test', 'Le test en cours sera abandonné', false, () => this.startQuiz(...this.pending, true), ic('zap')),
+        ] };
+      }
+      case 'reset': return { title: 'Réinitialiser ma progression ?', sub: 'Les statistiques, l’historique, les erreurs, les favoris et le test en cours du profil « ' + bank.name + ' » seront effacés. Les autres préparations ne sont pas touchées. Cette action est définitive.', confirm: { ok: 'Réinitialiser', cancel: 'Annuler', onOk: () => this.resetProfile() } };
       case 'appearance': return { title: 'Apparence', options: pick('theme', [['system', 'Système', 'Suit le réglage du téléphone'], ['light', 'Clair'], ['dark', 'Sombre']]) };
       case 'text': return { title: 'Taille du texte', sub: 'S’applique aux questions et réponses.', options: pick('text', [['Petite', 'Petite'], ['Normale', 'Normale'], ['Grande', 'Grande']]) };
-      case 'goal': return { title: 'Objectif quotidien', options: pick('goal', [[5, '5 questions', '≈ 3 min par jour'], [10, '10 questions', '≈ 6 min par jour'], [20, '20 questions', '≈ 12 min par jour'], [30, '30 questions', '≈ 18 min par jour']]) };
-      case 'prep': return { title: 'Type de préparation', sub: 'Le contenu s’adapte à ton objectif.', options: pick('prep', [['Carte de séjour pluriannuelle', 'Carte de séjour pluriannuelle'], ['Carte de résident', 'Carte de résident'], ['Naturalisation', 'Naturalisation']]) };
+      case 'goal': return { title: 'Objectif quotidien', sub: 'C’est aussi la longueur d’une révision intelligente.', options: pick('goal', [[5, '5 questions', '≈ 3 min par jour'], [10, '10 questions', '≈ 6 min par jour'], [20, '20 questions', '≈ 12 min par jour'], [30, '30 questions', '≈ 18 min par jour']]) };
+      case 'prep': return {
+        title: this.firstRun ? 'Quelle préparation ?' : 'Type de préparation',
+        sub: 'Chaque préparation est un profil séparé : ses propres questions, statistiques, historique, erreurs et favoris.',
+        options: PREPS.map((b) => { const o = overview(b, s.profiles[b.id]); return opt(b.name, o.pct + ' % · ' + plural(b.questions.length, 'question') + ' · ' + plural(b.lots.length, 'lot'), b.id === s.prep, () => this.switchPrep(b.id), ic('target')); }),
+      };
       case 'time': return { title: 'Heure du rappel', options: pick('time', [['08:00', '08:00', 'Le matin'], ['12:30', '12:30', 'À midi'], ['19:00', '19:00', 'En soirée'], ['21:00', '21:00', 'Avant de dormir']]) };
-      case 'examLength': return { title: 'Longueur de l’examen blanc', sub: 'L’examen officiel compte 40 questions.', options: pick('examLength', [[40, '40 questions', 'Conditions réelles'], [20, '20 questions', 'Entraînement court'], [10, '10 questions', 'Démo']]) };
-      case 'installIOS': return { title: 'Installer l’application', sub: 'Dans Safari, touche le bouton Partager, puis « Sur l’écran d’accueil ». L’app s’ouvrira en plein écran et fonctionnera hors connexion.' };
+      case 'examLength': return { title: 'Longueur de l’examen blanc', sub: 'L’examen officiel compte 40 questions en 45 minutes.', options: pick('examLength', [[40, '40 questions', 'Conditions réelles · 45 min'], [20, '20 questions', 'Entraînement court · ' + examMinutes(20) + ' min'], [10, '10 questions', 'Démo · ' + examMinutes(10) + ' min']]) };
+      case 'installHelp': return { title: 'Installer l’application', sub: installHelp() };
     }
     return null;
   }
 
   vals() {
-    const s = this.state, st = s.settings, c = this.cur(), R = s.reset;
-    const pct = (t) => (R ? 0 : t.p), chev = ic('chevR', 20), ex = st.examLength;
-    const weak = THEMES.slice().sort((a, b) => a.p - b.p).slice(0, 3);
+    const s = this.state, st = this.settings(), c = this.cur(), bank = this.bank(), P = this.prof();
+    const O = overview(bank, P), TS = themeStats(bank, P), weak = weakThemes(bank, P);
+    const qById = (id) => bank.byId.get(id);
+    const pct = (t) => TS[t.id].pct, chev = ic('chevR', 20), ex = Math.min(st.examLength, O.total), exMin = examMinutes(ex);
     const withSep = (rows) => rows.map((r, i) => ({ ...r, sep: i < rows.length - 1 ? '1px solid var(--divider)' : 'none' }));
     const G = (header, rows, action) => ({ header, rows: withSep(rows), action });
     const row = (o) => { const r = { color: 'var(--text)', iconBg: 'var(--tint)', iconColor: 'var(--primary)', op: 1, cursor: o.onClick ? 'pointer' : 'default', role: o.onClick ? 'button' : undefined, tab: o.onClick ? 0 : undefined, ...o }; if (typeof o.icon === 'string') r.icon = ic(o.icon); if (o.chev) r.chev = chev; return r; };
     const tagN = (l) => ({ label: l, bg: 'var(--surface2)', color: 'var(--text2)' });
-    const sw = (k, sub) => { const on = !!st[k]; return { sw: { track: on ? 'var(--primary)' : 'var(--surface2)', x: on ? '20px' : '0px' }, role: 'switch', checked: on ? 'true' : 'false', tab: 0, cursor: 'pointer', onClick: () => this.setS(k, !on), sub }; };
-    const nErr = s.errors.length, prep = R ? 0 : 72;
-    const themeRow = (t) => row({ icon: t.icon, title: t.name, sub: pct(t) + ' % maîtrisé', pct: pct(t) + '%', chev: true, onClick: () => this.pushTheme(t.id) });
-    const qRow = (id, chosen, from) => { const q = qById(id); return row({ tag: tagN(thById(q.t).short), title: q.q, sub: chosen != null ? 'Ta réponse : ' + q.a[chosen] : null, chev: true, onClick: () => this.push({ s: 'question', id, chosen, from }) }); };
+    const swRow = (on, onClick, sub) => ({ sw: { track: on ? 'var(--primary)' : 'var(--surface2)', x: on ? '20px' : '0px' }, role: 'switch', checked: on ? 'true' : 'false', tab: 0, cursor: 'pointer', onClick, sub });
+    const sw = (k, sub) => swRow(!!st[k], () => this.setS(k, !st[k]), sub);
+    const granted = s.notif === 'granted', canNotify = notifSupported();
+    const remOn = granted && st.reminder;
+    const nErr = P.errors.length, nTraps = bank.questions.filter((q) => q.trap).length;
+    const themeSub = (t) => (TS[t.id].seen ? pct(t) + ' % maîtrisé · ' + TS[t.id].mastered + ' / ' + TS[t.id].total : plural(TS[t.id].total, 'question') + ' · pas encore commencé');
+    const themeRow = (t) => row({ icon: t.icon, title: t.name, sub: themeSub(t), pct: pct(t) + '%', chev: true, onClick: () => this.pushTheme(t.id) });
+    const qRow = (id, sub, from, chosen) => { const q = qById(id); return q && row({ tag: tagN(thById(q.t).short), title: q.q, sub, chev: true, onClick: () => this.push({ s: 'question', id, chosen, from }) }); };
+    const answerSub = (q, chosen, none) => (chosen != null ? 'Ta réponse : ' + q.a[chosen] : none);
+    const verdictBadge = (ok) => ({ label: ok ? 'Réussi' : 'Échoué', icon: ic(ok ? 'check' : 'x', 14, 2.5), bg: ok ? 'var(--successTint)' : 'var(--errorTint)', color: ok ? 'var(--success)' : 'var(--error)' });
     const back = { show: true, backIcon: ic('chevL', 26), backLabel: 'Retour', onBack: () => this.back() };
     let bar = { show: false }, largeTitle = null, home = null, testHero = null, progHero = null, profile = null, intro = null, fiche = null, flash = null, qv = null, res = null, chips = null, groups = [], empty = null, sticky = null, quizBar = null;
     const primary = (label, onClick, o) => Object.assign({ label, onClick, dir: 'column', op: 1 }, o || {});
     const fsQ = { Petite: '20px', Normale: '23px', Grande: '26px' }[st.text], fsA = { Petite: '15px', Normale: '16px', Grande: '18px' }[st.text];
-    const buildQv = (q, states, onPick, disabled, explain, order = IDENTITY) => ({
-      theme: thById(q.t).short, text: q.q, fs: fsQ, afs: fsA, explain,
+    const buildQv = (q, states, onPick, disabled, explain, order = q.a.map((_, i) => i)) => ({
+      theme: thById(q.t).short + (q.situation ? ' · Mise en situation' : ''), text: q.q, fs: fsQ, afs: fsA, explain,
       answers: order.map((orig, i) => {
         const k = states[orig]; const m = {
           normal: { bg: 'var(--surface)', border: '2px solid var(--divider)', badgeBg: 'var(--surface2)', badgeColor: 'var(--text)', op: 1 },
@@ -274,166 +458,257 @@ export default class App extends Component {
         return { ...m, key: orig, badge: m.badge || LET[i], text: txt, disabled, checked: k === 'selected' ? 'true' : 'false', aria: LET[i] + '. ' + txt + (m.note ? ' — ' + m.note : ''), onClick: () => onPick(orig) };
       }),
     });
-    const favBtn = (id) => { const f = s.favs.includes(id); return { icon: ic('star', 22, 1.5, f), color: f ? 'var(--primary)' : 'var(--text2)', label: f ? 'Retirer des favoris' : 'Ajouter aux favoris', pressed: f ? 'true' : 'false', onClick: () => this.toggleFav(id) }; };
-    const T = { theme: 'Thème', errors: 'Mes erreurs', favs: 'Mes favoris', traps: 'Questions pièges', dates: 'Dates à retenir', flash: 'Flashcards', question: 'Question', examIntro: 'Examen blanc', review: 'Correction des erreurs', history: 'Historique des examens', settings: 'Paramètres', notifications: 'Notifications', about: 'À propos' };
+    const favBtn = (id) => { const f = P.favs.includes(id); return { icon: ic('star', 22, 1.5, f), color: f ? 'var(--primary)' : 'var(--text2)', label: f ? 'Retirer des favoris' : 'Ajouter aux favoris', pressed: f ? 'true' : 'false', onClick: () => this.toggleFav(id) }; };
+    const resumeRow = () => { const q = P.quiz; return row({ icon: 'clock', iconBg: 'var(--warnTint)', iconColor: 'var(--warn)', title: 'Reprendre : ' + q.title, sub: 'Question ' + (q.idx + 1) + ' / ' + q.qs.length + (q.timed ? ' · ' + fmt(q.timeLeft) + ' restantes' : '') + ' · sauvegardé', chev: true, onClick: () => this.resumeQuiz() }); };
+    const T = { theme: 'Thème', errors: 'Mes erreurs', favs: 'Mes favoris', traps: 'Questions pièges', dates: 'Dates à retenir', flash: 'Flashcards', question: 'Question', examIntro: 'Examen blanc', review: 'Correction des erreurs', history: 'Historique', settings: 'Paramètres', notifications: 'Notifications', about: 'À propos', lot: 'Lot de questions', result: 'Résultat' };
     if (T[c.s]) bar = { ...back, title: T[c.s] };
 
     switch (c.s) {
       case 'home': {
+        const plan = smartPlan(bank, P, Math.max(5, st.goal)), q = P.quiz;
+        const planSub = plan.dueNow && plan.freshNow ? plan.dueNow + ' à revoir · ' + plan.freshNow + (plan.freshNow > 1 ? ' nouvelles' : ' nouvelle') : plan.dueNow ? plural(plan.dueNow, 'question') + ' à revoir' : plan.freshNow ? plan.freshNow + (plan.freshNow > 1 ? ' nouvelles questions' : ' nouvelle question') : 'Tout est à jour · ' + plural(plan.size, 'question');
+        const cta = q
+          ? { label: 'Reprendre le test', sub: q.title + ' · question ' + (q.idx + 1) + ' / ' + q.qs.length + (q.timed ? ' · ' + fmt(q.timeLeft) : ''), onClick: () => this.resumeQuiz() }
+          : { label: O.seen ? 'Continuer ma révision' : 'Commencer ma préparation', sub: 'Révision intelligente : ' + planSub, onClick: () => this.startQuiz('smart', null, 'cta') };
         home = {
-          prep: prep + ' %', prepW: prep + '%', goal: 'Objectif du jour : ' + (R ? 0 : 6) + ' / ' + st.goal + ' questions', loading: s.loading === 'cta', ctaLabel: s.loading === 'cta' ? 'Chargement…' : 'Continuer ma révision', ctaSub: 'Suggestion : Institutions · 3 questions', onCta: () => this.startQuiz('theme', 'inst', 'cta'),
+          prep: O.pct + ' %', prepW: O.pct + '%', prepName: bank.name, chev: ic('chevR', 16, 2), onPrep: () => this.openSheet('prep'),
+          goal: 'Objectif du jour : ' + O.today + ' / ' + st.goal + ' questions' + (O.today >= st.goal ? ' ✓' : '') + (O.streak ? ' · Série : ' + plural(O.streak, 'jour') : ''),
+          loading: s.loading === 'cta', ctaLabel: s.loading === 'cta' ? 'Chargement…' : cta.label, ctaSub: cta.sub, onCta: cta.onClick,
+          install: !isStandalone() && (s.installable || isIOS()) && !st.installDismissed ? { icon: ic('download', 22), onInstall: () => this.install(), onDismiss: () => this.setS('installDismissed', true, false), close: ic('x', 18, 2) } : null,
           tiles: [
-            { label: 'Examen blanc', sub: ex + ' questions • 45 min', icon: ic('clipboard'), onClick: () => this.push({ s: 'examIntro' }) },
-            { label: 'Quiz rapide', sub: '5 à 40 questions', icon: ic('zap'), onClick: () => this.openSheet('count') },
+            { label: 'Examen blanc', sub: ex + ' questions • ' + exMin + ' min', icon: ic('clipboard'), onClick: () => this.push({ s: 'examIntro' }) },
+            { label: 'Quiz rapide', sub: '5 à ' + Math.min(40, O.total) + ' questions', icon: ic('zap'), onClick: () => this.openSheet('count') },
             { label: 'Mes erreurs', sub: nErr ? nErr + ' à revoir' : 'Aucune erreur', icon: ic('rotate'), badge: nErr || null, onClick: () => this.push({ s: 'errors' }) },
-            { label: 'Révision intelligente', sub: 'Selon tes points faibles', icon: ic('sparkles'), onClick: () => this.startQuiz('smart') },
+            { label: 'Révision intelligente', sub: planSub, icon: ic('sparkles'), onClick: () => this.startQuiz('smart') },
           ],
         };
-        groups = [G('À travailler aujourd’hui', weak.map(themeRow))]; break;
+        if (weak.length) groups = [G('À travailler aujourd’hui', weak.map(themeRow))];
+        break;
       }
       case 'revise':
         largeTitle = 'Réviser';
-        groups = [G('Thèmes', THEMES.map(themeRow)), G('Révision rapide', [
+        groups = [G('Thèmes', THEMES.filter((t) => TS[t.id].total).map(themeRow)), G('Révision rapide', [
           row({ icon: 'rotate', title: 'Mes erreurs', value: String(nErr), chev: true, onClick: () => this.push({ s: 'errors' }) }),
-          row({ icon: 'star', title: 'Mes favoris', value: String(s.favs.length), chev: true, onClick: () => this.push({ s: 'favs' }) }),
-          row({ icon: 'alert', title: 'Questions pièges', chev: true, onClick: () => this.push({ s: 'traps' }) }),
+          row({ icon: 'star', title: 'Mes favoris', value: String(P.favs.length), chev: true, onClick: () => this.push({ s: 'favs' }) }),
+          row({ icon: 'alert', title: 'Questions pièges', value: String(nTraps), chev: true, onClick: () => this.push({ s: 'traps' }) }),
           row({ icon: 'calendar', title: 'Dates à retenir', chev: true, onClick: () => this.push({ s: 'dates' }) }),
           row({ icon: 'layers', title: 'Flashcards', chev: true, onClick: () => this.push({ s: 'flash' }) }),
         ])]; break;
-      case 'test':
+      case 'test': {
         largeTitle = 'Tester';
-        testHero = { sub: ex + ' questions • 45 min', pass: 'Seuil de réussite : ' + Math.ceil(ex * 0.8) + ' / ' + ex, onStart: () => this.push({ s: 'examIntro' }) };
-        groups = [G('Entraînement libre', [
-          row({ icon: 'zap', title: 'Quiz rapide', sub: '5, 10, 20 ou 40 questions', chev: true, onClick: () => this.openSheet('count') }),
+        testHero = { sub: ex + ' questions • ' + exMin + ' min', pass: 'Seuil de réussite : ' + passMark(ex) + ' / ' + ex, onStart: () => this.push({ s: 'examIntro' }) };
+        const nHard = hardPool(bank, P).length;
+        if (P.quiz) groups.push(G('En cours', [resumeRow()]));
+        groups.push(G('Entraînement libre', [
+          row({ icon: 'zap', title: 'Quiz rapide', sub: '5 à ' + Math.min(40, O.total) + ' questions au hasard', chev: true, onClick: () => this.openSheet('count') }),
           row({ icon: 'book', title: 'Quiz par thème', sub: '5 thématiques officielles', chev: true, onClick: () => this.openSheet('theme') }),
-          row({ icon: 'flame', title: 'Questions difficiles', sub: 'Les pièges les plus fréquents', chev: true, onClick: () => this.startQuiz('hard') }),
-        ])]; break;
-      case 'progress':
-        largeTitle = 'Progression'; progHero = { label: (R ? 0 : 78) + ' %', w: (R ? 0 : 78) + '%' };
+          row({ icon: 'flame', title: 'Questions difficiles', sub: nHard ? plural(nHard, 'question') + ' · pièges et questions souvent ratées' : 'Aucune pour l’instant', chev: true, onClick: () => this.startQuiz('hard') }),
+        ]));
+        groups.push(G('Lots de questions', bank.lots.map((L) => {
+          const runs = P.history.filter((h) => h.lot === L.id), best = bestOf(runs);
+          return row({ icon: 'layers', title: L.title, sub: plural(L.qs.length, 'question') + ' · ' + (best ? 'meilleur score ' + best.score + ' / ' + best.total : 'jamais testé'), chev: true, onClick: () => this.push({ s: 'lot', id: L.id }) });
+        })));
+        break;
+      }
+      case 'lot': {
+        const L = bank.lots.find((l) => l.id === c.id);
+        if (!L) { empty = { icon: ic('alert', 32), iconBg: 'var(--surface2)', iconColor: 'var(--text2)', title: 'Lot introuvable', text: 'Ce lot n’existe plus.' }; break; }
+        bar.title = L.title; intro = L.description || null;
+        const runs = P.history.filter((h) => h.lot === L.id), best = bestOf(runs), counts = {};
+        L.qs.forEach((id) => { const t = qById(id).t; counts[t] = (counts[t] || 0) + 1; });
+        const mastered = L.qs.filter((id) => isMastered(P.stats[id])).length;
+        const sc = (h) => (h ? h.score + ' / ' + h.total : '–');
         groups = [
-          G(null, [row({ title: 'Questions maîtrisées', stat: R ? '0 / 209' : '154 / 209' }), row({ title: 'Examens réalisés', stat: R ? '0' : '7' }), row({ title: 'Meilleur score', stat: R ? '–' : '36 / 40' })]),
-          G('Progression par thème', THEMES.map((t) => row({ title: t.name, value: pct(t) + ' %', pct: pct(t) + '%', chev: true, onClick: () => this.pushTheme(t.id) }))),
-          G('Mes points faibles', weak.map((t) => row({ icon: 'alert', iconBg: 'var(--warnTint)', iconColor: 'var(--warn)', title: t.name, sub: pct(t) + ' % maîtrisé', chev: true, onClick: () => this.pushTheme(t.id) })), { label: s.loading === 'weak' ? 'Chargement…' : 'Travailler mes points faibles', loading: s.loading === 'weak', onClick: () => this.startQuiz('weak', null, 'weak') }),
-          G(null, [row({ icon: 'clock', title: 'Historique des examens', sub: '7 examens blancs', chev: true, onClick: () => this.push({ s: 'history' }) })]),
+          G('Contenu · ' + plural(L.qs.length, 'question'), THEMES.filter((t) => counts[t.id]).map((t) => row({ icon: t.icon, title: t.name, value: String(counts[t.id]) }))),
+          G('Tes résultats', [row({ title: 'Questions maîtrisées', stat: mastered + ' / ' + L.qs.length }), row({ title: 'Tentatives', stat: String(runs.length) }), row({ title: 'Meilleur score', stat: sc(best) }), row({ title: 'Dernier score', stat: sc(runs[0]) })]),
+          G('Autres façons de s’entraîner', [
+            row({ icon: 'clock', title: 'En conditions d’examen', sub: 'Chronométré · ' + examMinutes(L.qs.length) + ' min · correction à la fin', chev: true, onClick: () => this.startQuiz('lot', { id: L.id, timed: true }, 'lot') }),
+            row({ icon: 'layers', title: 'Flashcards du lot', chev: true, onClick: () => this.push({ s: 'flash', lot: L.id }) }),
+          ]),
+        ];
+        sticky = primary(s.loading === 'lot' ? 'Chargement…' : 'Lancer ce lot', () => this.startQuiz('lot', { id: L.id }, 'lot'), { loading: s.loading === 'lot', disabled: s.loading === 'lot' });
+        break;
+      }
+      case 'progress': {
+        largeTitle = 'Progression'; progHero = { label: O.pct + ' %', w: O.pct + '%', sub: 'Maîtrise · ' + bank.short };
+        const best = O.best;
+        groups = [
+          G(null, [
+            row({ title: 'Questions maîtrisées', stat: O.mastered + ' / ' + O.total }),
+            row({ title: 'Questions déjà vues', stat: O.seen + ' / ' + O.total }),
+            row({ title: 'Bonnes réponses', sub: O.attempts ? plural(O.attempts, 'réponse') + ' au total' : null, stat: O.accuracy != null ? O.accuracy + ' %' : '–' }),
+            row({ title: 'Examens blancs réalisés', sub: O.exams ? plural(O.passed, 'réussi') : null, stat: String(O.exams) }),
+            row({ title: 'Meilleur score à l’examen', stat: best ? best.score + ' / ' + best.total : '–' }),
+            row({ title: 'Série de révision', stat: plural(O.streak, 'jour') }),
+          ]),
+          G('Progression par thème', THEMES.filter((t) => TS[t.id].total).map((t) => row({ title: t.name, sub: TS[t.id].acc != null ? TS[t.id].acc + ' % de bonnes réponses' : 'Pas encore travaillé', value: pct(t) + ' %', pct: pct(t) + '%', chev: true, onClick: () => this.pushTheme(t.id) }))),
+          !O.seen
+            ? G('Mes points faibles', [row({ icon: 'info', title: 'Pas encore de données', sub: 'Réponds à quelques questions : tes points faibles seront calculés à partir de tes résultats.' })])
+            : weak.length
+              ? G('Mes points faibles', weak.map((t) => row({ icon: 'alert', iconBg: 'var(--warnTint)', iconColor: 'var(--warn)', title: t.name, sub: t.pct + ' % maîtrisé' + (t.acc != null ? ' · ' + t.acc + ' % de bonnes réponses' : ' · pas encore travaillé'), chev: true, onClick: () => this.pushTheme(t.id) })), { label: s.loading === 'weak' ? 'Chargement…' : 'Travailler mes points faibles', loading: s.loading === 'weak', onClick: () => this.startQuiz('weak', null, 'weak') })
+              : G('Mes points faibles', [row({ icon: 'check', iconBg: 'var(--successTint)', iconColor: 'var(--success)', title: 'Aucun point faible', sub: 'Tous les thèmes sont maîtrisés.' })]),
+          G(null, [row({ icon: 'clock', title: 'Historique', sub: plural(O.exams, 'examen blanc') + ' · ' + plural(P.history.length, 'test') + ' au total', chev: true, onClick: () => this.push({ s: 'history' }) })]),
         ]; break;
+      }
       case 'profile': {
-        largeTitle = 'Profil'; profile = { initials: 'AM', name: 'Amina M.', sub: st.prep + ' · ' + prep + ' % de préparation' };
+        largeTitle = 'Profil'; profile = { initials: bank.initials, name: bank.name, sub: O.pct + ' % de préparation · ' + plural(O.total, 'question') };
         const rows = [
+          row({ icon: 'target', title: 'Type de préparation', sub: 'Change de profil de préparation', value: bank.short, chev: true, onClick: () => this.openSheet('prep') }),
           row({ icon: 'sliders', title: 'Paramètres', chev: true, onClick: () => this.push({ s: 'settings' }) }),
-          row({ icon: 'bell', title: 'Notifications', value: st.reminder ? st.time : 'Désactivées', chev: true, onClick: () => this.push({ s: 'notifications' }) }),
+          canNotify && row({ icon: 'bell', title: 'Notifications', value: remOn ? st.time : 'Désactivées', chev: true, onClick: () => this.push({ s: 'notifications' }) }),
           row({ icon: 'sun', title: 'Apparence', value: { system: 'Système', light: 'Clair', dark: 'Sombre' }[st.theme], chev: true, onClick: () => this.openSheet('appearance') }),
           row({ icon: 'info', title: 'À propos', chev: true, onClick: () => this.push({ s: 'about' }) }),
-        ];
+        ].filter(Boolean);
         groups = [G(null, rows)];
-        if (!isStandalone() && (s.installable || isIOS())) groups.push(G(null, [row({ icon: 'download', title: 'Installer l’application', sub: 'Accès depuis l’écran d’accueil, hors connexion', chev: true, onClick: () => this.install() })]));
+        if (!isStandalone()) groups.push(G(null, [row({ icon: 'download', title: 'Installer l’application', sub: 'Accès depuis l’écran d’accueil, plein écran et hors connexion', chev: true, onClick: () => this.install() })]));
         break;
       }
       case 'settings': {
         const seg = [['system', 'Système'], ['light', 'Clair'], ['dark', 'Sombre']].map(([v, l]) => { const a = st.theme === v; return { label: l, checked: a ? 'true' : 'false', bg: a ? 'var(--segOn)' : 'transparent', color: a ? 'var(--text)' : 'var(--text2)', shadow: a ? '0 1px 3px rgba(0,0,0,.14)' : 'none', weight: a ? 600 : 500, onClick: (e) => { e.stopPropagation(); this.setS('theme', v); } }; });
         groups = [
-          G('Préparation', [row({ title: 'Type de préparation', value: st.prep, chev: true, onClick: () => this.openSheet('prep') }), row({ title: 'Objectif quotidien', value: st.goal + ' questions', chev: true, onClick: () => this.openSheet('goal') }), row({ title: 'Révision automatique', ...sw('auto') })]),
-          G('Notifications', [row({ title: 'Rappels', value: st.reminder ? 'Activés · ' + st.time : 'Désactivés', chev: true, onClick: () => this.push({ s: 'notifications' }) })]),
+          G('Préparation · ' + bank.short, [row({ title: 'Type de préparation', value: bank.short, chev: true, onClick: () => this.openSheet('prep') }), row({ title: 'Objectif quotidien', value: st.goal + ' questions', chev: true, onClick: () => this.openSheet('goal') }), row({ title: 'Révision automatique', ...sw('auto', 'Ajoute tes mauvaises réponses à « Mes erreurs »') }), row({ title: 'Longueur de l’examen blanc', value: st.examLength + ' questions', chev: true, onClick: () => this.openSheet('examLength') })]),
+          canNotify && G('Notifications', [row({ title: 'Rappels', value: remOn ? 'Activés · ' + st.time : 'Désactivés', chev: true, onClick: () => this.push({ s: 'notifications' }) })]),
           G('Apparence', [row({ title: 'Thème', seg }), row({ title: 'Taille du texte', value: st.text, chev: true, onClick: () => this.openSheet('text') })]),
-          G('Quiz', [row({ title: 'Afficher immédiatement la correction', ...sw('instant') }), row({ title: 'Mélanger les réponses', ...sw('shuffle') }), row({ title: 'Longueur de l’examen blanc', value: st.examLength + ' questions', chev: true, onClick: () => this.openSheet('examLength') }), row({ title: 'Son', ...sw('sound') }), row({ title: 'Vibration', ...sw('vibration') })]),
-          G('Données', [row({ title: 'Réinitialiser ma progression', color: 'var(--error)', onClick: () => this.openSheet('reset') })]),
-          G('À propos', [row({ title: 'Version de l’application', value: '2.4.0' }), row({ title: 'Sources officielles', chev: true, onClick: () => this.push({ s: 'about' }) }), row({ title: 'Confidentialité', chev: true, onClick: () => this.push({ s: 'about' }) })]),
-        ]; break;
+          G('Quiz', [row({ title: 'Afficher immédiatement la correction', ...sw('instant') }), row({ title: 'Mélanger les réponses', ...sw('shuffle') }), row({ title: 'Son', ...sw('sound') }), row({ title: 'Vibration', ...sw('vibration') })]),
+          G('Données', [row({ title: 'Réinitialiser ma progression', sub: 'Profil « ' + bank.name + ' » uniquement', color: 'var(--error)', onClick: () => this.openSheet('reset') })]),
+          G('À propos', [row({ title: 'Version de l’application', value: APP_VERSION }), row({ title: 'Sources officielles', chev: true, onClick: () => this.push({ s: 'about' }) }), row({ title: 'Confidentialité', chev: true, onClick: () => this.push({ s: 'about' }) })]),
+        ].filter(Boolean); break;
       }
-      case 'notifications':
+      case 'notifications': {
+        if (!canNotify) { empty = { icon: ic('bell', 32), iconBg: 'var(--surface2)', iconColor: 'var(--text2)', title: 'Notifications indisponibles', text: 'Ce navigateur ne permet pas les notifications. Sur iPhone, installe d’abord Civi sur l’écran d’accueil (iOS 16.4 ou plus).' }; break; }
+        intro = s.notif === 'denied'
+          ? 'Les notifications sont bloquées pour ce site. Autorise-les dans les réglages du navigateur, puis réactive les rappels ici.'
+          : 'Les rappels s’affichent quand l’application est ouverte ou en arrière-plan. Sur Android, une fois l’application installée, ils peuvent aussi arriver quand elle est fermée.';
         groups = [
-          G(null, [row({ title: 'Rappel quotidien', ...sw('reminder', 'Un rappel pour garder ton rythme') }), row({ title: 'Heure du rappel', value: st.time, chev: true, op: st.reminder ? 1 : 0.45, onClick: st.reminder ? () => this.openSheet('time') : undefined })]),
-          G(null, [row({ title: 'Rappel de série', ...sw('streak', 'Si tu n’as pas révisé depuis 2 jours') })]),
-        ]; break;
+          G(null, [row({ title: 'Rappel quotidien', ...swRow(remOn, () => this.toggleReminder('reminder'), 'Si ton objectif du jour (' + st.goal + ' questions) n’est pas atteint') }), row({ title: 'Heure du rappel', value: st.time, chev: true, op: remOn ? 1 : 0.45, onClick: remOn ? () => this.openSheet('time') : undefined })]),
+          G(null, [row({ title: 'Rappel de reprise', ...swRow(granted && st.streak, () => this.toggleReminder('streak'), 'Si tu n’as pas révisé depuis 2 jours') })]),
+        ];
+        if (granted) groups.push(G(null, [row({ icon: 'bell', title: 'Envoyer une notification de test', chev: true, onClick: () => { testNotification('Les rappels de Civi fonctionnent sur cet appareil.'); this.toast('Notification envoyée'); } })]));
+        break;
+      }
       case 'about':
         groups = [
-          G(null, [row({ title: 'Version', value: '2.4.0' }), row({ title: 'Questions mises à jour', value: 'Sept. 2026' })]),
+          G(null, [row({ title: 'Version', value: APP_VERSION }), row({ title: 'Préparation', value: bank.short }), row({ title: 'Banque de questions', value: plural(O.total, 'question') + ' · ' + plural(bank.lots.length, 'lot') })]),
           G('Sources officielles', [row({ title: 'Livret du citoyen', sub: 'Ministère de l’Intérieur' }), row({ title: 'Service-Public.fr', sub: 'Démarches et droits' }), row({ title: 'Légifrance', sub: 'Constitution et lois' })]),
           G('Confidentialité', [row({ title: 'Tes données restent sur ton téléphone', sub: 'Aucun compte requis. Aucune donnée partagée.' })]),
         ]; break;
-      case 'history':
-        groups = [G(null, HISTORY.map(([d, sc, t]) => { const ok = sc >= 32; return row({ title: 'Examen blanc', sub: d + ' · ' + t, stat: sc + ' / 40', badge: { label: ok ? 'Réussi' : 'Échoué', icon: ic(ok ? 'check' : 'x', 14, 2.5), bg: ok ? 'var(--successTint)' : 'var(--errorTint)', color: ok ? 'var(--success)' : 'var(--error)' } }); }))]; break;
+      case 'history': {
+        const exams = P.history.filter((h) => h.mode === 'exam');
+        const f = c.filter || (exams.length || !P.history.length ? 'exam' : 'all');
+        const list = f === 'exam' ? exams : P.history;
+        chips = [['exam', 'Examens blancs (' + exams.length + ')'], ['all', 'Tous les tests (' + P.history.length + ')']].map(([id, label]) => { const a = id === f; return { key: id, label, pressed: a ? 'true' : 'false', bg: a ? 'var(--primary)' : 'var(--surface)', color: a ? 'var(--onChip)' : 'var(--text)', border: a ? 'transparent' : 'var(--line)', onClick: () => this.setTop({ filter: id }) }; });
+        if (list.length) groups = [G(null, list.map((h) => row({ title: h.title, sub: fmtWhen(h.at) + (h.used != null ? ' · ' + fmt(h.used) : ''), stat: h.score + ' / ' + h.total, badge: verdictBadge(h.passed), chev: true, onClick: () => this.push({ s: 'result', hid: h.id }) })))];
+        else empty = { icon: ic('clipboard', 32), iconBg: 'var(--surface2)', iconColor: 'var(--text2)', title: f === 'exam' ? 'Aucun examen blanc' : 'Aucun test terminé', text: 'Tes résultats apparaîtront ici après chaque test terminé.', btn: 'Passer un examen blanc', onBtn: () => this.push({ s: 'examIntro' }) };
+        break;
+      }
       case 'errors': {
-        if (!nErr) { empty = { icon: ic('check', 32, 2), iconBg: 'var(--successTint)', iconColor: 'var(--success)', title: 'Aucune erreur à revoir', text: 'Continue comme ça.', btn: 'Faire un quiz', onBtn: () => this.openSheet('count') }; break; }
+        if (!nErr) { empty = { icon: ic('check', 32, 2), iconBg: 'var(--successTint)', iconColor: 'var(--success)', title: 'Aucune erreur à revoir', text: st.auto ? 'Continue comme ça.' : 'La révision automatique est désactivée : tes erreurs ne sont pas ajoutées ici.', btn: 'Faire un quiz', onBtn: () => this.openSheet('count') }; break; }
         const f = c.filter || 'all';
         chips = [{ id: 'all', label: 'Toutes' }].concat(THEMES.map((t) => ({ id: t.id, label: t.short }))).map((ch) => { const a = ch.id === f; return { key: ch.id, label: ch.label, pressed: a ? 'true' : 'false', bg: a ? 'var(--primary)' : 'var(--surface)', color: a ? 'var(--onChip)' : 'var(--text)', border: a ? 'transparent' : 'var(--line)', onClick: () => this.setTop({ filter: ch.id }) }; });
-        const list = s.errors.filter((e) => f === 'all' || qById(e.id).t === f);
-        if (list.length) groups = [G(null, list.map((e) => qRow(e.id, e.chosen, 'errors')))];
+        const list = P.errors.filter((e) => f === 'all' || qById(e.id).t === f);
+        if (list.length) groups = [G(null, list.map((e) => qRow(e.id, answerSub(qById(e.id), e.chosen, 'Marquée « À revoir »'), 'errors', e.chosen)))];
         else empty = { icon: ic('check', 32, 2), iconBg: 'var(--surface2)', iconColor: 'var(--text2)', title: 'Rien dans ce thème', text: 'Choisis un autre filtre.' };
         sticky = primary('Revoir en quiz (' + nErr + ')', () => this.startQuiz('errors')); break;
       }
       case 'favs':
-        if (s.favs.length) groups = [G(null, s.favs.map((id) => qRow(id, null, 'favs')))];
+        if (P.favs.length) groups = [G(null, P.favs.map((id) => qRow(id, null, 'favs')).filter(Boolean))];
         else empty = { icon: ic('star', 32), iconBg: 'var(--surface2)', iconColor: 'var(--text2)', title: 'Aucune question favorite', text: 'Ajoute une question avec l’icône étoile pendant tes révisions.' };
         break;
-      case 'traps':
+      case 'traps': {
+        const traps = bank.questions.filter((q) => q.trap);
         intro = 'Les questions où les candidats se trompent le plus souvent.';
-        groups = [G(null, TRAPS.map((id) => qRow(id, null, 'traps')))]; break;
+        if (traps.length) groups = [G(null, traps.map((q) => qRow(q.id, null, 'traps')))];
+        else { intro = null; empty = { icon: ic('alert', 32), iconBg: 'var(--surface2)', iconColor: 'var(--text2)', title: 'Aucune question piège', text: 'Aucune question de cette préparation n’est marquée comme piège.' }; }
+        break;
+      }
       case 'dates':
-        groups = [G(null, DATES.map(([y, t]) => row({ year: y, title: t })))]; break;
+        if (bank.dates.length) groups = [G(null, bank.dates.map(([y, t]) => row({ year: y, title: t })))];
+        else empty = { icon: ic('calendar', 32), iconBg: 'var(--surface2)', iconColor: 'var(--text2)', title: 'Aucune date', text: 'Aucune date à retenir pour cette préparation.' };
+        break;
       case 'review': {
-        const L = s.last;
-        if (L && L.wrong.length) groups = [G(null, L.wrong.map((w) => qRow(w.id, w.chosen, 'review')))];
+        const H = P.history.find((h) => h.id === c.hid), list = H ? H.wrong.filter((w) => qById(w.id)) : [];
+        if (list.length) groups = [G(null, list.map((w) => qRow(w.id, answerSub(qById(w.id), w.chosen, 'Sans réponse'), 'review', w.chosen)))];
         else empty = { icon: ic('check', 32, 2), iconBg: 'var(--successTint)', iconColor: 'var(--success)', title: 'Aucune erreur', text: 'Tu as tout bon.' };
         break;
       }
       case 'examIntro':
         intro = 'Mets-toi dans les conditions de l’examen officiel. La correction s’affiche à la fin.';
-        groups = [G('Déroulement', [row({ icon: 'clipboard', title: ex + ' questions à choix multiples' }), row({ icon: 'clock', title: '45 minutes chronométrées' }), row({ icon: 'target', title: Math.ceil(ex * 0.8) + ' bonnes réponses pour réussir' }), row({ icon: 'rotate', title: 'Tes erreurs sont ajoutées à ta liste de révision' })])];
+        groups = [G('Déroulement', [
+          row({ icon: 'clipboard', title: ex + ' questions à choix multiples', sub: 'Réparties selon les 5 thèmes officiels' }),
+          row({ icon: 'clock', title: exMin + ' minutes chronométrées' }),
+          row({ icon: 'target', title: passMark(ex) + ' bonnes réponses pour réussir' }),
+          row({ icon: 'download', title: 'Progression sauvegardée', sub: 'Tu peux quitter et reprendre plus tard, même après avoir fermé l’application' }),
+          st.auto && row({ icon: 'rotate', title: 'Tes erreurs sont ajoutées à ta liste de révision' }),
+        ].filter(Boolean))];
+        if (P.quiz) groups.push(G('En cours', [resumeRow()]));
         sticky = primary(s.loading === 'exam' ? 'Chargement…' : 'Commencer l’examen', () => this.startQuiz('exam', null, 'exam'), { loading: s.loading === 'exam', disabled: s.loading === 'exam' }); break;
       case 'theme': {
-        const t = thById(c.id); bar.title = t.short; const n = Q.filter((q) => q.t === t.id).length;
-        fiche = { loading: s.skeleton, ready: !s.skeleton, icon: ic(t.icon, 26), name: t.name, pct: pct(t) + '%', pctLabel: pct(t) + ' %', sub: 'Maîtrise · ' + n + ' questions', facts: withSep(FACTS[t.id].map((x, i) => ({ n: i + 1, text: x }))) };
+        const t = thById(c.id); bar.title = t.short; const ts = TS[t.id];
+        fiche = { loading: s.skeleton, ready: !s.skeleton, icon: ic(t.icon, 26), name: t.name, pct: pct(t) + '%', pctLabel: pct(t) + ' %', sub: 'Maîtrise · ' + ts.mastered + ' / ' + plural(ts.total, 'question') + (ts.acc != null ? ' · ' + ts.acc + ' % de réussite' : ''), facts: withSep(bank.facts[t.id].map((x, i) => ({ n: i + 1, text: x }))) };
         if (!s.skeleton) groups = [G('S’entraîner', [row({ icon: 'layers', title: 'Flashcards du thème', chev: true, onClick: () => this.push({ s: 'flash', theme: t.id }) }), row({ icon: 'alert', title: 'Questions pièges', chev: true, onClick: () => this.push({ s: 'traps' }) })])];
-        sticky = primary(s.loading === 'theme' ? 'Chargement…' : 'Tester mes connaissances', () => this.startQuiz('theme', t.id, 'theme'), { loading: s.loading === 'theme', disabled: s.loading === 'theme' || s.skeleton, op: s.skeleton ? 0.45 : 1 }); break;
+        sticky = primary(s.loading === 'theme' ? 'Chargement…' : 'Tester mes connaissances', () => this.startQuiz('theme', t.id, 'theme'), { loading: s.loading === 'theme', disabled: s.loading === 'theme' || s.skeleton || !ts.total, op: s.skeleton || !ts.total ? 0.45 : 1 }); break;
       }
       case 'flash': {
-        const cards = c.theme ? Q.filter((q) => q.t === c.theme) : Q; const i = s.fc % cards.length; const q = cards[i];
+        const L = c.lot && bank.lots.find((l) => l.id === c.lot);
+        const cards = c.theme ? bank.questions.filter((q) => q.t === c.theme) : L ? L.qs.map(qById) : bank.questions;
         if (c.theme) bar.title = 'Flashcards · ' + thById(c.theme).short;
+        if (L) bar.title = 'Flashcards · ' + L.title;
+        if (!cards.length) { empty = { icon: ic('layers', 32), iconBg: 'var(--surface2)', iconColor: 'var(--text2)', title: 'Aucune carte', text: 'Aucune question disponible ici.' }; break; }
+        const i = s.fc % cards.length; const q = cards[i];
         flash = {
           theme: thById(q.t).short, counter: (i + 1) + ' / ' + cards.length, kicker: s.flip ? 'Réponse' : 'Question', kColor: s.flip ? 'var(--success)' : 'var(--primaryText)', text: s.flip ? q.a[q.c] : q.q, detail: s.flip ? q.x : null, hint: s.flip ? 'Touche pour revoir la question' : 'Touche pour voir la réponse', flipIcon: ic('rotate', 16),
           onFlip: () => { const el = this.cardRef.current; if (el && el.animate) el.animate([{ transform: 'scaleX(.96)', opacity: 0.4 }, { transform: 'none', opacity: 1 }], { duration: 200, easing: 'ease-out' }); this.setState({ flip: !s.flip }); },
         };
-        const next = (ok) => { this.setState({ fc: s.fc + 1, flip: false }); if (!ok && !s.errors.some((e) => e.id === q.id)) this.setState({ errors: s.errors.concat([{ id: q.id, chosen: (q.c + 1) % 4 }]) }); };
+        // Self-assessment counts as an answer: it feeds mastery, spaced repetition and the daily goal.
+        const next = (ok) => {
+          this.updP((p) => { const r = recordAnswer(p, q.id, ok); return ok || r.errors.some((e) => e.id === q.id) ? r : { ...r, errors: r.errors.concat([{ id: q.id, chosen: null }]) }; });
+          this.setState({ fc: s.fc + 1, flip: false });
+        };
         sticky = primary('Je savais', () => next(true), { dir: 'row', icon: ic('check', 20, 2), secondary: { label: 'À revoir', icon: ic('x', 20, 2), onClick: () => next(false), order: 0, h: '54px', border: '1.5px solid var(--line)', color: 'var(--text)' } }); break;
       }
       case 'question': {
-        const q = qById(c.id); bar.star = favBtn(q.id);
+        const q = qById(c.id); if (!q) break; bar.star = favBtn(q.id);
         const states = q.a.map((_, i) => (i === q.c ? 'correct' : i === c.chosen ? 'wrong' : 'dim'));
         qv = buildQv(q, states, () => {}, true, { text: q.x, bulb: ic('bulb', 16) });
-        if (c.from === 'errors' && s.errors.some((e) => e.id === q.id)) sticky = primary('J’ai compris', () => { this.setState({ errors: s.errors.filter((e) => e.id !== q.id) }); this.toast('Retiré de mes erreurs'); this.back(); }, { icon: ic('check', 20, 2) });
+        if (c.from === 'errors' && P.errors.some((e) => e.id === q.id)) sticky = primary('J’ai compris', () => { this.updP((p) => ({ ...p, errors: p.errors.filter((e) => e.id !== q.id) })); this.toast('Retiré de mes erreurs'); this.back(); }, { icon: ic('check', 20, 2) });
         break;
       }
       case 'quiz': {
-        const z = s.quiz; if (!z) break; const id = z.qs[z.idx]; const q = qById(id); const n = z.qs.length; const last = z.idx + 1 >= n;
+        const z = P.quiz; if (!z) break; const id = z.qs[z.idx]; const q = qById(id); if (!q) break; const n = z.qs.length; const last = z.idx + 1 >= n;
         bar = { ...back, title: 'Question ' + (z.idx + 1) + ' / ' + n, backLabel: 'Quitter le test', star: favBtn(q.id) };
         quizBar = { pct: ((z.idx + (z.validated ? 1 : 0)) / n) * 100 + '%', mode: z.title, timer: z.timed ? fmt(z.timeLeft) : null, timerColor: z.timeLeft < 300 ? 'var(--warn)' : 'var(--text)', clock: ic('clock', 16, 2) };
         const ans = z.validated ? z.answers[z.answers.length - 1] : null;
         const states = q.a.map((_, i) => (z.validated ? (i === q.c ? 'correct' : i === ans.chosen ? 'wrong' : 'dim') : z.sel === i ? 'selected' : 'normal'));
         const explain = z.validated ? { text: q.x, bulb: ic('bulb', 16), verdict: ans.ok ? 'Bonne réponse' : 'Mauvaise réponse', vColor: ans.ok ? 'var(--success)' : 'var(--error)', vIcon: ic(ans.ok ? 'check' : 'x', 20, 2.5) } : null;
-        qv = buildQv(q, states, (i) => this.select(i), z.validated, explain, z.orders[id] || IDENTITY);
-        const label = z.validated ? (last ? 'Voir le résultat' : 'Question suivante') : z.instant ? 'Valider' : last ? 'Terminer l’examen' : 'Valider et continuer';
+        qv = buildQv(q, states, (i) => this.select(i), z.validated, explain, z.orders[id]);
+        const label = z.validated ? (last ? 'Voir le résultat' : 'Question suivante') : z.instant ? 'Valider' : last ? 'Terminer le test' : 'Valider et continuer';
         sticky = primary(label, () => this.primaryQuiz(), { disabled: !z.validated && z.sel == null, op: !z.validated && z.sel == null ? 0.45 : 1 }); break;
       }
       case 'result': {
-        const L = s.last; if (!L) break; const need = Math.ceil(L.total * 0.8); const ok = L.score >= need;
-        bar = { show: true, title: 'Résultat', backIcon: ic('x', 24), backLabel: 'Fermer', onBack: () => this.back() };
+        const L = P.history.find((h) => h.id === c.hid); if (!L) break; const need = passMark(L.total);
+        if (c.fresh) bar = { show: true, title: 'Résultat', backIcon: ic('x', 24), backLabel: 'Fermer', onBack: () => this.back() };
+        const missing = L.total - L.answered;
         res = {
-          title: L.title, score: L.score, total: L.total, verdict: ok ? 'Réussi' : 'Pas encore', vIcon: ic(ok ? 'check' : 'x', 16, 2.5), vBg: ok ? 'var(--successTint)' : 'var(--errorTint)', vColor: ok ? 'var(--success)' : 'var(--error)',
-          msg: ok ? 'Bravo, tu atteins le seuil de réussite.' : 'Il faut ' + need + ' bonnes réponses sur ' + L.total + ' pour réussir.',
+          title: L.title + (c.fresh ? '' : ' · ' + fmtWhen(L.at)), score: L.score, total: L.total, verdict: L.passed ? 'Réussi' : 'Pas encore', vIcon: ic(L.passed ? 'check' : 'x', 16, 2.5), vBg: L.passed ? 'var(--successTint)' : 'var(--errorTint)', vColor: L.passed ? 'var(--success)' : 'var(--error)',
+          msg: (L.passed ? 'Bravo, tu atteins le seuil de réussite.' : 'Il faut ' + need + ' bonnes réponses sur ' + L.total + ' pour réussir.') + (missing ? ' ' + plural(missing, 'question') + ' sans réponse.' : ''),
           stats: [{ v: L.score, l: 'Bonnes réponses' }, { v: L.total - L.score, l: 'Erreurs' }, { v: L.used != null ? fmt(L.used) : Math.round((L.score / L.total) * 100) + ' %', l: L.used != null ? 'Temps' : 'Réussite' }].map((x, i) => ({ ...x, sep: i ? '1px solid var(--divider)' : 'none' })),
         };
+        groups = [G('Par thème', THEMES.filter((t) => L.themes[t.id]).map((t) => { const [ok, n] = L.themes[t.id]; return row({ title: t.name, value: ok + ' / ' + n, pct: Math.round((ok / n) * 100) + '%' }); }))];
         const nw = L.wrong.length;
-        const home2 = { label: 'Retour à l’accueil', onClick: () => this.goHome(), order: 2, h: '46px', border: 'none', color: 'var(--primaryText)' };
-        sticky = nw ? primary('Revoir mes erreurs (' + nw + ')', () => this.push({ s: 'review' }), { secondary: home2 }) : primary('Terminer', () => this.back(), { secondary: home2 });
+        const review = () => this.push({ s: 'review', hid: L.id });
+        if (c.fresh) {
+          const home2 = { label: 'Retour à l’accueil', onClick: () => this.goHome(), order: 2, h: '46px', border: 'none', color: 'var(--primaryText)' };
+          sticky = nw ? primary('Revoir mes erreurs (' + nw + ')', review, { secondary: home2 }) : primary('Terminer', () => this.back(), { secondary: home2 });
+        } else if (nw) sticky = primary('Revoir mes erreurs (' + nw + ')', review);
         break;
       }
     }
-    const showNav = !(c.s === 'quiz' || c.s === 'result');
+    const showNav = !(c.s === 'quiz' || (c.s === 'result' && c.fresh));
     const sd = s.sheet ? this.sheetData() : null;
     const sheet = sd ? { ...sd, scrimOp: s.closing ? 0 : 1, transform: s.closing ? 'translateY(100%)' : 'translateY(' + s.drag + 'px)', transition: s.dragging ? 'none' : 'transform .22s cubic-bezier(.2,.8,.2,1)' } : null;
     const tabs = TABS.map(([id, label, icn]) => { const a = s.tab === id; return { id, label, icon: ic(icn, 22, a ? 2 : 1.5), color: a ? 'var(--primaryText)' : 'var(--text2)', pill: a ? 'var(--tint)' : 'transparent', weight: a ? 600 : 500, current: a ? 'page' : undefined, onClick: () => this.switchTab(id) }; });
     const toastPx = (showNav ? 72 : 0) + (sticky ? (sticky.secondary && sticky.dir === 'column' ? 140 : 86) : 0) + 24;
-    const toast = s.toast ? { m: s.toast.m, icon: ic('check', 18, 2.5), bottom: 'calc(' + toastPx + 'px + var(--safe-bottom))' } : null;
+    const toast = s.toast ? { m: s.toast.m, icon: ic(s.toast.icon, 18, 2.5), bottom: 'calc(' + toastPx + 'px + var(--safe-bottom))' } : null;
     return { bar, quizBar, largeTitle, home, testHero, progHero, profile, intro, fiche, flash, qv, res, chips, groups, empty, sticky, showNav, tabs, toast, sheet, safeBg: showNav ? 'var(--surface)' : 'var(--bg)' };
   }
 
@@ -479,6 +754,7 @@ export default class App extends Component {
   }
 }
 
+
 const Corners = () => (<><i className="corner tl" /><i className="corner tr" /><i className="corner bl" /><i className="corner br" /></>);
 const Bar = ({ w, h = 8 }) => (
   <div role="progressbar" style={{ height: h, background: 'var(--surface2)', borderRadius: h / 2, overflow: 'hidden' }}>
@@ -522,9 +798,19 @@ function Home({ h }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
           <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--primaryText)' }}>Civi · Test Civique</div>
           <h1 style={{ margin: 0, font: '600 32px/1.05 var(--font-heading)' }}>Bonjour 👋</h1>
-          <p style={{ margin: 0, fontSize: 15, color: 'var(--text2)' }}>Continue ta préparation</p>
+          <button className="p-chip" onClick={h.onPrep} aria-label={'Préparation : ' + h.prepName + '. Changer'} style={{ alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: 4, margin: 0, padding: '2px 8px 2px 10px', border: '1px solid var(--line)', borderRadius: 14, background: 'var(--surface)', fontSize: 14, color: 'var(--text2)', cursor: 'pointer' }}>{h.prepName}<span style={{ transform: 'rotate(90deg)', display: 'grid' }}>{h.chev}</span></button>
         </div>
       </div>
+      {h.install && (
+        <div style={{ padding: '0 20px' }}>
+          <div style={{ ...card, display: 'flex', alignItems: 'center', gap: 12, padding: '12px 8px 12px 14px' }}>
+            <span style={{ width: 40, height: 40, flex: 'none', borderRadius: 8, display: 'grid', placeItems: 'center', background: 'var(--tint)', color: 'var(--primary)' }}>{h.install.icon}</span>
+            <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}><span style={{ fontSize: 16, fontWeight: 600 }}>Installer Civi</span><span style={{ fontSize: 13, color: 'var(--text2)', lineHeight: 1.3 }}>Sur l’écran d’accueil, plein écran et hors connexion</span></span>
+            <button className="p-btn" onClick={h.install.onInstall} style={{ ...btnPrimary, flex: 'none', height: 38, padding: '0 14px', fontSize: 15 }}>Installer</button>
+            <button className="p-bg2" onClick={h.install.onDismiss} aria-label="Masquer" style={{ ...iconBtn, width: 36, height: 36, color: 'var(--text2)' }}>{h.install.close}</button>
+          </div>
+        </div>
+      )}
       <div style={{ padding: '0 20px' }}>
         <div className="blueprint" style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 14 }}>
           <Corners />
@@ -570,7 +856,7 @@ function ProgHero({ p }) {
     <div style={{ padding: '0 20px' }}>
       <div className="blueprint" style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 14 }}>
         <Corners />
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}><span style={{ font: '600 64px/0.9 var(--font-heading)', letterSpacing: '-.02em' }}>{p.label}</span><span style={{ fontSize: 16, color: 'var(--text2)' }}>Maîtrise globale</span></div>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}><span style={{ font: '600 64px/0.9 var(--font-heading)', letterSpacing: '-.02em' }}>{p.label}</span><span style={{ fontSize: 16, color: 'var(--text2)' }}>{p.sub}</span></div>
         <Bar w={p.w} />
       </div>
     </div>
@@ -605,14 +891,14 @@ function Fiche({ f }) {
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, color: 'var(--text2)' }}><span>{f.sub}</span><span style={{ fontWeight: 600, color: 'var(--text)' }}>{f.pctLabel}</span></div>
             <Bar w={f.pct} />
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {f.facts.length > 0 && <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             <h2 style={h2s}>L'essentiel</h2>
             <div style={card}>
               {f.facts.map((x) => (
                 <div key={x.n} style={{ display: 'flex', gap: 14, padding: '14px 16px', borderBottom: x.sep }}><span style={{ flex: 'none', width: 16, font: '600 20px/1.3 var(--font-heading)', color: 'var(--primaryText)' }}>{x.n}</span><span style={{ fontSize: 16, lineHeight: 1.45, textWrap: 'pretty' }}>{x.text}</span></div>
               ))}
             </div>
-          </div>
+          </div>}
         </div>
       )}
     </div>
@@ -783,6 +1069,7 @@ function Sheet({ sheet, onClose, onDown, onMove, onUp }) {
         )}
         {sheet.confirm && (
           <div style={{ padding: '18px 20px 0', display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {sheet.confirm.alt && <button className="p-btn" onClick={sheet.confirm.alt.onClick} style={{ ...btnPrimary, height: 54 }}>{sheet.confirm.alt.label}</button>}
             <button className="p-danger" onClick={sheet.confirm.onOk} style={{ height: 54, border: 'none', borderRadius: 10, background: 'var(--errorFill)', color: '#fff', font: '600 17px/1 var(--font-body)', cursor: 'pointer' }}>{sheet.confirm.ok}</button>
             <button className="p-cancel" onClick={onClose} style={{ height: 52, border: 'none', borderRadius: 10, background: 'var(--surface2)', color: 'var(--text)', font: '600 17px/1 var(--font-body)', cursor: 'pointer' }}>{sheet.confirm.cancel}</button>
           </div>

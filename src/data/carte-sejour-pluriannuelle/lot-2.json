@@ -1,0 +1,204 @@
+{
+  "titre": "Droits, devoirs et vie quotidienne",
+  "description": "Égalité, famille, impôts, santé et école.",
+  "questions": [
+    {
+      "id": "sp-2-01",
+      "theme": "droits",
+      "question": "Payer ses impôts est :",
+      "reponses": [
+        "Un choix personnel",
+        "Réservé aux Français",
+        "Réservé aux entreprises",
+        "Un devoir pour toutes les personnes concernées"
+      ],
+      "bonne_reponse": "D",
+      "explication": "La contribution commune aux dépenses publiques est prévue par l’article 13 de la Déclaration de 1789."
+    },
+    {
+      "id": "sp-2-02",
+      "theme": "droits",
+      "question": "En France, les femmes et les hommes ont :",
+      "reponses": [
+        "Des droits différents selon la religion",
+        "Des droits différents une fois mariés",
+        "Les mêmes droits",
+        "Les mêmes droits seulement au travail"
+      ],
+      "bonne_reponse": "C",
+      "explication": "Le Préambule de 1946 précise : « La loi garantit à la femme, dans tous les domaines, des droits égaux à ceux de l’homme »."
+    },
+    {
+      "id": "sp-2-03",
+      "theme": "droits",
+      "question": "Un étranger non européen peut-il voter aux élections municipales ?",
+      "reponses": [
+        "Oui, toujours",
+        "Non, ce droit est réservé aux Français et aux citoyens de l’Union européenne",
+        "Oui, après 5 ans de résidence",
+        "Oui, s’il paie des impôts"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Les citoyens de l’Union européenne résidant en France peuvent voter aux élections municipales et européennes. Les autres étrangers ne votent pas.",
+      "piege": true
+    },
+    {
+      "id": "sp-2-04",
+      "theme": "droits",
+      "question": "Frapper son enfant pour l’éduquer est :",
+      "reponses": [
+        "Autorisé à la maison",
+        "Autorisé s’il n’y a pas de marque",
+        "Autorisé à partir de 10 ans",
+        "Interdit par la loi"
+      ],
+      "bonne_reponse": "D",
+      "explication": "Depuis la loi du 10 juillet 2019, l’autorité parentale s’exerce sans violences physiques ou psychologiques.",
+      "piege": true
+    },
+    {
+      "id": "sp-2-05",
+      "theme": "droits",
+      "question": "Les violences au sein du couple sont :",
+      "reponses": [
+        "Une affaire privée",
+        "Punies par la loi",
+        "Autorisées dans le mariage",
+        "Punies seulement s’il y a des témoins"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Les violences conjugales sont des délits ou des crimes. Le 3919 est un numéro d’écoute gratuit et anonyme ; en urgence, appeler le 17."
+    },
+    {
+      "id": "sp-2-06",
+      "theme": "droits",
+      "question": "Le mariage forcé est-il autorisé en France ?",
+      "reponses": [
+        "Non, le mariage exige le libre consentement des deux époux",
+        "Oui, si la famille est d’accord",
+        "Oui, à partir de 16 ans",
+        "Oui, dans certaines religions"
+      ],
+      "bonne_reponse": "A",
+      "explication": "Il n’y a pas de mariage sans consentement (Code civil). L’âge minimum pour se marier est de 18 ans pour les deux époux."
+    },
+    {
+      "id": "sp-2-07",
+      "theme": "institutions",
+      "question": "Qui vote les lois en France ?",
+      "reponses": [
+        "Le Parlement",
+        "Le président de la République",
+        "Le Gouvernement",
+        "Le maire"
+      ],
+      "bonne_reponse": "A",
+      "explication": "Le Parlement, composé de l’Assemblée nationale et du Sénat, vote la loi."
+    },
+    {
+      "id": "sp-2-08",
+      "theme": "institutions",
+      "question": "Le Parlement est composé de :",
+      "reponses": [
+        "Le Gouvernement et le Sénat",
+        "L’Assemblée nationale et le Conseil constitutionnel",
+        "Les maires et les préfets",
+        "L’Assemblée nationale et le Sénat"
+      ],
+      "bonne_reponse": "D",
+      "explication": "Les députés siègent à l’Assemblée nationale, les sénateurs au Sénat."
+    },
+    {
+      "id": "sp-2-09",
+      "theme": "institutions",
+      "question": "Comment le président de la République est-il élu ?",
+      "reponses": [
+        "Par les députés",
+        "Au suffrage universel direct, par les citoyens",
+        "Par le Gouvernement",
+        "Par les maires"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Depuis 1962, le président est élu directement par les citoyens."
+    },
+    {
+      "id": "sp-2-10",
+      "theme": "histoire",
+      "question": "Quelle est la date de la fête nationale française ?",
+      "reponses": [
+        "Le 1er mai",
+        "Le 11 novembre",
+        "Le 8 mai",
+        "Le 14 juillet"
+      ],
+      "bonne_reponse": "D",
+      "explication": "Elle rappelle la prise de la Bastille (1789) et la fête de la Fédération (1790). C’est la fête nationale depuis 1880."
+    },
+    {
+      "id": "sp-2-11",
+      "theme": "histoire",
+      "question": "Lequel de ces pays a une frontière avec la France métropolitaine ?",
+      "reponses": [
+        "L’Espagne",
+        "Le Portugal",
+        "Les Pays-Bas",
+        "L’Autriche"
+      ],
+      "bonne_reponse": "A",
+      "explication": "Voisins de la métropole : Belgique, Luxembourg, Allemagne, Suisse, Italie, Monaco, Andorre et Espagne."
+    },
+    {
+      "id": "sp-2-12",
+      "theme": "histoire",
+      "question": "De quelle organisation la France est-elle un membre fondateur ?",
+      "reponses": [
+        "L’ALENA",
+        "L’Union africaine",
+        "L’Union européenne",
+        "Le Mercosur"
+      ],
+      "bonne_reponse": "C",
+      "explication": "La France fait partie des six pays fondateurs de la construction européenne (traité de Rome, 1957)."
+    },
+    {
+      "id": "sp-2-13",
+      "theme": "societe",
+      "question": "Quel organisme rembourse une partie des frais de santé ?",
+      "reponses": [
+        "L’Assurance maladie (Sécurité sociale)",
+        "La mairie",
+        "La préfecture",
+        "La banque"
+      ],
+      "bonne_reponse": "A",
+      "explication": "La carte Vitale permet d’être remboursé par l’Assurance maladie."
+    },
+    {
+      "id": "sp-2-14",
+      "theme": "societe",
+      "question": "L’école publique en France est :",
+      "reponses": [
+        "Gratuite et laïque",
+        "Payante",
+        "Réservée aux Français",
+        "Religieuse"
+      ],
+      "bonne_reponse": "A",
+      "explication": "Les lois Jules Ferry (1881-1882) ont rendu l’école primaire gratuite, laïque et obligatoire."
+    },
+    {
+      "id": "sp-2-15",
+      "theme": "valeurs",
+      "question": "La liberté d’expression permet-elle de tout dire ?",
+      "reponses": [
+        "Oui, sans aucune limite",
+        "Non, il est interdit de critiquer le Gouvernement",
+        "Oui, sauf sur Internet",
+        "Non : l’injure, la diffamation et l’incitation à la haine sont punies"
+      ],
+      "bonne_reponse": "D",
+      "explication": "On peut critiquer librement, y compris le Gouvernement, mais la loi punit l’injure, la diffamation et la provocation à la haine.",
+      "piege": true
+    }
+  ]
+}
