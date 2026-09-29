@@ -11,11 +11,11 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
+      includeAssets: ['brand-icon.svg', 'favicon-32x32.png', 'apple-touch-icon.png'],
       manifest: {
         id: base,
-        name: 'Test Civique — Entraînement',
-        short_name: 'Test Civique',
+        name: 'Civi — Test Civique',
+        short_name: 'Civi',
         description: 'Entraînement au test civique français : quiz, révisions par thème et examens blancs.',
         lang: 'fr',
         start_url: base,
