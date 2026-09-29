@@ -1,13 +1,21 @@
 import { Component, createRef } from 'react';
 import { ic } from './Icon.jsx';
-import { THEMES, LET, MODE_T, TABS, PAL, EXAM_SECONDS, thById, shuffle, fmt } from './constants.js';
+import { THEMES, LET, MODE_T, TABS, PAL, EXAM_SECONDS, APP_VERSION, thById, shuffle, fmt } from './constants.js';
+import { plural, fmtWhen, bestOf, examMinutes } from './utils.js';
+import { EMPTY_PROPOSAL, sendProposal, checkImage } from './feedback.js';
+import { TopBar, QuizBar, Sticky, Nav, Sheet } from './components/Chrome.jsx';
+import { Home, TestHero, ProgHero, Profile } from './components/Dashboard.jsx';
+import { Fiche, Flash, QuestionView, Result } from './components/Study.jsx';
+import { Chips, Group, Empty } from './components/Lists.jsx';
+import { ProposeForm } from './components/ProposeForm.jsx';
+import { sheetData } from './sheets.js';
 import { PREPS, prepById, hasPrep } from './bank.js';
 import {
   emptyProfile, recordAnswer, isMastered, themeStats, overview, weakThemes, pickSmart, smartPlan, pickWeak, hardPool, pickExam,
   passMark, dayKey, lastActiveDay,
 } from './stats.js';
 import { loadSettings, saveSettings, loadProfile, saveProfile, saveQuiz } from './storage.js';
-import { canInstall, isIOS, isStandalone, onInstallChange, promptInstall, installHelp } from './install.js';
+import { canInstall, isIOS, isStandalone, onInstallChange, promptInstall } from './install.js';
 import { notifSupported, notifPermission, askPermission, pushConfig, checkReminders, testNotification, onReminderMessage } from './notify.js';
 
 // Device-wide settings; the preparation-specific ones live in each profile.
@@ -21,82 +29,6 @@ const DEFAULT_PREP = 'carte-resident';
 const EMPTY_STACKS = () => ({ home: [], revise: [], test: [], progress: [], profile: [] });
 const EMPTY_MSG = { weak: 'Aucun point faible détecté pour l’instant', hard: 'Aucune question difficile pour l’instant', errors: 'Aucune erreur à revoir' };
 const darkQuery = typeof window !== 'undefined' && window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
-const BRAND_ICON = import.meta.env.BASE_URL + 'brand-icon.svg';
-const APP_VERSION = __APP_VERSION__;
-
-// The official exam gives 45 minutes for 40 questions; shorter tests get proportional time.
-const examMinutes = (n) => Math.max(1, Math.round((EXAM_SECONDS / 60) * (n / 40)));
-// « Signaler » sends the report by e-mail to the maintainer through Web3Forms (public key, it can only send to that inbox).
-const WEB3FORMS_KEY = '8acd26cf-61e8-4f4c-9075-d0c2d884ba57';
-const BUG_REASONS = ['L’application plante ou se bloque', 'Problème d’affichage', 'Mauvais calcul (score, progression…)', 'Autre'];
-const REPORT_REASONS = ['Réponse incorrecte', 'Énoncé ambigu', 'Faute ou coquille', 'Information périmée', 'Autre'];
-// ctx: { prep, where, mode, chosen (original answer index or null), revealed }. q is null for a general bug report.
-async function sendReport(ctx, q, reason, comment, img) {
-  const imageUrl = img ? await uploadImage(img, CLOUDINARY.reportPreset) : null;
-  const L = (i) => LET[i] + '. ' + q.a[i];
-  const lines = ['=== SIGNALEMENT ===', 'Motif : ' + reason, 'Commentaire : ' + (comment || '—'), 'Capture : ' + (imageUrl || 'aucune'), ''];
-  if (q) {
-    const chosen = ctx.chosen == null ? 'pas encore répondu' : L(ctx.chosen) + (ctx.chosen === q.c ? ' (juste)' : ' (fausse)');
-    lines.push(
-      '=== QUESTION ===', 'Identifiant : ' + q.id, 'Préparation : ' + ctx.prep, 'Fichier : ' + (q.lot || '—') + '.json',
-      'Thème : ' + thById(q.t).name, 'Type : ' + ([q.situation && 'mise en situation', q.trap && 'piège'].filter(Boolean).join(', ') || 'classique'), '',
-      'Énoncé :', q.q, '', 'Réponses :', ...q.a.map((_, i) => L(i) + (i === q.c ? '  ✅ bonne réponse' : '')), '',
-      'À retenir :', q.x || '—', '', '=== CONTEXTE ===', 'Écran : ' + ctx.where + (ctx.mode ? ' (' + ctx.mode + ')' : ''), 'Réponse choisie : ' + chosen,
-      'Correction affichée : ' + (ctx.revealed ? 'oui' : 'non'),
-    );
-  } else lines.push('=== CONTEXTE ===', 'Préparation : ' + ctx.prep);
-  lines.push('Version : ' + APP_VERSION, 'Date : ' + new Date().toLocaleString('fr-FR'), 'Appareil : ' + navigator.userAgent, 'Écran : ' + window.innerWidth + '×' + window.innerHeight);
-  const subject = 'Civi · ' + (q ? 'Signalement ' + q.id : 'Bug') + ' · ' + reason + (imageUrl ? ' · avec capture' : '');
-  const j = await fetch('https://api.web3forms.com/submit', {
-    method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-    body: JSON.stringify({ access_key: WEB3FORMS_KEY, subject, from_name: 'Civi · ' + ctx.prep, message: lines.join('\n') }),
-  }).then((r) => r.json());
-  if (!j.success) throw new Error(j.message);
-}
-// « Proposer une question » : optional image goes to Cloudinary (unsigned preset, folder civi-propositions), then the whole proposal is e-mailed via Web3Forms.
-const CLOUDINARY = { cloud: 'dapzqelui', preset: 'civi_propositions', reportPreset: 'civi_signales' };
-const EMPTY_PROPOSAL = () => ({ prep: null, theme: '', q: '', a: ['', '', '', ''], c: null, x: '', note: '', img: null, preview: null, sending: false });
-// Shrinks photos before upload (max 1600 px, JPEG) to stay fast on mobile data and small on the free plan.
-function shrinkImage(file, max = 1600) {
-  return new Promise((resolve) => {
-    const url = URL.createObjectURL(file), img = new Image();
-    img.onload = () => {
-      const k = Math.min(1, max / Math.max(img.width, img.height)), cv = document.createElement('canvas');
-      cv.width = Math.round(img.width * k); cv.height = Math.round(img.height * k);
-      cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height); URL.revokeObjectURL(url);
-      cv.toBlob((b) => resolve(b || file), 'image/jpeg', 0.85);
-    };
-    img.onerror = () => { URL.revokeObjectURL(url); resolve(file); };
-    img.src = url;
-  });
-}
-async function uploadImage(file, preset) {
-  const fd = new FormData(); fd.append('file', await shrinkImage(file)); fd.append('upload_preset', preset);
-  const r = await fetch('https://api.cloudinary.com/v1_1/' + CLOUDINARY.cloud + '/image/upload', { method: 'POST', body: fd }).then((x) => x.json());
-  if (!r.secure_url) throw new Error(r.error?.message || 'upload');
-  return r.secure_url;
-}
-async function sendProposal(p, prepName) {
-  const imageUrl = p.img ? await uploadImage(p.img, CLOUDINARY.preset) : null;
-  const answers = p.a.map((t, i) => [t.trim(), i]).filter(([t]) => t);
-  const lines = [
-    '=== PROPOSITION DE QUESTION ===', 'Préparation : ' + prepName, 'Thème : ' + (p.theme ? thById(p.theme).name : '—'), '',
-    'Énoncé :', p.q.trim() || '—', '', 'Réponses :', ...(answers.length ? answers.map(([t, i]) => LET[i] + '. ' + t + (i === p.c ? '  ✅ bonne réponse' : '')) : ['—']), '',
-    'À retenir :', p.x.trim() || '—', '', 'Commentaire :', p.note.trim() || '—', '', 'Image : ' + (imageUrl || 'aucune'), '',
-    '=== CONTEXTE ===', 'Version : ' + APP_VERSION, 'Date : ' + new Date().toLocaleString('fr-FR'), 'Appareil : ' + navigator.userAgent,
-  ];
-  const j = await fetch('https://api.web3forms.com/submit', {
-    method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-    body: JSON.stringify({ access_key: WEB3FORMS_KEY, subject: 'Civi · Proposition de question · ' + prepName + (imageUrl ? ' · avec image' : ''), from_name: 'Civi · ' + prepName, message: lines.join('\n') }),
-  }).then((r) => r.json());
-  if (!j.success) throw new Error(j.message);
-}
-const plural = (n, word) => n + ' ' + word + (n > 1 ? 's' : '');
-const fmtWhen = (ts) => {
-  const d = new Date(ts);
-  return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) + ' · ' + d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-};
-const bestOf = (list) => list.reduce((b, h) => (!b || h.score / h.total > b.score / b.total ? h : b), null);
 
 // Drops references to questions that no longer exist in the bank (lot files edited or removed).
 function cleanProfile(bank, p) {
@@ -467,8 +399,7 @@ export default class App extends Component {
   pickReportImage(file) {
     const old = this.state.reportImg; if (old) URL.revokeObjectURL(old.preview);
     if (!file) return this.setState({ reportImg: null });
-    if (!file.type.startsWith('image/')) return this.toast('Choisis une image');
-    if (file.size > 15e6) return this.toast('Image trop lourde (15 Mo max)');
+    const bad = checkImage(file); if (bad) return this.toast(bad);
     this.setState({ reportImg: { file, preview: URL.createObjectURL(file) } });
   }
   openPropose() { this.setState({ pf: { ...EMPTY_PROPOSAL(), prep: this.state.prep } }); this.push({ s: 'propose' }); }
@@ -476,8 +407,7 @@ export default class App extends Component {
   pickImage(file) {
     const old = this.state.pf.preview; if (old) URL.revokeObjectURL(old);
     if (!file) return this.setPf({ img: null, preview: null });
-    if (!file.type.startsWith('image/')) return this.toast('Choisis une image');
-    if (file.size > 15e6) return this.toast('Image trop lourde (15 Mo max)');
+    const bad = checkImage(file); if (bad) return this.toast(bad);
     this.setPf({ img: file, preview: URL.createObjectURL(file) });
   }
   submitPropose() {
@@ -490,60 +420,7 @@ export default class App extends Component {
     }, () => { this.setPf({ sending: false }); this.toast('Échec de l’envoi, réessaie plus tard'); });
   }
 
-  sheetData() {
-    const s = this.state, st = this.settings(), bank = this.bank(), P = this.prof(), TS = themeStats(bank, P);
-    const opt = (label, sub, sel, fn, icon) => ({ label, sub, onClick: fn, icon, check: sel ? ic('check', 20, 2) : null, color: sel ? 'var(--primaryText)' : 'var(--text)', weight: sel ? 600 : 500, bg: sel ? 'var(--tint)' : 'transparent' });
-    const pick = (k, list) => list.map((o) => opt(o[1], o[2], st[k] === o[0], () => { this.setS(k, o[0]); this.closeSheet(); }));
-    const n = bank.questions.length;
-    switch (s.sheet) {
-      case 'count': {
-        const counts = [5, 10, 20, 40].filter((c) => c <= n);
-        if (!counts.length || n < 40) counts.push(n);
-        return { title: 'Quiz rapide', sub: 'Combien de questions ?', options: [...new Set(counts)].map((c) => opt(c === n ? 'Toutes les questions (' + c + ')' : c + ' questions', '≈ ' + Math.max(1, Math.round(c * 0.6)) + ' min', false, () => this.startQuiz('quick', c))) };
-      }
-      case 'theme': return { title: 'Quiz par thème', sub: 'Choisis un thème', options: THEMES.filter((t) => TS[t.id].total).map((t) => opt(t.name, TS[t.id].pct + ' % maîtrisé · ' + plural(TS[t.id].total, 'question'), false, () => this.startQuiz('theme', t.id), ic(t.icon))) };
-      case 'quit': return { title: 'Quitter le test ?', sub: 'Ta progression est sauvegardée sur cet appareil : tu pourras reprendre ce test plus tard, même après avoir fermé l’application.', confirm: { alt: { label: 'Sauvegarder et quitter', onClick: () => this.quitQuiz(true) }, ok: 'Abandonner le test', onOk: () => this.quitQuiz(false), cancel: 'Continuer le test' } };
-      case 'replace': {
-        const q = P.quiz; if (!q) return null;
-        return { title: 'Un test est en cours', sub: q.title + ' · question ' + (q.idx + 1) + ' / ' + q.qs.length, options: [
-          opt('Reprendre ce test', 'Là où tu t’étais arrêté', false, () => this.resumeQuiz(), ic('rotate')),
-          opt('Commencer le nouveau test', 'Le test en cours sera abandonné', false, () => this.startQuiz(...this.pending, true), ic('zap')),
-        ] };
-      }
-      case 'reset': return { title: 'Réinitialiser ma progression ?', sub: 'Les statistiques, l’historique, les erreurs, les favoris et le test en cours du profil « ' + bank.name + ' » seront effacés. Les autres préparations ne sont pas touchées. Cette action est définitive.', confirm: { ok: 'Réinitialiser', cancel: 'Annuler', onOk: () => this.resetProfile() } };
-      case 'appearance': return { title: 'Apparence', options: pick('theme', [['system', 'Système', 'Suit le réglage du téléphone'], ['light', 'Clair'], ['dark', 'Sombre']]) };
-      case 'text': return { title: 'Taille du texte', sub: 'S’applique aux questions et réponses.', options: pick('text', [['Petite', 'Petite'], ['Normale', 'Normale'], ['Grande', 'Grande']]) };
-      case 'goal': return { title: 'Objectif quotidien', sub: 'C’est aussi la longueur d’une révision intelligente.', options: pick('goal', [[5, '5 questions', '≈ 3 min par jour'], [10, '10 questions', '≈ 6 min par jour'], [20, '20 questions', '≈ 12 min par jour'], [30, '30 questions', '≈ 18 min par jour']]) };
-      case 'prep': return {
-        title: this.firstRun ? 'Quelle préparation ?' : 'Type de préparation',
-        sub: 'Chaque préparation est un profil séparé : ses propres questions, statistiques, historique, erreurs et favoris.',
-        options: PREPS.map((b) => { const o = overview(b, s.profiles[b.id]); return opt(b.name, o.pct + ' % · ' + plural(b.questions.length, 'question') + ' · ' + plural(b.lots.length, 'lot'), b.id === s.prep, () => this.switchPrep(b.id), ic('target')); }),
-      };
-      case 'time': return { title: 'Heure du rappel', options: pick('time', [['08:00', '08:00', 'Le matin'], ['12:30', '12:30', 'À midi'], ['19:00', '19:00', 'En soirée'], ['21:00', '21:00', 'Avant de dormir']]) };
-      case 'examLength': return { title: 'Longueur de l’examen blanc', sub: 'L’examen officiel compte 40 questions en 45 minutes.', options: pick('examLength', [[40, '40 questions', 'Conditions réelles · 45 min'], [20, '20 questions', 'Entraînement court · ' + examMinutes(20) + ' min'], [10, '10 questions', 'Démo · ' + examMinutes(10) + ' min']]) };
-      case 'report': {
-        const q = this.reportQ, reason = s.reportReason, text = s.reportText || '', img = s.reportImg;
-        const send = () => {
-          this.closeSheet();
-          if (!navigator.onLine) return this.toast('Pas de connexion : réessaie plus tard');
-          if (img) this.toast('Envoi en cours…');
-          sendReport(q ? this.reportCtx(bank, q) : { prep: bank.name }, q, reason, text.trim().slice(0, 1000), img?.file)
-            .then(() => this.toast('Merci, signalement envoyé'), () => this.toast('Échec de l’envoi, réessaie plus tard'));
-        };
-        return {
-          title: q ? 'Signaler cette question' : 'Signaler un bug', sub: 'Choisis le problème. Le signalement est envoyé anonymement à l’auteur de l’application.',
-          options: (q ? REPORT_REASONS : BUG_REASONS).map((r) => opt(r, null, r === reason, () => this.setState({ reportReason: r }), ic('alert'))),
-          form: {
-            value: text, placeholder: q ? 'Précise le problème (facultatif)' : 'Décris ce qui s’est passé (facultatif)', onChange: (e) => this.setState({ reportText: e.target.value }),
-            image: { preview: img?.preview, label: 'Ajouter une capture d’écran', icon: ic('download', 18), onPick: (f) => this.pickReportImage(f) },
-            send: { label: 'Envoyer le signalement', disabled: !reason, onClick: send },
-          },
-        };
-      }
-      case 'installHelp': return { title: 'Installer l’application', sub: installHelp() };
-    }
-    return null;
-  }
+  sheetData() { return sheetData(this); }
 
   vals() {
     const s = this.state, st = this.settings(), c = this.cur(), bank = this.bank(), P = this.prof();
@@ -720,7 +597,6 @@ export default class App extends Component {
         propose = {
           p, preps: PREPS.map((b) => ({ id: b.id, name: b.name })), themes: THEMES.map((t) => ({ id: t.id, name: t.name })), LET,
           set: (patch) => this.setPf(patch), setA: (i, v) => this.setPf({ a: p.a.map((t, j) => (j === i ? v : t)) }), pick: (f) => this.pickImage(f),
-          imgIcon: ic('download', 20),
         };
         intro = 'Propose une nouvelle question : remplis les champs, ou envoie simplement une photo (livret, document officiel…). Elle sera vérifiée avant d’être ajoutée.';
         sticky = primary(p.sending ? 'Envoi…' : 'Envoyer la proposition', () => this.submitPropose(), { disabled: !ok || p.sending, op: !ok || p.sending ? 0.45 : 1 });
@@ -893,381 +769,4 @@ export default class App extends Component {
       </div>
     );
   }
-}
-
-
-const Corners = () => (<><i className="corner tl" /><i className="corner tr" /><i className="corner bl" /><i className="corner br" /></>);
-const Bar = ({ w, h = 8 }) => (
-  <div role="progressbar" style={{ height: h, background: 'var(--surface2)', borderRadius: h / 2, overflow: 'hidden' }}>
-    <div style={{ height: '100%', width: w, background: 'var(--primary)', borderRadius: h / 2, transition: 'width .6s ease' }} />
-  </div>
-);
-const btnPrimary = { border: 'none', borderRadius: 10, background: 'var(--btn)', color: 'var(--onBtn)', font: '600 17px/1 var(--font-body)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, cursor: 'pointer' };
-const iconBtn = { width: 44, height: 44, flex: 'none', border: 'none', background: 'transparent', borderRadius: 8, display: 'grid', placeItems: 'center', cursor: 'pointer' };
-const h2s = { margin: 0, font: '600 21px/1.2 var(--font-heading)' };
-const card = { background: 'var(--surface)', borderRadius: 10, boxShadow: 'var(--shadowS)' };
-
-function TopBar({ bar }) {
-  return (
-    <div style={{ flex: 'none', height: 52, display: 'flex', alignItems: 'center', gap: 4, padding: '0 8px 0 4px' }}>
-      <button className="p-bg2" onClick={bar.onBack} aria-label={bar.backLabel} style={{ ...iconBtn, color: 'var(--text)' }}>{bar.backIcon}</button>
-      <div style={{ flex: 1, minWidth: 0, font: '600 21px/1.2 var(--font-heading)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{bar.title}</div>
-      {bar.star && <button className="p-star" onClick={bar.star.onClick} aria-label={bar.star.label} aria-pressed={bar.star.pressed} style={{ ...iconBtn, color: bar.star.color, transition: 'transform .15s' }}>{bar.star.icon}</button>}
-    </div>
-  );
-}
-
-function QuizBar({ b }) {
-  return (
-    <div style={{ flex: 'none', padding: '0 20px 8px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-      <div role="progressbar" aria-label="Progression du test" style={{ height: 4, background: 'var(--surface2)', borderRadius: 2, overflow: 'hidden' }}>
-        <div style={{ height: '100%', width: b.pct, background: 'var(--primary)', borderRadius: 2, transition: 'width .35s ease' }} />
-      </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: 22, fontSize: 14, color: 'var(--text2)' }}>
-        <span>{b.mode}</span>
-        {b.timer && <span aria-label="Temps restant" style={{ display: 'flex', alignItems: 'center', gap: 6, font: '600 18px/1 var(--font-heading)', color: b.timerColor, fontVariantNumeric: 'tabular-nums' }}>{b.clock}{b.timer}</span>}
-      </div>
-    </div>
-  );
-}
-
-function Home({ h }) {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
-      <div style={{ padding: '6px 20px 0', display: 'flex', alignItems: 'center', gap: 13 }}>
-        <img src={BRAND_ICON} alt="" aria-hidden="true" style={{ width: 52, height: 52, flex: 'none', objectFit: 'contain', filter: 'drop-shadow(0 6px 12px rgba(20,55,130,.12))' }} />
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
-          <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--primaryText)' }}>Civi · Test Civique</div>
-          <h1 style={{ margin: 0, font: '600 32px/1.05 var(--font-heading)' }}>Bonjour 👋</h1>
-          <button className="p-chip" onClick={h.onPrep} aria-label={'Préparation : ' + h.prepName + '. Changer'} style={{ alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: 4, margin: 0, padding: '2px 8px 2px 10px', border: '1px solid var(--line)', borderRadius: 14, background: 'var(--surface)', fontSize: 14, color: 'var(--text2)', cursor: 'pointer' }}>{h.prepName}<span style={{ transform: 'rotate(90deg)', display: 'grid' }}>{h.chev}</span></button>
-        </div>
-      </div>
-      {h.install && (
-        <div style={{ padding: '0 20px' }}>
-          <div style={{ ...card, display: 'flex', alignItems: 'center', gap: 12, padding: '12px 8px 12px 14px' }}>
-            <span style={{ width: 40, height: 40, flex: 'none', borderRadius: 8, display: 'grid', placeItems: 'center', background: 'var(--tint)', color: 'var(--primary)' }}>{h.install.icon}</span>
-            <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}><span style={{ fontSize: 16, fontWeight: 600 }}>Installer Civi</span><span style={{ fontSize: 13, color: 'var(--text2)', lineHeight: 1.3 }}>Sur l’écran d’accueil, plein écran et hors connexion</span></span>
-            <button className="p-btn" onClick={h.install.onInstall} style={{ ...btnPrimary, flex: 'none', height: 38, padding: '0 14px', fontSize: 15 }}>Installer</button>
-            <button className="p-bg2" onClick={h.install.onDismiss} aria-label="Masquer" style={{ ...iconBtn, width: 36, height: 36, color: 'var(--text2)' }}>{h.install.close}</button>
-          </div>
-        </div>
-      )}
-      <div style={{ padding: '0 20px' }}>
-        <div className="blueprint" style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 14 }}>
-          <Corners />
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}><span style={{ font: '600 64px/0.9 var(--font-heading)', letterSpacing: '-.02em' }}>{h.prep}</span><span style={{ fontSize: 16, color: 'var(--text2)' }}>de préparation</span></div>
-          <Bar w={h.prepW} />
-          <div style={{ fontSize: 14, color: 'var(--text2)' }}>{h.goal}</div>
-          <button className="p-btn" onClick={h.onCta} disabled={h.loading} style={{ ...btnPrimary, marginTop: 4, height: 56 }}>{h.loading && <span className="spinner" />}{h.ctaLabel}</button>
-          <div style={{ fontSize: 13, color: 'var(--text2)', textAlign: 'center' }}>{h.ctaSub}</div>
-        </div>
-      </div>
-      <div style={{ padding: '0 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-        <h2 style={h2s}>Que veux-tu faire ?</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-          {h.tiles.map((t) => (
-            <button key={t.label} className="p-tile" onClick={t.onClick} style={{ position: 'relative', minHeight: 116, padding: 14, border: 'none', borderRadius: 10, background: 'var(--surface)', boxShadow: 'var(--shadowS)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, textAlign: 'left', cursor: 'pointer' }}>
-              <span style={{ width: 40, height: 40, borderRadius: 8, display: 'grid', placeItems: 'center', background: 'var(--tint)', color: 'var(--primary)' }}>{t.icon}</span>
-              <span style={{ display: 'flex', flexDirection: 'column', gap: 3 }}><span style={{ fontSize: 16, fontWeight: 600, lineHeight: 1.2 }}>{t.label}</span><span style={{ fontSize: 13, color: 'var(--text2)', lineHeight: 1.3 }}>{t.sub}</span></span>
-              {t.badge && <span style={{ position: 'absolute', top: 12, right: 12, minWidth: 22, height: 22, padding: '0 6px', borderRadius: 11, background: 'var(--red)', color: '#fff', font: '600 13px/22px var(--font-body)', textAlign: 'center' }}>{t.badge}</span>}
-            </button>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function TestHero({ t }) {
-  return (
-    <div style={{ padding: '0 20px' }}>
-      <div className="blueprint" style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 14 }}>
-        <Corners />
-        <span style={{ fontSize: 13, fontWeight: 600, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--primaryText)' }}>Conditions réelles</span>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}><h2 style={{ margin: 0, font: '600 30px/1.1 var(--font-heading)' }}>Examen blanc</h2><span style={{ fontSize: 16, color: 'var(--text2)' }}>{t.sub}</span></div>
-        <span style={{ fontSize: 14, color: 'var(--text2)' }}>{t.pass}</span>
-        <button className="p-btn" onClick={t.onStart} style={{ ...btnPrimary, height: 56 }}>Démarrer l'examen</button>
-      </div>
-    </div>
-  );
-}
-
-function ProgHero({ p }) {
-  return (
-    <div style={{ padding: '0 20px' }}>
-      <div className="blueprint" style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 14 }}>
-        <Corners />
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}><span style={{ font: '600 64px/0.9 var(--font-heading)', letterSpacing: '-.02em' }}>{p.label}</span><span style={{ fontSize: 16, color: 'var(--text2)' }}>{p.sub}</span></div>
-        <Bar w={p.w} />
-      </div>
-    </div>
-  );
-}
-
-function Profile({ p }) {
-  return (
-    <div style={{ padding: '0 20px', display: 'flex', alignItems: 'center', gap: 16 }}>
-      <span style={{ width: 64, height: 64, flex: 'none', borderRadius: '50%', display: 'grid', placeItems: 'center', background: 'var(--tint)', color: 'var(--primaryText)', font: '600 24px/1 var(--font-heading)' }}>{p.initials}</span>
-      <span style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}><span style={{ font: '600 22px/1.15 var(--font-heading)' }}>{p.name}</span><span style={{ fontSize: 14, color: 'var(--text2)' }}>{p.sub}</span></span>
-    </div>
-  );
-}
-
-function Fiche({ f }) {
-  const sk = { background: 'var(--surface2)', borderRadius: 4 };
-  return (
-    <div style={{ padding: '4px 20px 0', display: 'flex', flexDirection: 'column', gap: 20 }}>
-      {f.loading && (
-        <div aria-label="Chargement" style={{ display: 'flex', flexDirection: 'column', gap: 16, animation: 'tcShimmer 1.1s ease-in-out infinite' }}>
-          <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}><span style={{ ...sk, width: 52, height: 52, borderRadius: 10 }} /><span style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 8 }}><span style={{ ...sk, height: 20, width: '80%' }} /><span style={{ ...sk, height: 20, width: '50%' }} /></span></div>
-          <span style={{ ...sk, height: 8 }} />
-          <span style={{ ...sk, height: 22, width: '40%', marginTop: 8 }} />
-          <span style={{ ...sk, height: 220, borderRadius: 10 }} />
-        </div>
-      )}
-      {f.ready && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-          <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}><span style={{ width: 52, height: 52, flex: 'none', borderRadius: 10, display: 'grid', placeItems: 'center', background: 'var(--tint)', color: 'var(--primary)' }}>{f.icon}</span><h1 style={{ margin: 0, font: '600 26px/1.15 var(--font-heading)', textWrap: 'pretty' }}>{f.name}</h1></div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, color: 'var(--text2)' }}><span>{f.sub}</span><span style={{ fontWeight: 600, color: 'var(--text)' }}>{f.pctLabel}</span></div>
-            <Bar w={f.pct} />
-          </div>
-          {f.facts.length > 0 && <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            <h2 style={h2s}>L'essentiel</h2>
-            <div style={card}>
-              {f.facts.map((x) => (
-                <div key={x.n} style={{ display: 'flex', gap: 14, padding: '14px 16px', borderBottom: x.sep }}><span style={{ flex: 'none', width: 16, font: '600 20px/1.3 var(--font-heading)', color: 'var(--primaryText)' }}>{x.n}</span><span style={{ fontSize: 16, lineHeight: 1.45, textWrap: 'pretty' }}>{x.text}</span></div>
-              ))}
-            </div>
-          </div>}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function Flash({ f, cardRef }) {
-  return (
-    <div style={{ padding: '4px 20px 0', display: 'flex', flexDirection: 'column', gap: 14 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, color: 'var(--text2)' }}><span>{f.theme}</span><span style={{ fontVariantNumeric: 'tabular-nums' }}>{f.counter}</span></div>
-      <button ref={cardRef} className="p-card" onClick={f.onFlip} aria-label="Retourner la carte" style={{ minHeight: 400, border: 'none', borderRadius: 12, background: 'var(--surface)', boxShadow: 'var(--shadowM)', padding: '28px 24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 16, textAlign: 'left', cursor: 'pointer', transition: 'transform .1s' }}>
-        <span style={{ fontSize: 13, fontWeight: 600, letterSpacing: '.06em', textTransform: 'uppercase', color: f.kColor }}>{f.kicker}</span>
-        <span style={{ display: 'flex', flexDirection: 'column', gap: 12 }}><span style={{ font: '600 27px/1.2 var(--font-heading)', textWrap: 'pretty' }}>{f.text}</span>{f.detail && <span style={{ fontSize: 16, lineHeight: 1.5, color: 'var(--text2)', textWrap: 'pretty' }}>{f.detail}</span>}</span>
-        <span style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, color: 'var(--text2)' }}>{f.flipIcon}{f.hint}</span>
-      </button>
-    </div>
-  );
-}
-
-function QuestionView({ qv }) {
-  return (
-    <div style={{ padding: '12px 20px 0', display: 'flex', flexDirection: 'column', gap: 20 }}>
-      <span style={{ alignSelf: 'flex-start', fontSize: 13, fontWeight: 600, padding: '4px 8px', borderRadius: 4, background: 'var(--surface2)', color: 'var(--text2)' }}>{qv.theme}</span>
-      <h2 style={{ margin: 0, fontFamily: 'var(--font-heading)', fontWeight: 600, fontSize: qv.fs, lineHeight: 1.2, textWrap: 'pretty' }}>{qv.text}</h2>
-      <div role="radiogroup" aria-label="Réponses" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-        {qv.answers.map((a) => (
-          <button key={a.key} className="p-answer" onClick={a.onClick} disabled={a.disabled} role="radio" aria-checked={a.checked} aria-label={a.aria} style={{ display: 'flex', alignItems: 'center', gap: 14, minHeight: 60, padding: '12px 14px', borderRadius: 10, border: a.border, background: a.bg, opacity: a.op, textAlign: 'left', cursor: a.disabled ? 'default' : 'pointer', transition: 'background .18s,border-color .18s,opacity .18s,transform .1s' }}>
-            <span style={{ width: 34, height: 34, flex: 'none', display: 'grid', placeItems: 'center', borderRadius: 8, background: a.badgeBg, color: a.badgeColor, font: '600 18px/1 var(--font-heading)', transition: 'background .18s' }}>{a.badge}</span>
-            <span style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}><span style={{ fontSize: qv.afs, fontWeight: 500, lineHeight: 1.3, color: 'var(--text)' }}>{a.text}</span>{a.note && <span style={{ fontSize: 13, fontWeight: 600, color: a.noteColor }}>{a.note}</span>}</span>
-          </button>
-        ))}
-      </div>
-      <button onClick={qv.onReport} style={{ alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: 6, padding: '4px 0', border: 'none', background: 'none', font: 'inherit', fontSize: 14, color: 'var(--text2)', cursor: 'pointer' }}>{ic('alert', 16)}Signaler une erreur dans cette question</button>
-      {qv.explain && (
-        <div style={{ ...card, display: 'flex', flexDirection: 'column', gap: 10, padding: 16, animation: 'tcRise .25s ease' }}>
-          {qv.explain.verdict && <span style={{ display: 'flex', alignItems: 'center', gap: 8, font: '600 18px/1.2 var(--font-heading)', color: qv.explain.vColor }}>{qv.explain.vIcon}{qv.explain.verdict}</span>}
-          <span style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 600, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--primaryText)' }}>{qv.explain.bulb}À retenir</span>
-          <span style={{ fontSize: 16, lineHeight: 1.5, textWrap: 'pretty' }}>{qv.explain.text}</span>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function Result({ r }) {
-  return (
-    <div style={{ padding: '12px 20px 0', display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <div className="blueprint" style={{ padding: '28px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, textAlign: 'center' }}>
-        <Corners />
-        <span style={{ fontSize: 14, color: 'var(--text2)' }}>{r.title}</span>
-        <div style={{ font: '600 80px/0.9 var(--font-heading)', letterSpacing: '-.02em' }}>{r.score}<span style={{ fontSize: 34, color: 'var(--text2)' }}> / {r.total}</span></div>
-        <span style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px', borderRadius: 6, background: r.vBg, color: r.vColor, fontSize: 15, fontWeight: 600 }}>{r.vIcon}{r.verdict}</span>
-        <span style={{ fontSize: 15, color: 'var(--text2)', textWrap: 'pretty', maxWidth: 260 }}>{r.msg}</span>
-      </div>
-      <div style={{ ...card, display: 'grid', gridTemplateColumns: 'repeat(3,1fr)' }}>
-        {r.stats.map((st) => (
-          <div key={st.l} style={{ padding: '14px 8px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, borderLeft: st.sep }}><span style={{ font: '600 26px/1 var(--font-heading)' }}>{st.v}</span><span style={{ fontSize: 13, color: 'var(--text2)', textAlign: 'center' }}>{st.l}</span></div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function Chips({ chips }) {
-  return (
-    <div className="chips" style={{ display: 'flex', gap: 8, overflowX: 'auto', padding: '4px 20px 0' }}>
-      {chips.map((ch) => (
-        <button key={ch.key} className="p-chip" onClick={ch.onClick} aria-pressed={ch.pressed} style={{ flex: 'none', height: 38, padding: '0 16px', borderRadius: 19, border: '1px solid ' + ch.border, background: ch.bg, color: ch.color, fontSize: 15, fontWeight: 500, cursor: 'pointer', transition: 'background .15s' }}>{ch.label}</button>
-      ))}
-    </div>
-  );
-}
-
-function Group({ g }) {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 10, padding: '0 16px' }}>
-      {g.header && <h2 style={{ ...h2s, padding: '0 4px' }}>{g.header}</h2>}
-      <div style={{ ...card, overflow: 'hidden' }}>
-        {g.rows.map((r, i) => <Row key={i} r={r} />)}
-      </div>
-      {g.action && (
-        <button className="p-outline" onClick={g.action.onClick} disabled={g.action.loading} style={{ height: 52, borderRadius: 10, border: '1.5px solid var(--primary)', background: 'transparent', color: 'var(--primaryText)', fontSize: 16, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, cursor: 'pointer' }}>
-          {g.action.loading && <span className="spinner sm" />}{g.action.label}
-        </button>
-      )}
-    </div>
-  );
-}
-
-function Row({ r }) {
-  const onKeyDown = r.onClick ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); r.onClick(e); } } : undefined;
-  return (
-    <div className="p-row" onClick={r.onClick} onKeyDown={onKeyDown} role={r.role} tabIndex={r.tab} aria-checked={r.role === 'switch' ? r.checked : undefined} style={{ display: 'flex', alignItems: 'center', gap: 14, minHeight: 58, padding: '10px 16px', borderBottom: r.sep, cursor: r.cursor, opacity: r.op, transition: 'background .12s' }}>
-      {r.icon && <span style={{ width: 40, height: 40, flex: 'none', display: 'grid', placeItems: 'center', borderRadius: 8, background: r.iconBg, color: r.iconColor }}>{r.icon}</span>}
-      {r.year && <span style={{ width: 58, flex: 'none', font: '600 28px/1 var(--font-heading)', color: 'var(--primaryText)' }}>{r.year}</span>}
-      <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 3, padding: '3px 0' }}>
-        {r.tag && <span style={{ alignSelf: 'flex-start', fontSize: 12, fontWeight: 600, padding: '2px 7px', borderRadius: 4, background: r.tag.bg, color: r.tag.color }}>{r.tag.label}</span>}
-        <span style={{ fontSize: 16, fontWeight: 500, lineHeight: 1.3, color: r.color, textWrap: 'pretty' }}>{r.title}</span>
-        {r.sub && <span style={{ fontSize: 14, lineHeight: 1.35, color: 'var(--text2)' }}>{r.sub}</span>}
-        {r.pct && <span style={{ height: 4, borderRadius: 2, background: 'var(--surface2)', overflow: 'hidden', marginTop: 5 }}><span style={{ display: 'block', height: '100%', width: r.pct, background: 'var(--primary)', borderRadius: 2 }} /></span>}
-      </span>
-      {r.value && <span style={{ flex: 'none', fontSize: 15, color: 'var(--text2)' }}>{r.value}</span>}
-      {r.stat && <span style={{ flex: 'none', font: '600 22px/1 var(--font-heading)' }}>{r.stat}</span>}
-      {r.badge && <span style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 4, fontSize: 13, fontWeight: 600, padding: '3px 8px', borderRadius: 4, background: r.badge.bg, color: r.badge.color }}>{r.badge.icon}{r.badge.label}</span>}
-      {r.seg && (
-        <span role="radiogroup" aria-label="Thème" style={{ flex: 'none', display: 'flex', padding: 2, borderRadius: 8, background: 'var(--surface2)' }}>
-          {r.seg.map((sg) => <button key={sg.label} onClick={sg.onClick} role="radio" aria-checked={sg.checked} style={{ height: 34, padding: '0 11px', border: 'none', borderRadius: 6, background: sg.bg, color: sg.color, boxShadow: sg.shadow, fontSize: 14, fontWeight: sg.weight, cursor: 'pointer', transition: 'background .15s' }}>{sg.label}</button>)}
-        </span>
-      )}
-      {r.sw && <span aria-hidden="true" style={{ flex: 'none', width: 51, height: 31, borderRadius: 16, background: r.sw.track, padding: 2, transition: 'background .2s' }}><span style={{ display: 'block', width: 27, height: 27, borderRadius: '50%', background: '#fff', boxShadow: '0 2px 4px rgba(0,0,0,.2)', transform: 'translateX(' + r.sw.x + ')', transition: 'transform .2s cubic-bezier(.3,.7,.3,1)' }} /></span>}
-      {r.chev && <span style={{ flex: 'none', color: 'var(--text2)', opacity: 0.7 }}>{r.chev}</span>}
-    </div>
-  );
-}
-
-function Empty({ e }) {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 12, padding: '56px 32px 24px' }}>
-      <span style={{ width: 76, height: 76, borderRadius: '50%', display: 'grid', placeItems: 'center', background: e.iconBg, color: e.iconColor }}>{e.icon}</span>
-      <div style={{ font: '600 23px/1.2 var(--font-heading)', marginTop: 4 }}>{e.title}</div>
-      <div style={{ fontSize: 16, lineHeight: 1.45, color: 'var(--text2)', maxWidth: 270, textWrap: 'pretty' }}>{e.text}</div>
-      {e.btn && <button className="p-empty" onClick={e.onBtn} style={{ marginTop: 12, height: 52, padding: '0 28px', borderRadius: 10, border: 'none', background: 'var(--btn)', color: 'var(--onBtn)', fontSize: 16, fontWeight: 600, cursor: 'pointer' }}>{e.btn}</button>}
-    </div>
-  );
-}
-
-function Sticky({ s }) {
-  return (
-    <div style={{ flex: 'none', padding: '12px 16px 10px', background: 'var(--bg)', borderTop: '1px solid var(--divider)', display: 'flex', flexDirection: s.dir, gap: 8 }}>
-      <button className="p-btn" onClick={s.onClick} disabled={s.disabled} aria-busy={s.loading ? 'true' : undefined} style={{ ...btnPrimary, order: 1, flex: 1, minHeight: 54, opacity: s.op }}>{s.loading && <span className="spinner" />}{s.icon}{s.label}</button>
-      {s.secondary && <button className="p-secondary" onClick={s.secondary.onClick} style={{ order: s.secondary.order, flex: 1, minHeight: s.secondary.h, borderRadius: 10, border: s.secondary.border, background: 'transparent', color: s.secondary.color, font: '600 16px/1 var(--font-body)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, cursor: 'pointer' }}>{s.secondary.icon}{s.secondary.label}</button>}
-    </div>
-  );
-}
-
-function Nav({ tabs }) {
-  return (
-    <nav aria-label="Navigation principale" style={{ flex: 'none', display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', background: 'var(--surface)', borderTop: '1px solid var(--divider)', padding: '6px 4px 0' }}>
-      {tabs.map((t) => (
-        <button key={t.id} className="p-tab" onClick={t.onClick} aria-label={t.label} aria-current={t.current} style={{ height: 58, border: 'none', background: 'transparent', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, color: t.color, cursor: 'pointer', transition: 'transform .1s' }}>
-          <span style={{ width: 56, height: 30, borderRadius: 8, display: 'grid', placeItems: 'center', background: t.pill, transition: 'background .2s' }}>{t.icon}</span>
-          <span style={{ fontSize: 12, fontWeight: t.weight }}>{t.label}</span>
-        </button>
-      ))}
-    </nav>
-  );
-}
-
-function ProposeForm({ f }) {
-  const { p } = f;
-  const field = { width: '100%', boxSizing: 'border-box', padding: 12, borderRadius: 10, border: '1px solid var(--line)', background: 'var(--surface)', color: 'var(--text)', font: '400 16px/1.4 var(--font-body)' };
-  const label = { fontSize: 13, fontWeight: 600, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--text2)' };
-  const box = { display: 'flex', flexDirection: 'column', gap: 8 };
-  return (
-    <div style={{ padding: '0 20px', display: 'flex', flexDirection: 'column', gap: 18 }}>
-      <div style={{ display: 'flex', gap: 10 }}>
-        <label style={{ ...box, flex: 1 }}><span style={label}>Préparation</span>
-          <select value={p.prep} onChange={(e) => f.set({ prep: e.target.value })} style={field}>{f.preps.map((o) => <option key={o.id} value={o.id}>{o.name}</option>)}</select></label>
-        <label style={{ ...box, flex: 1 }}><span style={label}>Thème</span>
-          <select value={p.theme} onChange={(e) => f.set({ theme: e.target.value })} style={field}><option value="">Je ne sais pas</option>{f.themes.map((o) => <option key={o.id} value={o.id}>{o.name}</option>)}</select></label>
-      </div>
-      <label style={box}><span style={label}>Question</span>
-        <textarea value={p.q} onChange={(e) => f.set({ q: e.target.value })} rows={3} maxLength={600} placeholder="Ex. : Quelle est la devise de la République ?" style={{ ...field, resize: 'vertical' }} /></label>
-      <div style={box}><span style={label}>Réponses · touche la lettre de la bonne</span>
-        {p.a.map((t, i) => {
-          const good = p.c === i;
-          return (
-            <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-              <button type="button" onClick={() => f.set({ c: good ? null : i })} aria-label={'Bonne réponse : ' + f.LET[i]} aria-pressed={good} style={{ width: 44, height: 44, flex: 'none', borderRadius: 8, border: good ? 'none' : '1px solid var(--line)', background: good ? 'var(--success)' : 'var(--surface)', color: good ? '#fff' : 'var(--text)', font: '600 18px/1 var(--font-heading)', cursor: 'pointer' }}>{good ? '✓' : f.LET[i]}</button>
-              <input value={t} onChange={(e) => f.setA(i, e.target.value)} maxLength={300} placeholder={'Réponse ' + f.LET[i] + (i >= 2 ? ' (facultative)' : '')} style={field} />
-            </div>
-          );
-        })}
-      </div>
-      <label style={box}><span style={label}>À retenir (facultatif)</span>
-        <textarea value={p.x} onChange={(e) => f.set({ x: e.target.value })} rows={2} maxLength={600} placeholder="Explication ou source" style={{ ...field, resize: 'vertical' }} /></label>
-      <div style={box}><span style={label}>Photo (facultative)</span>
-        {p.preview
-          ? <div style={{ position: 'relative' }}><img src={p.preview} alt="Aperçu" style={{ width: '100%', maxHeight: 260, objectFit: 'contain', borderRadius: 10, background: 'var(--surface2)' }} />
-              <button type="button" onClick={() => f.pick(null)} style={{ position: 'absolute', top: 8, right: 8, padding: '6px 10px', border: 'none', borderRadius: 8, background: 'var(--scrim)', color: '#fff', font: '600 14px/1 var(--font-body)', cursor: 'pointer' }}>Retirer</button></div>
-          : <label style={{ ...field, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, minHeight: 64, borderStyle: 'dashed', color: 'var(--primaryText)', fontWeight: 600, cursor: 'pointer' }}>
-              {f.imgIcon}Ajouter une photo ou une capture
-              <input type="file" accept="image/*" onChange={(e) => f.pick(e.target.files[0])} style={{ display: 'none' }} /></label>}
-      </div>
-      <label style={box}><span style={label}>Commentaire (facultatif)</span>
-        <textarea value={p.note} onChange={(e) => f.set({ note: e.target.value })} rows={2} maxLength={600} placeholder="Source, contexte…" style={{ ...field, resize: 'vertical' }} /></label>
-    </div>
-  );
-}
-
-function Sheet({ sheet, onClose, onDown, onMove, onUp }) {
-  return (
-    <div style={{ position: 'absolute', inset: 0, zIndex: 40, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
-      <div onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'var(--scrim)', opacity: sheet.scrimOp, transition: 'opacity .2s', animation: 'tcFade .2s' }} />
-      <div role="dialog" aria-modal="true" aria-label={sheet.title} style={{ position: 'relative', background: 'var(--sheet)', borderRadius: '16px 16px 0 0', paddingBottom: 'calc(14px + max(24px, var(--safe-bottom)))', transform: sheet.transform, transition: sheet.transition, animation: 'tcUp .28s cubic-bezier(.2,.8,.2,1)', maxHeight: '86%', display: 'flex', flexDirection: 'column' }}>
-        <div onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp} style={{ touchAction: 'none', cursor: 'grab', padding: '10px 20px 8px', display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <span style={{ alignSelf: 'center', width: 40, height: 5, borderRadius: 3, background: 'var(--line)', marginBottom: 12 }} />
-          <div style={{ font: '600 25px/1.15 var(--font-heading)' }}>{sheet.title}</div>
-          {sheet.sub && <div style={{ fontSize: 16, lineHeight: 1.45, color: 'var(--text2)', textWrap: 'pretty' }}>{sheet.sub}</div>}
-        </div>
-        {sheet.options && (
-          <div style={{ padding: '8px 12px 0', display: 'flex', flexDirection: 'column', gap: 2, overflowY: 'auto' }}>
-            {sheet.options.map((o) => (
-              <button key={o.label} className="p-bg2" onClick={o.onClick} style={{ minHeight: 58, padding: '10px 12px', border: 'none', borderRadius: 10, background: o.bg, color: o.color, display: 'flex', alignItems: 'center', gap: 14, textAlign: 'left', cursor: 'pointer' }}>
-                {o.icon && <span style={{ flex: 'none', color: 'var(--primary)' }}>{o.icon}</span>}
-                <span style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}><span style={{ fontSize: 17, fontWeight: o.weight }}>{o.label}</span>{o.sub && <span style={{ fontSize: 14, color: 'var(--text2)' }}>{o.sub}</span>}</span>
-                {o.check && <span style={{ flex: 'none' }}>{o.check}</span>}
-              </button>
-            ))}
-          </div>
-        )}
-        {sheet.form && (
-          <div style={{ padding: '12px 20px 0', display: 'flex', flexDirection: 'column', gap: 10 }}>
-            <textarea value={sheet.form.value} onChange={sheet.form.onChange} placeholder={sheet.form.placeholder} maxLength={1000} rows={3} aria-label={sheet.form.placeholder} style={{ resize: 'none', padding: 12, borderRadius: 10, border: '1px solid var(--line)', background: 'var(--surface)', color: 'var(--text)', font: '400 16px/1.4 var(--font-body)' }} />
-            {sheet.form.image && (sheet.form.image.preview
-              ? <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}><img src={sheet.form.image.preview} alt="Capture" style={{ width: 56, height: 56, objectFit: 'cover', borderRadius: 8 }} /><span style={{ flex: 1, fontSize: 15, color: 'var(--text2)' }}>Capture jointe</span><button type="button" onClick={() => sheet.form.image.onPick(null)} style={{ padding: '8px 12px', border: 'none', borderRadius: 8, background: 'var(--surface2)', color: 'var(--text)', font: '600 14px/1 var(--font-body)', cursor: 'pointer' }}>Retirer</button></div>
-              : <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, minHeight: 48, borderRadius: 10, border: '1px dashed var(--line)', color: 'var(--primaryText)', fontWeight: 600, fontSize: 15, cursor: 'pointer' }}>{sheet.form.image.icon}{sheet.form.image.label}<input type="file" accept="image/*" onChange={(e) => sheet.form.image.onPick(e.target.files[0])} style={{ display: 'none' }} /></label>)}
-            <button className="p-btn" onClick={sheet.form.send.onClick} disabled={sheet.form.send.disabled} style={{ ...btnPrimary, height: 54, opacity: sheet.form.send.disabled ? 0.45 : 1, cursor: sheet.form.send.disabled ? 'default' : 'pointer' }}>{sheet.form.send.label}</button>
-          </div>
-        )}
-        {sheet.confirm && (
-          <div style={{ padding: '18px 20px 0', display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {sheet.confirm.alt && <button className="p-btn" onClick={sheet.confirm.alt.onClick} style={{ ...btnPrimary, height: 54 }}>{sheet.confirm.alt.label}</button>}
-            <button className="p-danger" onClick={sheet.confirm.onOk} style={{ height: 54, border: 'none', borderRadius: 10, background: 'var(--errorFill)', color: '#fff', font: '600 17px/1 var(--font-body)', cursor: 'pointer' }}>{sheet.confirm.ok}</button>
-            <button className="p-cancel" onClick={onClose} style={{ height: 52, border: 'none', borderRadius: 10, background: 'var(--surface2)', color: 'var(--text)', font: '600 17px/1 var(--font-body)', cursor: 'pointer' }}>{sheet.confirm.cancel}</button>
-          </div>
-        )}
-      </div>
-    </div>
-  );
 }

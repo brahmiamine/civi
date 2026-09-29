@@ -34,3 +34,6 @@ export const fmt = (t) => {
   t = Math.max(0, t);
   return Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0');
 };
+
+export const APP_VERSION = __APP_VERSION__;
+export const BRAND_ICON = import.meta.env.BASE_URL + 'brand-icon.svg';
