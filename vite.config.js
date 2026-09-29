@@ -22,7 +22,7 @@ export default defineConfig({
         scope: base,
         display: 'standalone',
         orientation: 'portrait',
-        background_color: '#F5F6F8',
+        background_color: '#2447A8',
         theme_color: '#2447A8',
         categories: ['education'],
         icons: [
