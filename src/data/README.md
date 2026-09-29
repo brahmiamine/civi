@@ -49,7 +49,9 @@ Les fichiers sont intégrés au build : pour ajouter des questions, il suffit d�
 | `situation` | non | `true` pour une question de mise en situation. |
 | `piege` | non | `true` pour l’afficher dans « Questions pièges » et « Questions difficiles ». |
 
-Une question invalide (thème inconnu, bonne réponse absente, identifiant en double…) est ignorée avec un avertissement dans la console du navigateur.
+Une question invalide (thème inconnu, bonne réponse absente, identifiant en double…) est ignorée avec un avertissement dans la console du navigateur, et fait échouer `npm run validate:data`.
+
+**Ne pas réordonner les réponses d’une question déjà publiée** sans augmenter `DATA_REV` dans `src/App.jsx` : les réponses choisies enregistrées (« Ta réponse : … ») sont des positions.
 
 ## Examen blanc
 
@@ -57,9 +59,12 @@ L’examen tire les questions de toute la préparation en suivant la répartitio
 
 ## Trois fichiers de banque + lots
 
-- `questions.json`, `pieges.json`, `situations.json` forment la **banque** utilisée partout sauf dans « Lots de questions ».
-- Les `lot-N.json` ne servent qu’à **Tester → Lots de questions**. Une question d’un lot qui reprend l’`id` d’une question de la banque est la même question (progression partagée).
-- Sans ces trois fichiers, tous les lots forment la banque.
+- `questions.json`, `pieges.json`, `situations.json` forment la **banque**, utilisée par la révision, l’examen blanc, les thèmes, etc.
+- Les `lot-N.json` apparaissent dans **Tester → Lots de questions**. Leurs nouvelles questions rejoignent aussi la banque, pour que tout ce qui est répondu compte dans la progression. Une question d’un lot qui reprend l’`id` d’une question de la banque est la même question (c’est la version de la banque qui est utilisée).
+
+## Contrôle automatique
+
+`npm run validate:data` (lancé par la CI avant chaque déploiement) refuse : JSON invalide, thème inconnu, moins de 2 ou plus de 6 réponses, bonne réponse invalide, deux réponses identiques, identifiant en double dans la banque, **même énoncé sous deux identifiants** (réutiliser l’identifiant existant), identifiant de lot qui reprend la banque avec un autre énoncé. Il signale aussi les explications manquantes et un déséquilibre de la position de la bonne réponse (plus de 40 % sur la même lettre).
 
 ## Format compact (grandes banques)
 

@@ -8,11 +8,11 @@
       "question": "Combien de membres composent l'Assemblée nationale, et non le Sénat ?",
       "reponses": [
         "348",
-        "577",
         "720",
+        "577",
         "925"
       ],
-      "bonne_reponse": "B",
+      "bonne_reponse": "C",
       "explication": "L'Assemblée nationale compte 577 députés. Le Sénat compte 348 sénateurs.",
       "piege": true
     },
@@ -22,11 +22,11 @@
       "question": "Combien de sénateurs compte le Sénat français ?",
       "reponses": [
         "577",
-        "348",
         "81",
+        "348",
         "101"
       ],
-      "bonne_reponse": "B",
+      "bonne_reponse": "C",
       "explication": "Le Sénat compte 348 sénateurs ; 577 correspond au nombre de députés.",
       "piege": true
     },
@@ -37,10 +37,10 @@
       "reponses": [
         "3 ans",
         "5 ans",
-        "6 ans",
-        "7 ans"
+        "7 ans",
+        "6 ans"
       ],
-      "bonne_reponse": "C",
+      "bonne_reponse": "D",
       "explication": "Le mandat d'un sénateur est de 6 ans. Le Sénat est renouvelé par moitié tous les 3 ans.",
       "piege": true
     },
@@ -50,11 +50,11 @@
       "question": "Quelle est la durée du mandat du président de la République ?",
       "reponses": [
         "4 ans",
-        "5 ans",
         "6 ans",
+        "5 ans",
         "7 ans"
       ],
-      "bonne_reponse": "B",
+      "bonne_reponse": "C",
       "explication": "Le mandat présidentiel est de 5 ans.",
       "piege": true
     },
@@ -91,12 +91,12 @@
       "theme": "institutions",
       "question": "Combien de régions compte la France métropolitaine, Corse comprise ?",
       "reponses": [
-        "13",
-        "18",
         "22",
+        "18",
+        "13",
         "101"
       ],
-      "bonne_reponse": "A",
+      "bonne_reponse": "C",
       "explication": "La France métropolitaine compte 13 régions, Corse comprise.",
       "piege": true
     },
@@ -133,12 +133,12 @@
       "theme": "institutions",
       "question": "Le Parlement français est composé de :",
       "reponses": [
-        "L'Assemblée nationale et le Sénat",
-        "Le Gouvernement et le Sénat",
         "Le Conseil constitutionnel et l'Assemblée nationale",
+        "Le Gouvernement et le Sénat",
+        "L'Assemblée nationale et le Sénat",
         "Le Président et le Gouvernement"
       ],
-      "bonne_reponse": "A",
+      "bonne_reponse": "C",
       "explication": "Le Parlement comprend deux chambres : l'Assemblée nationale et le Sénat.",
       "piege": true
     },
@@ -147,12 +147,12 @@
       "theme": "institutions",
       "question": "Qui exerce le pouvoir législatif ?",
       "reponses": [
-        "Le Parlement",
         "Le Gouvernement seul",
+        "Le Parlement",
         "Les préfets",
         "Les tribunaux"
       ],
-      "bonne_reponse": "A",
+      "bonne_reponse": "B",
       "explication": "Le Parlement vote la loi et contrôle l'action du Gouvernement.",
       "piege": true
     },
@@ -189,12 +189,12 @@
       "theme": "institutions",
       "question": "Quel est le dernier niveau de juridiction de l'ordre judiciaire ?",
       "reponses": [
-        "Le Conseil d'État",
         "La Cour de cassation",
+        "Le Conseil d'État",
         "Le Conseil constitutionnel",
         "La Cour des comptes"
       ],
-      "bonne_reponse": "B",
+      "bonne_reponse": "A",
       "explication": "La Cour de cassation est la juridiction suprême de l'ordre judiciaire ; le Conseil d'État l'est pour l'ordre administratif.",
       "piege": true
     },
@@ -241,30 +241,16 @@
       "piege": true
     },
     {
-      "id": "cr-piege-018",
-      "theme": "institutions",
-      "question": "Quand célèbre-t-on la Journée de l'Europe ?",
-      "reponses": [
-        "8 mai",
-        "9 mai",
-        "14 juillet",
-        "11 novembre"
-      ],
-      "bonne_reponse": "B",
-      "explication": "La Journée de l'Europe est le 9 mai, anniversaire de la déclaration Schuman du 9 mai 1950.",
-      "piege": true
-    },
-    {
       "id": "cr-piege-019",
       "theme": "institutions",
       "question": "En quelle année le traité de Maastricht a-t-il été signé ?",
       "reponses": [
         "1957",
-        "1985",
         "1992",
+        "1985",
         "2002"
       ],
-      "bonne_reponse": "C",
+      "bonne_reponse": "B",
       "explication": "Le traité de Maastricht a été signé en 1992.",
       "piege": true
     },
@@ -273,12 +259,12 @@
       "theme": "institutions",
       "question": "L'euro est devenu monnaie unique pour les opérations scripturales en :",
       "reponses": [
-        "1992",
         "1999",
+        "1992",
         "2002",
         "2007"
       ],
-      "bonne_reponse": "B",
+      "bonne_reponse": "A",
       "explication": "L'euro a été introduit comme monnaie unique en 1999 ; les pièces et billets ont circulé à partir de 2002.",
       "piege": true
     },
@@ -302,11 +288,11 @@
       "question": "Où se trouve le siège officiel du Parlement européen ?",
       "reponses": [
         "Bruxelles",
-        "Strasbourg",
         "Luxembourg",
+        "Strasbourg",
         "Paris"
       ],
-      "bonne_reponse": "B",
+      "bonne_reponse": "C",
       "explication": "Le siège officiel du Parlement européen est à Strasbourg ; une grande partie de son travail se déroule aussi à Bruxelles.",
       "piege": true
     },
@@ -315,12 +301,12 @@
       "theme": "institutions",
       "question": "Où se trouve le siège principal de la Commission européenne ?",
       "reponses": [
-        "Strasbourg",
         "Bruxelles",
+        "Strasbourg",
         "Luxembourg",
         "Francfort"
       ],
-      "bonne_reponse": "B",
+      "bonne_reponse": "A",
       "explication": "La Commission européenne siège principalement à Bruxelles.",
       "piege": true
     },
@@ -331,10 +317,10 @@
       "reponses": [
         "Paris",
         "Bruxelles",
-        "Strasbourg",
-        "Luxembourg"
+        "Luxembourg",
+        "Strasbourg"
       ],
-      "bonne_reponse": "D",
+      "bonne_reponse": "C",
       "explication": "La Cour de justice de l'Union européenne siège à Luxembourg.",
       "piege": true
     },
@@ -343,12 +329,12 @@
       "theme": "valeurs",
       "question": "La loi séparant les Églises et l'État date de :",
       "reponses": [
-        "1789",
-        "1882",
         "1905",
+        "1882",
+        "1789",
         "2004"
       ],
-      "bonne_reponse": "C",
+      "bonne_reponse": "A",
       "explication": "La grande loi de séparation des Églises et de l'État date de 1905.",
       "piege": true
     },
@@ -357,12 +343,12 @@
       "theme": "valeurs",
       "question": "La loi interdisant les signes religieux ostensibles aux élèves dans les écoles, collèges et lycées publics date de :",
       "reponses": [
-        "1905",
-        "1958",
         "2004",
+        "1958",
+        "1905",
         "2010"
       ],
-      "bonne_reponse": "C",
+      "bonne_reponse": "A",
       "explication": "Cette règle résulte de la loi du 15 mars 2004.",
       "piege": true
     },
@@ -373,10 +359,10 @@
       "reponses": [
         "1905",
         "2004",
-        "2010",
-        "2021"
+        "2021",
+        "2010"
       ],
-      "bonne_reponse": "C",
+      "bonne_reponse": "D",
       "explication": "La loi du 11 octobre 2010 interdit la dissimulation du visage dans l'espace public, sous les réserves prévues par la loi.",
       "piege": true
     },
@@ -385,12 +371,12 @@
       "theme": "valeurs",
       "question": "Un usager qui vient à la mairie peut-il porter un signe religieux ?",
       "reponses": [
-        "Oui, en respectant le fonctionnement du service",
         "Non, jamais",
+        "Oui, en respectant le fonctionnement du service",
         "Seulement s'il est fonctionnaire",
         "Seulement avec l'autorisation du maire"
       ],
-      "bonne_reponse": "A",
+      "bonne_reponse": "B",
       "explication": "L'obligation de neutralité religieuse s'impose aux agents publics, pas aux usagers, sous réserve du respect de l'ordre public et du service.",
       "piege": true
     },
@@ -399,12 +385,12 @@
       "theme": "valeurs",
       "question": "Un agent public peut-il porter un signe religieux visible pendant son service ?",
       "reponses": [
-        "Oui, toujours",
-        "Oui, si le signe est discret",
         "Non, il est soumis à la neutralité",
+        "Oui, si le signe est discret",
+        "Oui, toujours",
         "Seulement le vendredi"
       ],
-      "bonne_reponse": "C",
+      "bonne_reponse": "A",
       "explication": "Les agents publics doivent respecter une stricte neutralité religieuse dans l'exercice de leurs fonctions.",
       "piege": true
     },
@@ -428,11 +414,11 @@
       "question": "Quel symbole n'est pas un symbole officiel de la République ?",
       "reponses": [
         "Le drapeau tricolore",
-        "Marianne",
+        "Le coq",
         "La Marseillaise",
-        "Le coq"
+        "Marianne"
       ],
-      "bonne_reponse": "D",
+      "bonne_reponse": "B",
       "explication": "Le coq est un symbole national très utilisé mais il n'est pas un symbole officiel de la République.",
       "piege": true
     },
@@ -541,10 +527,10 @@
       "reponses": [
         "1975",
         "1981",
-        "2000",
-        "2024"
+        "2024",
+        "2000"
       ],
-      "bonne_reponse": "D",
+      "bonne_reponse": "C",
       "explication": "La révision constitutionnelle du 8 mars 2024 a inscrit cette liberté dans la Constitution.",
       "piege": true
     },
@@ -553,12 +539,12 @@
       "theme": "droits",
       "question": "Depuis 2021, la PMA est ouverte en France :",
       "reponses": [
-        "Uniquement aux couples mariés homme-femme",
         "À toutes les femmes, seules ou en couple, dans les conditions prévues par la loi",
+        "Uniquement aux couples mariés homme-femme",
         "Uniquement aux femmes de nationalité française",
         "Uniquement aux couples ayant déjà un enfant"
       ],
-      "bonne_reponse": "B",
+      "bonne_reponse": "A",
       "explication": "La loi de bioéthique du 2 août 2021 a ouvert la PMA aux couples de femmes et aux femmes non mariées.",
       "piege": true
     },
@@ -567,12 +553,12 @@
       "theme": "societe",
       "question": "À quel âge commence l'instruction obligatoire ?",
       "reponses": [
-        "2 ans",
         "3 ans",
+        "2 ans",
         "6 ans",
         "16 ans"
       ],
-      "bonne_reponse": "B",
+      "bonne_reponse": "A",
       "explication": "L'instruction est obligatoire à partir de 3 ans.",
       "piege": true
     },
@@ -597,10 +583,10 @@
       "reponses": [
         "16 ans",
         "17 ans",
-        "18 ans",
-        "21 ans"
+        "21 ans",
+        "18 ans"
       ],
-      "bonne_reponse": "C",
+      "bonne_reponse": "D",
       "explication": "La majorité civile est fixée à 18 ans.",
       "piege": true
     },
@@ -610,11 +596,11 @@
       "question": "Quel numéro appelle-t-on en priorité pour joindre la police ou la gendarmerie en urgence ?",
       "reponses": [
         "15",
-        "17",
+        "119",
         "18",
-        "119"
+        "17"
       ],
-      "bonne_reponse": "B",
+      "bonne_reponse": "D",
       "explication": "Le 17 permet de joindre la police ou la gendarmerie en urgence.",
       "piege": true
     },
@@ -624,26 +610,12 @@
       "question": "Quel est l'ordre correct des infractions de la moins grave à la plus grave ?",
       "reponses": [
         "Crime, délit, contravention",
-        "Contravention, délit, crime",
+        "Contravention, crime, délit",
         "Délit, crime, contravention",
-        "Contravention, crime, délit"
+        "Contravention, délit, crime"
       ],
-      "bonne_reponse": "B",
+      "bonne_reponse": "D",
       "explication": "Les infractions sont classées, par gravité croissante : contravention, délit, crime.",
-      "piege": true
-    },
-    {
-      "id": "cr-piege-046",
-      "theme": "histoire",
-      "question": "Quel fleuve traverse Paris ?",
-      "reponses": [
-        "La Loire",
-        "La Seine",
-        "Le Rhône",
-        "La Garonne"
-      ],
-      "bonne_reponse": "B",
-      "explication": "La Seine traverse Paris ; la Loire est le plus long fleuve entièrement français.",
       "piege": true
     },
     {
@@ -666,11 +638,11 @@
       "question": "Quelle île française se situe dans l'océan Indien ?",
       "reponses": [
         "La Corse",
-        "La Martinique",
         "La Réunion",
+        "La Martinique",
         "La Guadeloupe"
       ],
-      "bonne_reponse": "C",
+      "bonne_reponse": "B",
       "explication": "La Réunion est une île française de l'océan Indien.",
       "piege": true
     },
@@ -693,12 +665,12 @@
       "theme": "histoire",
       "question": "Que commémore le 11 novembre ?",
       "reponses": [
-        "La victoire de 1945",
         "L'armistice de 1918",
+        "La victoire de 1945",
         "La fête nationale",
         "Le débarquement de Normandie"
       ],
-      "bonne_reponse": "B",
+      "bonne_reponse": "A",
       "explication": "Le 11 novembre commémore l'armistice du 11 novembre 1918.",
       "piege": true
     },
@@ -708,11 +680,11 @@
       "question": "Le débarquement allié du 6 juin 1944 a eu lieu principalement :",
       "reponses": [
         "En Provence",
-        "En Normandie",
         "En Bretagne",
+        "En Normandie",
         "En Corse"
       ],
-      "bonne_reponse": "B",
+      "bonne_reponse": "C",
       "explication": "Le débarquement du 6 juin 1944 a eu lieu en Normandie. Un autre débarquement allié a eu lieu en Provence le 15 août 1944.",
       "piege": true
     },
@@ -737,10 +709,10 @@
       "reponses": [
         "48 millions",
         "58 millions",
-        "68 millions",
-        "88 millions"
+        "88 millions",
+        "68 millions"
       ],
-      "bonne_reponse": "C",
+      "bonne_reponse": "D",
       "explication": "La population française est d'environ 68 millions d'habitants en 2025.",
       "piege": true
     },
@@ -751,10 +723,10 @@
       "reponses": [
         "Moins de 100 millions",
         "Environ 150 millions",
-        "Plus de 300 millions",
-        "Plus d'un milliard"
+        "Plus d'un milliard",
+        "Plus de 300 millions"
       ],
-      "bonne_reponse": "C",
+      "bonne_reponse": "D",
       "explication": "Le support officiel indique que le français compte plus de 300 millions de locuteurs dans le monde.",
       "piege": true
     },
@@ -763,12 +735,12 @@
       "theme": "histoire",
       "question": "Quel est le classement du français parmi les langues les plus parlées dans le monde selon le support officiel ?",
       "reponses": [
-        "2e",
-        "3e",
         "5e",
+        "3e",
+        "2e",
         "8e"
       ],
-      "bonne_reponse": "C",
+      "bonne_reponse": "A",
       "explication": "Le support officiel présente le français comme la 5e langue la plus parlée au monde.",
       "piege": true
     },
@@ -777,12 +749,12 @@
       "theme": "histoire",
       "question": "Quel département est donné comme le plus touristique dans les questions d'entraînement CR ?",
       "reponses": [
-        "La Creuse",
         "Paris",
+        "La Creuse",
         "La Lozère",
         "L'Ariège"
       ],
-      "bonne_reponse": "B",
+      "bonne_reponse": "A",
       "explication": "Paris est la réponse attendue dans la banque CR pour cette question.",
       "piege": true
     },
@@ -792,11 +764,11 @@
       "question": "Quelle date est la fête nationale française ?",
       "reponses": [
         "8 mai",
-        "9 mai",
         "14 juillet",
+        "9 mai",
         "11 novembre"
       ],
-      "bonne_reponse": "C",
+      "bonne_reponse": "B",
       "explication": "La fête nationale est célébrée le 14 juillet.",
       "piege": true
     },
@@ -807,10 +779,10 @@
       "reponses": [
         "1789",
         "1792",
-        "1804",
-        "1815"
+        "1815",
+        "1804"
       ],
-      "bonne_reponse": "C",
+      "bonne_reponse": "D",
       "explication": "Napoléon Ier devient empereur en 1804.",
       "piege": true
     }
