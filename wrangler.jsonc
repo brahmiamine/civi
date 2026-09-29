@@ -1,0 +1,10 @@
+// Cloudflare Workers (static assets): publishes the Vite build output.
+// Build with BASE_PATH=/ so the app is served from the root of the domain.
+{
+  "name": "civi",
+  "compatibility_date": "2026-09-01",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "single-page-application"
+  }
+}
