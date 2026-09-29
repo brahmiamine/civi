@@ -3,27 +3,82 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>Test Civique</title>
+    <title>Civi — Test Civique</title>
     <meta name="description" content="Entraînement au test civique français : quiz, révisions par thème et examens blancs." />
     <meta name="theme-color" content="#F5F6F8" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="apple-mobile-web-app-title" content="Test Civique" />
-    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
-    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="Civi" />
+    <link rel="icon" type="image/png" href="%BASE_URL%favicon-32x32.png" />
+    <link rel="apple-touch-icon" href="%BASE_URL%apple-touch-icon.png" />
+    <style>
+      html, body, #root { height: 100%; margin: 0; }
+      .civi-boot {
+        min-height: 100%;
+        display: grid;
+        place-items: center;
+        background: #F5F6F8;
+        color: #141821;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+      html[data-boot-theme="dark"] .civi-boot {
+        background: #0D111A;
+        color: #ECEFF5;
+      }
+      .civi-boot__brand {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 14px;
+        transform: translateY(-2vh);
+      }
+      .civi-boot__icon {
+        width: 148px;
+        height: 148px;
+        object-fit: contain;
+        filter: drop-shadow(0 14px 26px rgba(15, 34, 82, .16));
+      }
+      .civi-boot__name {
+        font-size: 42px;
+        line-height: 1;
+        font-weight: 750;
+        letter-spacing: -.035em;
+        color: #163C8C;
+      }
+      html[data-boot-theme="dark"] .civi-boot__name { color: #B1C3FF; }
+      .civi-boot__dot { color: #D42A3A; }
+      .civi-boot__sub {
+        font-size: 15px;
+        letter-spacing: .14em;
+        text-transform: uppercase;
+        opacity: .7;
+      }
+    </style>
     <script>
-      // Paint the right background before React loads to avoid a light flash in dark mode.
+      // Paint the correct splash/background before React loads to avoid a theme flash.
       try {
         var s = JSON.parse(localStorage.getItem('test-civique:v1') || 'null');
         var t = (s && s.settings && s.settings.theme) || 'system';
         var d = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
-        document.documentElement.style.background = d ? '#0D111A' : '#F5F6F8';
+        var bg = d ? '#0D111A' : '#F5F6F8';
+        document.documentElement.dataset.bootTheme = d ? 'dark' : 'light';
+        document.documentElement.style.background = bg;
+        var meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.setAttribute('content', bg);
       } catch (e) {}
     </script>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div class="civi-boot" aria-label="Civi — Test Civique">
+        <div class="civi-boot__brand">
+          <img class="civi-boot__icon" src="%BASE_URL%brand-icon.svg" alt="" />
+          <div class="civi-boot__name">Civ<span class="civi-boot__dot">i</span></div>
+          <div class="civi-boot__sub">Test Civique</div>
+        </div>
+      </div>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
