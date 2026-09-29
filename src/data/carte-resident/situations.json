@@ -1,160 +1,706 @@
 {
- "titre": "Mises en situation",
- "description": "Cas concrets du quotidien.",
- "questions": [
-  {
-   "id": "cr-3-01",
-   "theme": "valeurs",
-   "question": "Un élève refuse le cours de natation pour des raisons religieuses. Peut-il être dispensé ?",
-   "reponses": [
-    "Oui, c’est son droit",
-    "Oui, avec un mot des parents",
-    "Oui, l’école doit organiser un cours séparé",
-    "Non, les convictions religieuses ne dispensent pas d’un enseignement obligatoire"
-   ],
-   "bonne_reponse": "D",
-   "explication": "Seule une raison médicale justifiée peut dispenser un élève d’un enseignement obligatoire.",
-   "situation": true
-  },
-  {
-   "id": "cr-3-02",
-   "theme": "valeurs",
-   "question": "Une mère ne veut plus envoyer sa fille de 12 ans à l’école. Est-ce possible ?",
-   "reponses": [
-    "Oui, c’est son choix",
-    "Oui, si la fille travaille",
-    "Oui, avec l’accord du père",
-    "Non, l’instruction est obligatoire jusqu’à 16 ans pour les filles comme pour les garçons"
-   ],
-   "bonne_reponse": "D",
-   "explication": "L’égalité entre filles et garçons s’applique à l’école. Le non-respect de l’obligation d’instruction est sanctionné.",
-   "situation": true
-  },
-  {
-   "id": "cr-3-03",
-   "theme": "valeurs",
-   "question": "Vous êtes moins payée que votre collègue masculin pour le même travail. C’est :",
-   "reponses": [
-    "Légal",
-    "Interdit : à travail égal, salaire égal",
-    "Légal dans le secteur privé",
-    "Normal pour une nouvelle salariée"
-   ],
-   "bonne_reponse": "B",
-   "explication": "Le Code du travail impose l’égalité de rémunération entre les femmes et les hommes.",
-   "situation": true
-  },
-  {
-   "id": "cr-3-04",
-   "theme": "valeurs",
-   "question": "Un restaurant refuse l’entrée à une personne à cause de sa couleur de peau. C’est :",
-   "reponses": [
-    "Le droit du restaurant",
-    "Autorisé le soir",
-    "Une discrimination punie par la loi",
-    "Autorisé dans un club privé"
-   ],
-   "bonne_reponse": "C",
-   "explication": "Refuser un bien ou un service en raison de l’origine est un délit.",
-   "situation": true
-  },
-  {
-   "id": "cr-3-05",
-   "theme": "valeurs",
-   "question": "Lors d’un rassemblement, un groupe appelle à la violence contre une communauté. C’est :",
-   "reponses": [
-    "La liberté d’expression",
-    "Une provocation à la haine ou à la violence, punie par la loi",
-    "Autorisé pendant une manifestation",
-    "Autorisé sur Internet"
-   ],
-   "bonne_reponse": "B",
-   "explication": "La liberté d’expression a des limites : la provocation à la haine ou à la violence est un délit, en ligne comme ailleurs.",
-   "situation": true
-  },
-  {
-   "id": "cr-3-06",
-   "theme": "droits",
-   "question": "Vous voulez créer une association. Que faut-il faire ?",
-   "reponses": [
-    "Obtenir l’autorisation du maire",
-    "Être de nationalité française",
-    "La créer librement et la déclarer en préfecture",
-    "Payer un impôt spécial"
-   ],
-   "bonne_reponse": "C",
-   "explication": "La loi du 1er juillet 1901 garantit la liberté d’association, y compris pour les étrangers.",
-   "situation": true
-  },
-  {
-   "id": "cr-3-07",
-   "theme": "droits",
-   "question": "Votre propriétaire entre chez vous sans votre accord pendant votre absence. C’est :",
-   "reponses": [
-    "Son droit",
-    "Interdit : c’est une violation de domicile",
-    "Autorisé une fois par mois",
-    "Autorisé s’il prévient les voisins"
-   ],
-   "bonne_reponse": "B",
-   "explication": "Le domicile du locataire est protégé, même vis-à-vis du propriétaire.",
-   "situation": true
-  },
-  {
-   "id": "cr-3-08",
-   "theme": "droits",
-   "question": "Votre employeur veut vous licencier parce que vous êtes enceinte. C’est :",
-   "reponses": [
-    "Légal",
-    "Légal pendant la période d’essai",
-    "Légal dans les petites entreprises",
-    "Une discrimination interdite"
-   ],
-   "bonne_reponse": "D",
-   "explication": "La grossesse ne peut jamais justifier un licenciement ou un refus d’embauche.",
-   "situation": true
-  },
-  {
-   "id": "cr-3-10",
-   "theme": "droits",
-   "question": "Un ami vous propose d’utiliser sa carte Vitale pour vous soigner. C’est :",
-   "reponses": [
-    "Une bonne idée",
-    "Autorisé en famille",
-    "Autorisé en cas d’urgence",
-    "Une fraude, interdite par la loi"
-   ],
-   "bonne_reponse": "D",
-   "explication": "La carte Vitale est personnelle. Son utilisation par une autre personne est une fraude à l’Assurance maladie.",
-   "situation": true
-  },
-  {
-   "id": "cr-3-11",
-   "theme": "institutions",
-   "question": "Vous contestez une décision de l’administration. Que pouvez-vous faire ?",
-   "reponses": [
-    "Rien, la décision est définitive",
-    "Faire un recours, notamment devant le tribunal administratif",
-    "Écrire uniquement au président de la République",
-    "Manifester devant la préfecture"
-   ],
-   "bonne_reponse": "B",
-   "explication": "On peut former un recours auprès de l’administration puis devant le tribunal administratif, généralement dans un délai de deux mois.",
-   "situation": true
-  },
-  {
-   "id": "cr-3-15",
-   "theme": "societe",
-   "question": "Une personne sourde doit joindre les secours. Quel numéro utiliser ?",
-   "reponses": [
-    "Le 15",
-    "Le 3919",
-    "Le 114 (SMS, visio ou tchat)",
-    "Le 119"
-   ],
-   "bonne_reponse": "C",
-   "explication": "Le 114 est le numéro d’urgence pour les personnes sourdes, malentendantes ou qui ne peuvent pas parler.",
-   "situation": true
-  }
- ]
+  "titre": "Mises en situation - Carte de résident",
+  "description": "50 mises en situation d'entraînement, distinctes des 209 questions officielles de connaissances. Les questions de situation exactes de l'examen ne sont pas publiées par le ministère.",
+  "questions": [
+    {
+      "id": "cr-sit-001",
+      "theme": "valeurs",
+      "question": "Un élève refuse un cours de sport obligatoire parce que filles et garçons sont ensemble. Ses parents peuvent-ils imposer cette dispense ?",
+      "reponses": [
+        "Oui, pour un motif religieux",
+        "Oui, avec un simple mot des parents",
+        "Non, un motif religieux ne permet pas de refuser un enseignement obligatoire",
+        "Oui, si l'élève a plus de 12 ans"
+      ],
+      "bonne_reponse": "C",
+      "explication": "Dans l'école publique, les enseignements obligatoires s'appliquent à tous. Une conviction religieuse ne permet pas d'exiger une adaptation du programme ou de la mixité.",
+      "situation": true
+    },
+    {
+      "id": "cr-sit-002",
+      "theme": "valeurs",
+      "question": "Un agent de préfecture porte un signe religieux visible pendant son service. Est-ce conforme au principe de neutralité ?",
+      "reponses": [
+        "Oui, toujours",
+        "Non, un agent public doit rester neutre dans l'exercice de ses fonctions",
+        "Oui, si aucun usager ne se plaint",
+        "Oui, uniquement le matin"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Les agents publics doivent respecter la neutralité religieuse, politique et philosophique pendant leur service.",
+      "situation": true
+    },
+    {
+      "id": "cr-sit-003",
+      "theme": "valeurs",
+      "question": "Une usagère se rend à la mairie en portant un signe religieux. Peut-elle être accueillie ?",
+      "reponses": [
+        "Oui, les usagers ne sont pas soumis à la neutralité des agents, sous réserve du respect des règles du service",
+        "Non, tout signe religieux est interdit dans une mairie",
+        "Seulement si elle enlève le signe à l'entrée",
+        "Seulement avec l'autorisation du maire"
+      ],
+      "bonne_reponse": "A",
+      "explication": "La neutralité s'impose aux agents publics. Les usagers peuvent manifester leurs convictions dans le respect du fonctionnement du service et de l'ordre public.",
+      "situation": true
+    },
+    {
+      "id": "cr-sit-004",
+      "theme": "valeurs",
+      "question": "Un employeur refuse une candidature uniquement parce que la candidate est une femme. Que dit la loi ?",
+      "reponses": [
+        "C'est autorisé dans le privé",
+        "C'est une discrimination interdite",
+        "C'est autorisé si l'entreprise compte moins de 10 salariés",
+        "C'est une simple préférence sans conséquence"
+      ],
+      "bonne_reponse": "B",
+      "explication": "La discrimination à l'embauche fondée sur le sexe est interdite.",
+      "situation": true
+    },
+    {
+      "id": "cr-sit-005",
+      "theme": "valeurs",
+      "question": "Sur un réseau social, une personne insulte publiquement quelqu'un à cause de son handicap. Est-ce protégé par la liberté d'expression ?",
+      "reponses": [
+        "Oui, internet est un espace privé",
+        "Oui, si c'est une plaisanterie",
+        "Non, les injures discriminatoires peuvent être sanctionnées",
+        "Oui, si le compte est anonyme"
+      ],
+      "bonne_reponse": "C",
+      "explication": "La liberté d'expression n'autorise pas les injures, la haine ou la discrimination, y compris en ligne.",
+      "situation": true
+    },
+    {
+      "id": "cr-sit-006",
+      "theme": "valeurs",
+      "question": "Une personne veut changer de religion. La loi française le permet-elle ?",
+      "reponses": [
+        "Oui, la liberté de conscience permet de croire, de ne pas croire ou de changer de religion",
+        "Non",
+        "Oui, seulement avec l'accord de la famille",
+        "Oui, seulement après 25 ans"
+      ],
+      "bonne_reponse": "A",
+      "explication": "La laïcité garantit la liberté de conscience.",
+      "situation": true
+    },
+    {
+      "id": "cr-sit-007",
+      "theme": "valeurs",
+      "question": "Une personne critique une religion sans insulter les croyants ni appeler à la haine. Est-ce autorisé ?",
+      "reponses": [
+        "Non, le blasphème est interdit",
+        "Oui, la critique d'une religion relève de la liberté d'expression",
+        "Seulement dans un lieu privé",
+        "Seulement avec une autorisation judiciaire"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Le blasphème n'est pas une infraction en France ; les attaques contre des personnes, la haine ou la discrimination restent interdites.",
+      "situation": true
+    },
+    {
+      "id": "cr-sit-008",
+      "theme": "valeurs",
+      "question": "Une personne brûle volontairement et publiquement un drapeau français dans des conditions constituant un outrage. Est-ce permis ?",
+      "reponses": [
+        "Oui, toujours",
+        "Non, l'outrage public au drapeau peut être sanctionné",
+        "Oui, seulement le 14 juillet",
+        "Oui, si le drapeau lui appartient"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Le drapeau est un symbole officiel de la République et l'outrage public au drapeau est sanctionné dans les cas prévus par la loi.",
+      "situation": true
+    },
+    {
+      "id": "cr-sit-009",
+      "theme": "droits",
+      "question": "Une femme mineure souhaite recourir à une IVG. A-t-elle besoin de l'autorisation de ses parents ?",
+      "reponses": [
+        "Oui, obligatoirement",
+        "Non, elle peut recourir à l'IVG sans autorisation parentale, avec l'accompagnement prévu par la loi",
+        "Oui, si elle a moins de 16 ans",
+        "Non, mais uniquement si elle est mariée"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Une mineure peut demander une IVG sans autorisation parentale ; elle doit être accompagnée d'une personne majeure de son choix dans le cadre prévu.",
+      "situation": true
+    },
+    {
+      "id": "cr-sit-010",
+      "theme": "droits",
+      "question": "Une mineure souhaite obtenir une contraception en demandant le secret. Est-ce possible ?",
+      "reponses": [
+        "Non",
+        "Oui, les consultations et prescriptions peuvent être confidentielles et gratuites selon les dispositifs prévus",
+        "Seulement avec l'accord du père",
+        "Seulement après 17 ans"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Le droit à la contraception est accessible aux mineures ; des dispositifs permettent la gratuité et la confidentialité.",
+      "situation": true
+    },
+    {
+      "id": "cr-sit-011",
+      "theme": "droits",
+      "question": "Une personne veut imposer à son conjoint de rester marié contre sa volonté. Est-ce possible ?",
+      "reponses": [
+        "Oui",
+        "Non, chacun peut demander le divorce selon la procédure légale",
+        "Oui, si le mariage est religieux",
+        "Oui, si le couple a des enfants"
+      ],
+      "bonne_reponse": "B",
+      "explication": "La liberté conjugale comprend la possibilité de mettre fin au mariage par le divorce selon la loi.",
+      "situation": true
+    },
+    {
+      "id": "cr-sit-012",
+      "theme": "droits",
+      "question": "Vous êtes témoin d'une personne inconsciente après un accident. Quelle action est appropriée ?",
+      "reponses": [
+        "Partir sans rien faire",
+        "Appeler les secours et porter assistance sans se mettre soi-même en danger",
+        "Filmer la scène",
+        "Attendre qu'un proche arrive"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Alerter les secours est un exemple d'assistance à personne en danger.",
+      "situation": true
+    },
+    {
+      "id": "cr-sit-013",
+      "theme": "droits",
+      "question": "Vous êtes témoin de violences conjugales chez des voisins. Que devez-vous faire ?",
+      "reponses": [
+        "Ignorer la situation",
+        "Alerter les forces de l'ordre ou les secours si une personne est en danger",
+        "Intervenir physiquement dans tous les cas",
+        "Publier la scène sur internet"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Il faut alerter les services compétents lorsqu'une personne est en danger et éviter de se mettre soi-même en danger.",
+      "situation": true
+    },
+    {
+      "id": "cr-sit-014",
+      "theme": "droits",
+      "question": "Une victime de violences souhaite agir. Quelle démarche est adaptée ?",
+      "reponses": [
+        "Garder le silence obligatoirement",
+        "Contacter la police ou la gendarmerie et demander de l'aide",
+        "Se faire justice elle-même",
+        "Attendre plusieurs années avant de signaler"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Une victime peut signaler les faits aux forces de l'ordre et être orientée vers des dispositifs d'aide.",
+      "situation": true
+    },
+    {
+      "id": "cr-sit-015",
+      "theme": "droits",
+      "question": "Un policier effectue un contrôle légal et vous donne une instruction conforme à la loi. Que devez-vous faire ?",
+      "reponses": [
+        "Vous enfuir",
+        "Obéir à l'instruction et contester ensuite par les voies de droit si nécessaire",
+        "Refuser systématiquement",
+        "Demander l'accord d'un voisin"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Les ordres légaux des forces de l'ordre doivent être respectés ; un recours peut ensuite être exercé si une décision est contestée.",
+      "situation": true
+    },
+    {
+      "id": "cr-sit-016",
+      "theme": "droits",
+      "question": "Une personne commet un meurtre. Quelle catégorie d'infraction est concernée ?",
+      "reponses": [
+        "Une contravention",
+        "Un délit",
+        "Un crime",
+        "Aucune infraction"
+      ],
+      "bonne_reponse": "C",
+      "explication": "Le meurtre est un crime, la catégorie d'infraction la plus grave.",
+      "situation": true
+    },
+    {
+      "id": "cr-sit-017",
+      "theme": "droits",
+      "question": "Une personne commet un vol simple. Quelle catégorie d'infraction est généralement concernée ?",
+      "reponses": [
+        "Un crime",
+        "Un délit",
+        "Une simple incivilité sans sanction",
+        "Une faute administrative uniquement"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Le vol simple est un délit.",
+      "situation": true
+    },
+    {
+      "id": "cr-sit-018",
+      "theme": "droits",
+      "question": "Un salarié cesse collectivement le travail pour défendre des revendications professionnelles dans le cadre légal. Quel droit exerce-t-il ?",
+      "reponses": [
+        "Le droit de grève",
+        "Le droit de vote",
+        "La liberté de circulation",
+        "Le droit de propriété"
+      ],
+      "bonne_reponse": "A",
+      "explication": "Le droit de grève permet de cesser collectivement le travail pour défendre des revendications professionnelles.",
+      "situation": true
+    },
+    {
+      "id": "cr-sit-019",
+      "theme": "droits",
+      "question": "Un salarié souhaite adhérer à un syndicat. Son employeur peut-il l'interdire simplement parce qu'il n'aime pas les syndicats ?",
+      "reponses": [
+        "Oui",
+        "Non, le droit syndical est protégé",
+        "Oui, dans toute entreprise privée",
+        "Oui, si le salarié est étranger"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Le droit syndical permet aux salariés d'adhérer à un syndicat et de défendre collectivement leurs intérêts.",
+      "situation": true
+    },
+    {
+      "id": "cr-sit-020",
+      "theme": "droits",
+      "question": "Un employeur demande à un salarié d'effectuer des heures supplémentaires. Peut-il décider qu'elles seront toujours gratuites ?",
+      "reponses": [
+        "Oui",
+        "Non, le temps supplémentaire est encadré et doit donner lieu à la rémunération ou compensation prévue",
+        "Oui, si l'entreprise est petite",
+        "Oui, si le salarié est en CDI"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Les heures supplémentaires ou complémentaires sont encadrées par la loi et les accords applicables.",
+      "situation": true
+    },
+    {
+      "id": "cr-sit-021",
+      "theme": "droits",
+      "question": "Un employeur fait travailler un salarié sans le déclarer. Cette pratique est :",
+      "reponses": [
+        "Autorisée pendant un mois",
+        "Du travail dissimulé, interdit",
+        "Autorisée si le salarié est d'accord",
+        "Une simple erreur sans conséquence"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Le travail non déclaré constitue du travail dissimulé et est interdit.",
+      "situation": true
+    },
+    {
+      "id": "cr-sit-022",
+      "theme": "institutions",
+      "question": "Vous ne pouvez pas aller voter et souhaitez qu'une autre personne vote pour vous. Que faut-il faire ?",
+      "reponses": [
+        "Lui donner simplement votre carte d'électeur",
+        "Établir une procuration selon la procédure prévue",
+        "Lui envoyer un SMS",
+        "C'est impossible dans tous les cas"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Le vote par procuration permet à un électeur de mandater une autre personne dans le cadre légal.",
+      "situation": true
+    },
+    {
+      "id": "cr-sit-023",
+      "theme": "institutions",
+      "question": "Une personne affirme que voter est obligatoire en France. Est-ce exact ?",
+      "reponses": [
+        "Oui",
+        "Non, le vote est un droit et n'est pas obligatoire",
+        "Oui, uniquement aux législatives",
+        "Oui, pour les plus de 25 ans"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Le vote n'est pas obligatoire en France.",
+      "situation": true
+    },
+    {
+      "id": "cr-sit-024",
+      "theme": "institutions",
+      "question": "Un ministre commet une infraction. Est-il automatiquement au-dessus de la loi ?",
+      "reponses": [
+        "Oui",
+        "Non, l'État de droit implique que les gouvernants aussi sont soumis à la loi",
+        "Oui, pendant tout son mandat",
+        "Oui, sauf pour les crimes"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Dans un État de droit, les autorités publiques sont soumises à la loi.",
+      "situation": true
+    },
+    {
+      "id": "cr-sit-025",
+      "theme": "institutions",
+      "question": "Vous contestez une décision d'une administration. Quelle voie peut être utilisée ?",
+      "reponses": [
+        "Aucune, l'administration a toujours raison",
+        "Un recours administratif et, selon le cas, un recours devant la juridiction administrative",
+        "Uniquement une pétition en ligne",
+        "Uniquement un courrier au Président"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Les décisions administratives peuvent être contestées par les voies de recours prévues, notamment devant le tribunal administratif selon le cas.",
+      "situation": true
+    },
+    {
+      "id": "cr-sit-026",
+      "theme": "institutions",
+      "question": "Votre commune doit gérer une école primaire publique. Quelle collectivité en a la charge principale pour les bâtiments et équipements ?",
+      "reponses": [
+        "La commune",
+        "La région",
+        "L'Union européenne",
+        "Le Sénat"
+      ],
+      "bonne_reponse": "A",
+      "explication": "Les communes gèrent les écoles maternelles et primaires ; les départements les collèges et les régions les lycées.",
+      "situation": true
+    },
+    {
+      "id": "cr-sit-027",
+      "theme": "institutions",
+      "question": "Un collège public doit être construit ou entretenu. Quelle collectivité est principalement compétente ?",
+      "reponses": [
+        "La commune",
+        "Le département",
+        "La région",
+        "Le Parlement"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Le département gère les collèges.",
+      "situation": true
+    },
+    {
+      "id": "cr-sit-028",
+      "theme": "institutions",
+      "question": "Un lycée public doit être géré au niveau territorial. Quelle collectivité est principalement compétente ?",
+      "reponses": [
+        "La commune",
+        "Le département",
+        "La région",
+        "La préfecture uniquement"
+      ],
+      "bonne_reponse": "C",
+      "explication": "La région gère les lycées.",
+      "situation": true
+    },
+    {
+      "id": "cr-sit-029",
+      "theme": "institutions",
+      "question": "Un citoyen européen vivant en France veut voter aux élections européennes en France. Peut-il le faire ?",
+      "reponses": [
+        "Oui, s'il remplit les conditions et est inscrit sur les listes électorales",
+        "Non, seuls les Français peuvent voter aux européennes en France",
+        "Oui, sans inscription",
+        "Seulement s'il devient français"
+      ],
+      "bonne_reponse": "A",
+      "explication": "Un citoyen de l'Union européenne résidant en France peut voter aux élections européennes en France s'il remplit les conditions d'âge et d'inscription.",
+      "situation": true
+    },
+    {
+      "id": "cr-sit-030",
+      "theme": "institutions",
+      "question": "Un citoyen européen vivant en France veut participer aux élections municipales. Est-ce possible ?",
+      "reponses": [
+        "Oui, sous les conditions prévues et avec inscription sur la liste électorale complémentaire",
+        "Non, jamais",
+        "Oui, sans aucune inscription",
+        "Seulement s'il est né en France"
+      ],
+      "bonne_reponse": "A",
+      "explication": "Les citoyens de l'Union européenne résidant en France peuvent voter aux élections municipales et européennes sous les conditions prévues.",
+      "situation": true
+    },
+    {
+      "id": "cr-sit-031",
+      "theme": "histoire",
+      "question": "Quelqu'un confond le 8 mai et le 11 novembre. Le 8 mai commémore :",
+      "reponses": [
+        "L'armistice de 1918",
+        "La victoire de 1945 en Europe",
+        "La Révolution française",
+        "Le traité de Maastricht"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Le 8 mai commémore la victoire de 1945 et la fin de la Seconde Guerre mondiale en Europe.",
+      "situation": true
+    },
+    {
+      "id": "cr-sit-032",
+      "theme": "histoire",
+      "question": "Quelqu'un confond le 8 mai et le 11 novembre. Le 11 novembre commémore :",
+      "reponses": [
+        "L'armistice de 1918",
+        "La victoire de 1945",
+        "Le débarquement de 1944",
+        "La fête nationale"
+      ],
+      "bonne_reponse": "A",
+      "explication": "Le 11 novembre commémore l'armistice de 1918.",
+      "situation": true
+    },
+    {
+      "id": "cr-sit-033",
+      "theme": "histoire",
+      "question": "Vous préparez un voyage à Paris et on vous demande quel fleuve traverse la capitale. Que répondez-vous ?",
+      "reponses": [
+        "La Loire",
+        "La Seine",
+        "Le Rhône",
+        "Le Rhin"
+      ],
+      "bonne_reponse": "B",
+      "explication": "La Seine traverse Paris.",
+      "situation": true
+    },
+    {
+      "id": "cr-sit-034",
+      "theme": "histoire",
+      "question": "Vous devez identifier la chaîne de montagnes entre la France et l'Espagne. Laquelle ?",
+      "reponses": [
+        "Les Alpes",
+        "Le Jura",
+        "Les Pyrénées",
+        "Les Vosges"
+      ],
+      "bonne_reponse": "C",
+      "explication": "Les Pyrénées se situent entre la France et l'Espagne.",
+      "situation": true
+    },
+    {
+      "id": "cr-sit-035",
+      "theme": "histoire",
+      "question": "On vous demande une île française située dans l'océan Indien. Laquelle ?",
+      "reponses": [
+        "La Corse",
+        "La Réunion",
+        "La Guadeloupe",
+        "La Martinique"
+      ],
+      "bonne_reponse": "B",
+      "explication": "La Réunion est une île française de l'océan Indien.",
+      "situation": true
+    },
+    {
+      "id": "cr-sit-036",
+      "theme": "histoire",
+      "question": "Vous visitez un musée consacré à Auguste Rodin. Quel était son métier artistique ?",
+      "reponses": [
+        "Écrivain",
+        "Sculpteur",
+        "Compositeur",
+        "Architecte"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Auguste Rodin est un célèbre sculpteur français.",
+      "situation": true
+    },
+    {
+      "id": "cr-sit-037",
+      "theme": "histoire",
+      "question": "On vous parle de l'incendie d'une grande cathédrale parisienne en 2019. De quel monument s'agit-il ?",
+      "reponses": [
+        "Notre-Dame de Paris",
+        "La basilique du Sacré-Cœur",
+        "La cathédrale de Reims",
+        "La basilique de Fourvière"
+      ],
+      "bonne_reponse": "A",
+      "explication": "Notre-Dame de Paris a été gravement touchée par un incendie en avril 2019.",
+      "situation": true
+    },
+    {
+      "id": "cr-sit-038",
+      "theme": "histoire",
+      "question": "Un ami dit que les 12 étoiles du drapeau européen représentent les 12 premiers États membres. Est-ce exact ?",
+      "reponses": [
+        "Oui",
+        "Non, les 12 étoiles symbolisent notamment l'unité et l'harmonie et leur nombre ne dépend pas du nombre d'États",
+        "Oui, mais seulement depuis 2004",
+        "Oui, parce que l'UE compte 12 États"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Le nombre d'étoiles du drapeau européen est fixe et ne correspond pas au nombre d'États membres.",
+      "situation": true
+    },
+    {
+      "id": "cr-sit-039",
+      "theme": "societe",
+      "question": "Vous venez d'avoir un enfant en France. Où devez-vous déclarer sa naissance ?",
+      "reponses": [
+        "À la mairie du lieu de naissance",
+        "Au commissariat",
+        "À France Travail",
+        "À l'Assemblée nationale"
+      ],
+      "bonne_reponse": "A",
+      "explication": "La déclaration de naissance se fait auprès de l'état civil de la mairie du lieu de naissance.",
+      "situation": true
+    },
+    {
+      "id": "cr-sit-040",
+      "theme": "societe",
+      "question": "Vous souhaitez inscrire votre enfant à l'école publique. Quelle institution locale est l'interlocuteur habituel pour l'inscription administrative en primaire ?",
+      "reponses": [
+        "La mairie",
+        "Le tribunal",
+        "La préfecture de région",
+        "Le Sénat"
+      ],
+      "bonne_reponse": "A",
+      "explication": "Pour l'école publique maternelle ou élémentaire, l'inscription administrative se fait habituellement auprès de la mairie avant l'admission par l'école.",
+      "situation": true
+    },
+    {
+      "id": "cr-sit-041",
+      "theme": "societe",
+      "question": "Après un divorce, l'un des parents affirme qu'il perd automatiquement toute autorité parentale. Est-ce exact ?",
+      "reponses": [
+        "Oui",
+        "Non, l'autorité parentale reste en principe exercée par les deux parents sauf décision contraire du juge",
+        "Oui, pour le père seulement",
+        "Oui, pour le parent qui quitte le domicile"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Le divorce ne retire pas automatiquement l'autorité parentale à l'un des parents.",
+      "situation": true
+    },
+    {
+      "id": "cr-sit-042",
+      "theme": "societe",
+      "question": "Une personne aux faibles ressources a besoin d'un avocat. Quelle aide peut prendre en charge tout ou partie des frais selon ses ressources ?",
+      "reponses": [
+        "L'aide juridictionnelle",
+        "La prime d'activité",
+        "Le RSA automatiquement",
+        "La carte Vitale"
+      ],
+      "bonne_reponse": "A",
+      "explication": "L'aide juridictionnelle peut prendre en charge tout ou partie des frais de justice et d'avocat selon les conditions prévues.",
+      "situation": true
+    },
+    {
+      "id": "cr-sit-043",
+      "theme": "societe",
+      "question": "Vous signez un contrat de location d'un logement vide. Quelle forme est normalement requise ?",
+      "reponses": [
+        "Un accord oral uniquement",
+        "Un bail écrit conforme aux règles applicables",
+        "Un SMS du propriétaire",
+        "Une déclaration à la police"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Le bail d'habitation doit être établi par écrit et contenir les informations obligatoires.",
+      "situation": true
+    },
+    {
+      "id": "cr-sit-044",
+      "theme": "societe",
+      "question": "Votre lave-vaisselle est hors d'usage. Quelle solution est adaptée pour s'en débarrasser ?",
+      "reponses": [
+        "Le déposer dans la rue n'importe où",
+        "L'apporter en déchèterie ou utiliser une filière de collecte adaptée",
+        "Le jeter dans une rivière",
+        "Le brûler dans un parc"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Les gros appareils électroménagers doivent être orientés vers une filière de collecte ou de recyclage adaptée.",
+      "situation": true
+    },
+    {
+      "id": "cr-sit-045",
+      "theme": "societe",
+      "question": "Vous devez appeler en urgence la police ou la gendarmerie. Quel numéro composez-vous ?",
+      "reponses": [
+        "15",
+        "17",
+        "18",
+        "119"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Le 17 est le numéro d'urgence de la police et de la gendarmerie.",
+      "situation": true
+    },
+    {
+      "id": "cr-sit-046",
+      "theme": "societe",
+      "question": "Vous consultez un médecin. Peut-il raconter librement vos informations médicales à vos voisins ?",
+      "reponses": [
+        "Oui",
+        "Non, il est tenu au secret médical sauf exceptions prévues par la loi",
+        "Oui, si les voisins le demandent",
+        "Oui, si vous êtes étranger"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Le secret médical protège la confidentialité des informations de santé.",
+      "situation": true
+    },
+    {
+      "id": "cr-sit-047",
+      "theme": "societe",
+      "question": "Un salarié perd involontairement son emploi et souhaite demander l'ARE. Quelle démarche est notamment nécessaire ?",
+      "reponses": [
+        "S'inscrire à France Travail et remplir les conditions d'activité et de recherche d'emploi",
+        "Être obligatoirement français",
+        "Avoir plus de 30 ans",
+        "Ne jamais avoir travaillé auparavant"
+      ],
+      "bonne_reponse": "A",
+      "explication": "L'indemnisation chômage dépend notamment d'une durée d'activité suffisante, de l'inscription à France Travail et des autres conditions prévues.",
+      "situation": true
+    },
+    {
+      "id": "cr-sit-048",
+      "theme": "societe",
+      "question": "Des parents refusent sans motif valable toute instruction à leur enfant de 8 ans. Est-ce conforme à la loi ?",
+      "reponses": [
+        "Oui",
+        "Non, l'instruction est obligatoire de 3 à 16 ans",
+        "Oui, jusqu'à 12 ans",
+        "Oui, si les parents travaillent"
+      ],
+      "bonne_reponse": "B",
+      "explication": "L'instruction est obligatoire pour les enfants de 3 à 16 ans.",
+      "situation": true
+    },
+    {
+      "id": "cr-sit-049",
+      "theme": "societe",
+      "question": "Un enfant en situation de handicap se présente à l'école. Quel principe s'applique ?",
+      "reponses": [
+        "Il doit être refusé automatiquement",
+        "Il a droit à la scolarisation et aux aménagements ou accompagnements prévus selon ses besoins",
+        "Il peut aller seulement dans une école privée",
+        "Il ne peut être scolarisé qu'à partir de 10 ans"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Le service public de l'éducation accueille les enfants en situation de handicap et organise les adaptations nécessaires selon leur situation.",
+      "situation": true
+    },
+    {
+      "id": "cr-sit-050",
+      "theme": "societe",
+      "question": "Un couple souhaite que seul un mariage religieux produise les effets juridiques du mariage en France. Est-ce suffisant ?",
+      "reponses": [
+        "Oui",
+        "Non, seul le mariage civil célébré par l'officier d'état civil produit les effets juridiques du mariage",
+        "Oui, si la cérémonie a des témoins",
+        "Oui, si le couple vit ensemble depuis un an"
+      ],
+      "bonne_reponse": "B",
+      "explication": "En France, le mariage civil est le mariage reconnu juridiquement par l'État.",
+      "situation": true
+    }
+  ]
 }
