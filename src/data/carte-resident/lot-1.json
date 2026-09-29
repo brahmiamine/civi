@@ -1,204 +1,552 @@
 {
-  "titre": "Principes et institutions",
-  "description": "Constitution, Parlement et grands principes.",
+  "titre": "Dates à retenir",
+  "description": "42 questions uniquement sur les dates et années importantes à connaître pour le test civique – Carte de résident.",
   "questions": [
     {
-      "id": "cr-1-01",
-      "theme": "valeurs",
-      "question": "Selon l’article 1er de la Constitution, la France est une République :",
+      "id": "cr-date-001",
+      "theme": "histoire",
+      "question": "En quelle année la Déclaration des droits de l'homme et du citoyen a-t-elle été adoptée ?",
       "reponses": [
-        "Fédérale, laïque et libérale",
-        "Indivisible, laïque, démocratique et sociale",
-        "Indivisible, chrétienne et sociale",
-        "Démocratique, monarchique et sociale"
+        "1776",
+        "1789",
+        "1792",
+        "1848"
       ],
       "bonne_reponse": "B",
-      "explication": "L’article 1er affirme aussi l’égalité de tous les citoyens devant la loi, sans distinction d’origine, de race ou de religion."
+      "explication": "La Déclaration des droits de l'homme et du citoyen a été adoptée le 26 août 1789."
     },
     {
-      "id": "cr-1-02",
-      "theme": "valeurs",
-      "question": "En quelle année a été votée la loi de séparation des Églises et de l’État ?",
+      "id": "cr-date-002",
+      "theme": "histoire",
+      "question": "À quelle date a eu lieu la prise de la Bastille ?",
       "reponses": [
-        "1789",
-        "1882",
-        "1905",
-        "1958"
-      ],
-      "bonne_reponse": "C",
-      "explication": "La loi du 9 décembre 1905 garantit le libre exercice des cultes ; l’État n’en reconnaît et n’en finance aucun."
-    },
-    {
-      "id": "cr-1-03",
-      "theme": "valeurs",
-      "question": "Qui a composé La Marseillaise ?",
-      "reponses": [
-        "Victor Hugo",
-        "Napoléon Bonaparte",
-        "Jean Jaurès",
-        "Rouget de Lisle"
-      ],
-      "bonne_reponse": "D",
-      "explication": "Composée en 1792, La Marseillaise est l’hymne national inscrit dans la Constitution de 1958."
-    },
-    {
-      "id": "cr-1-04",
-      "theme": "valeurs",
-      "question": "La Déclaration des droits de l’homme et du citoyen a été adoptée en :",
-      "reponses": [
-        "1789",
-        "1848",
-        "1905",
-        "1946"
+        "14 juillet 1789",
+        "26 août 1789",
+        "21 septembre 1792",
+        "11 novembre 1918"
       ],
       "bonne_reponse": "A",
-      "explication": "Adoptée le 26 août 1789, elle a valeur constitutionnelle : le préambule de la Constitution de 1958 y fait référence."
+      "explication": "La prise de la Bastille a eu lieu le 14 juillet 1789, pendant la Révolution française."
     },
     {
-      "id": "cr-1-05",
-      "theme": "valeurs",
-      "question": "Depuis 2004, à l’école publique, les élèves :",
+      "id": "cr-date-003",
+      "theme": "histoire",
+      "question": "En quelle année la Première République française a-t-elle été proclamée ?",
       "reponses": [
-        "Peuvent porter tous les signes religieux",
-        "Doivent porter une tenue religieuse",
-        "Doivent déclarer leur religion",
-        "Ne peuvent pas porter de signes religieux ostensibles"
-      ],
-      "bonne_reponse": "D",
-      "explication": "La loi du 15 mars 2004 applique le principe de laïcité dans les écoles, collèges et lycées publics."
-    },
-    {
-      "id": "cr-1-06",
-      "theme": "institutions",
-      "question": "De quand date la Constitution de la Ve République ?",
-      "reponses": [
-        "1946",
-        "1875",
+        "1789",
         "1791",
-        "1958"
-      ],
-      "bonne_reponse": "D",
-      "explication": "Adoptée par référendum le 28 septembre 1958, elle a été promulguée le 4 octobre 1958."
-    },
-    {
-      "id": "cr-1-07",
-      "theme": "institutions",
-      "question": "Qui nomme le Premier ministre ?",
-      "reponses": [
-        "L’Assemblée nationale",
-        "Le président de la République",
-        "Le Sénat",
-        "Les électeurs"
-      ],
-      "bonne_reponse": "B",
-      "explication": "Le Premier ministre dirige l’action du Gouvernement, qui est responsable devant l’Assemblée nationale."
-    },
-    {
-      "id": "cr-1-08",
-      "theme": "institutions",
-      "question": "Combien y a-t-il de députés à l’Assemblée nationale ?",
-      "reponses": [
-        "348",
-        "577",
-        "925",
-        "101"
-      ],
-      "bonne_reponse": "B",
-      "explication": "Les 577 députés sont élus au suffrage universel direct pour 5 ans. Le Sénat compte 348 sénateurs.",
-      "piege": true
-    },
-    {
-      "id": "cr-1-09",
-      "theme": "institutions",
-      "question": "Comment sont élus les sénateurs ?",
-      "reponses": [
-        "Au suffrage universel direct",
-        "Ils sont nommés par le président",
-        "Au suffrage universel indirect, par des grands électeurs",
-        "Ils sont tirés au sort"
+        "1792",
+        "1804"
       ],
       "bonne_reponse": "C",
-      "explication": "Les sénateurs sont élus pour 6 ans par des grands électeurs, principalement des élus locaux."
+      "explication": "La Première République a été proclamée en septembre 1792 après l'abolition de la monarchie."
     },
     {
-      "id": "cr-1-10",
-      "theme": "institutions",
-      "question": "Quelle institution vérifie que les lois respectent la Constitution ?",
+      "id": "cr-date-004",
+      "theme": "valeurs",
+      "question": "En quelle année La Marseillaise a-t-elle été composée ?",
       "reponses": [
-        "Le Conseil constitutionnel",
-        "Le Conseil d’État",
-        "La Cour des comptes",
-        "Le Sénat"
-      ],
-      "bonne_reponse": "A",
-      "explication": "Le Conseil constitutionnel peut censurer une loi contraire à la Constitution. Le Conseil d’État, lui, conseille le Gouvernement et juge l’administration.",
-      "piege": true
-    },
-    {
-      "id": "cr-1-11",
-      "theme": "droits",
-      "question": "En quelle année les femmes ont-elles obtenu le droit de vote en France ?",
-      "reponses": [
+        "1789",
+        "1792",
         "1848",
-        "1944",
-        "1920",
-        "1968"
+        "1905"
       ],
       "bonne_reponse": "B",
-      "explication": "Ordonnance du 21 avril 1944. Les femmes votent pour la première fois en 1945."
+      "explication": "Rouget de Lisle a composé le Chant de guerre pour l'armée du Rhin en 1792, devenu La Marseillaise."
     },
     {
-      "id": "cr-1-12",
-      "theme": "droits",
-      "question": "Le droit de grève est :",
-      "reponses": [
-        "Un droit reconnu par la Constitution",
-        "Interdit",
-        "Réservé aux fonctionnaires",
-        "Soumis à l’accord de l’employeur"
-      ],
-      "bonne_reponse": "A",
-      "explication": "Le Préambule de 1946 le reconnaît ; il s’exerce dans le cadre des lois qui le réglementent."
-    },
-    {
-      "id": "cr-1-13",
+      "id": "cr-date-005",
       "theme": "histoire",
-      "question": "En quelle année l’esclavage a-t-il été définitivement aboli en France ?",
+      "question": "À quelle date Louis XVI a-t-il été exécuté ?",
+      "reponses": [
+        "14 juillet 1789",
+        "21 janvier 1793",
+        "2 décembre 1804",
+        "27 avril 1848"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Louis XVI a été guillotiné le 21 janvier 1793."
+    },
+    {
+      "id": "cr-date-006",
+      "theme": "histoire",
+      "question": "En quelle année Napoléon Ier est-il devenu empereur des Français ?",
+      "reponses": [
+        "1792",
+        "1799",
+        "1804",
+        "1815"
+      ],
+      "bonne_reponse": "C",
+      "explication": "Napoléon Ier est devenu empereur en 1804."
+    },
+    {
+      "id": "cr-date-007",
+      "theme": "histoire",
+      "question": "En quelle année l'esclavage a-t-il été définitivement aboli dans les colonies françaises ?",
+      "reponses": [
+        "1794",
+        "1802",
+        "1848",
+        "1905"
+      ],
+      "bonne_reponse": "C",
+      "explication": "Le décret du 27 avril 1848 a aboli définitivement l'esclavage dans les colonies françaises."
+    },
+    {
+      "id": "cr-date-008",
+      "theme": "droits",
+      "question": "De quelle année date la grande loi sur la liberté de la presse ?",
       "reponses": [
         "1789",
         "1848",
-        "1905",
-        "1946"
+        "1881",
+        "1905"
+      ],
+      "bonne_reponse": "C",
+      "explication": "La loi du 29 juillet 1881 est un texte majeur sur la liberté de la presse."
+    },
+    {
+      "id": "cr-date-009",
+      "theme": "droits",
+      "question": "De quelle date est la loi relative au contrat d'association ?",
+      "reponses": [
+        "1er juillet 1901",
+        "9 décembre 1905",
+        "15 mars 2004",
+        "17 mai 2013"
+      ],
+      "bonne_reponse": "A",
+      "explication": "La liberté d'association est organisée par la loi du 1er juillet 1901."
+    },
+    {
+      "id": "cr-date-010",
+      "theme": "valeurs",
+      "question": "À quelle date a été adoptée la loi de séparation des Églises et de l'État ?",
+      "reponses": [
+        "1er juillet 1901",
+        "9 décembre 1905",
+        "11 novembre 1918",
+        "4 octobre 1958"
       ],
       "bonne_reponse": "B",
-      "explication": "Le décret du 27 avril 1848, porté par Victor Schœlcher, abolit définitivement l’esclavage (une première abolition de 1794 avait été annulée en 1802).",
-      "piege": true
+      "explication": "La loi de séparation des Églises et de l'État date du 9 décembre 1905."
     },
     {
-      "id": "cr-1-14",
+      "id": "cr-date-011",
       "theme": "histoire",
-      "question": "Combien de régions compte la France métropolitaine ?",
+      "question": "En quelle année la Première Guerre mondiale a-t-elle commencé ?",
       "reponses": [
-        "18",
-        "22",
-        "101",
-        "13"
+        "1912",
+        "1914",
+        "1916",
+        "1918"
       ],
-      "bonne_reponse": "D",
-      "explication": "Depuis 2016, la métropole compte 13 régions (dont la Corse). Avec les 5 régions d’outre-mer, la France en compte 18."
+      "bonne_reponse": "B",
+      "explication": "La Première Guerre mondiale a commencé en 1914 et s'est terminée en 1918."
     },
     {
-      "id": "cr-1-15",
-      "theme": "societe",
-      "question": "Où se célèbre le mariage civil ?",
+      "id": "cr-date-012",
+      "theme": "histoire",
+      "question": "Quelle date correspond à l'armistice de la Première Guerre mondiale ?",
       "reponses": [
-        "Dans un lieu de culte",
-        "À la préfecture",
-        "Au tribunal",
-        "À la mairie"
+        "8 mai 1945",
+        "11 novembre 1918",
+        "18 juin 1940",
+        "6 juin 1944"
+      ],
+      "bonne_reponse": "B",
+      "explication": "L'armistice mettant fin aux combats de la Première Guerre mondiale a été signé le 11 novembre 1918."
+    },
+    {
+      "id": "cr-date-013",
+      "theme": "histoire",
+      "question": "À quelle date le général de Gaulle a-t-il lancé son appel à la Résistance ?",
+      "reponses": [
+        "8 mai 1945",
+        "18 juin 1940",
+        "11 novembre 1918",
+        "6 juin 1944"
+      ],
+      "bonne_reponse": "B",
+      "explication": "L'appel du général de Gaulle depuis Londres date du 18 juin 1940."
+    },
+    {
+      "id": "cr-date-014",
+      "theme": "droits",
+      "question": "À quelle date les femmes françaises ont-elles obtenu le droit de vote et d'éligibilité ?",
+      "reponses": [
+        "21 avril 1944",
+        "8 mai 1945",
+        "4 octobre 1958",
+        "28 octobre 1962"
+      ],
+      "bonne_reponse": "A",
+      "explication": "L'ordonnance du 21 avril 1944 dispose que les femmes sont électrices et éligibles dans les mêmes conditions que les hommes."
+    },
+    {
+      "id": "cr-date-015",
+      "theme": "histoire",
+      "question": "À quelle date a eu lieu le débarquement allié en Normandie ?",
+      "reponses": [
+        "18 juin 1940",
+        "6 juin 1944",
+        "8 mai 1945",
+        "11 novembre 1918"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Le débarquement allié en Normandie a eu lieu le 6 juin 1944."
+    },
+    {
+      "id": "cr-date-016",
+      "theme": "droits",
+      "question": "En quelle année les femmes françaises ont-elles voté pour la première fois ?",
+      "reponses": [
+        "1944",
+        "1945",
+        "1946",
+        "1958"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Après l'ordonnance de 1944, les Françaises ont voté pour la première fois lors des élections municipales de 1945."
+    },
+    {
+      "id": "cr-date-017",
+      "theme": "histoire",
+      "question": "Quelle date commémore la victoire de 1945 et la fin de la Seconde Guerre mondiale en Europe ?",
+      "reponses": [
+        "8 mai 1945",
+        "11 novembre 1918",
+        "14 juillet 1789",
+        "18 juin 1940"
+      ],
+      "bonne_reponse": "A",
+      "explication": "En France, le 8 mai commémore la victoire de 1945 et la fin de la Seconde Guerre mondiale en Europe."
+    },
+    {
+      "id": "cr-date-018",
+      "theme": "histoire",
+      "question": "En quelle année l'Organisation des Nations unies (ONU) a-t-elle été créée ?",
+      "reponses": [
+        "1919",
+        "1945",
+        "1951",
+        "1957"
+      ],
+      "bonne_reponse": "B",
+      "explication": "L'ONU a été créée en 1945 après la Seconde Guerre mondiale."
+    },
+    {
+      "id": "cr-date-019",
+      "theme": "institutions",
+      "question": "En quelle année la Communauté européenne du charbon et de l'acier (CECA) a-t-elle été créée ?",
+      "reponses": [
+        "1945",
+        "1951",
+        "1957",
+        "1992"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Le traité de Paris de 1951 crée la CECA, première grande étape de la construction européenne."
+    },
+    {
+      "id": "cr-date-020",
+      "theme": "institutions",
+      "question": "En quelle année le traité de Rome créant la Communauté économique européenne a-t-il été signé ?",
+      "reponses": [
+        "1951",
+        "1957",
+        "1958",
+        "1992"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Les traités de Rome ont été signés en 1957."
+    },
+    {
+      "id": "cr-date-021",
+      "theme": "institutions",
+      "question": "À quelle date la Constitution de la Ve République a-t-elle été promulguée ?",
+      "reponses": [
+        "28 septembre 1958",
+        "4 octobre 1958",
+        "6 novembre 1962",
+        "9 mai 1950"
+      ],
+      "bonne_reponse": "B",
+      "explication": "La Constitution de la Ve République a été promulguée le 4 octobre 1958."
+    },
+    {
+      "id": "cr-date-022",
+      "theme": "institutions",
+      "question": "En quelle année la réforme instaurant l'élection du président de la République au suffrage universel direct a-t-elle été adoptée ?",
+      "reponses": [
+        "1958",
+        "1962",
+        "1965",
+        "1974"
+      ],
+      "bonne_reponse": "B",
+      "explication": "La révision constitutionnelle de 1962 a instauré l'élection du président au suffrage universel direct."
+    },
+    {
+      "id": "cr-date-023",
+      "theme": "histoire",
+      "question": "En quelle année l'Algérie est-elle devenue indépendante de la France ?",
+      "reponses": [
+        "1954",
+        "1958",
+        "1962",
+        "1965"
+      ],
+      "bonne_reponse": "C",
+      "explication": "L'Algérie est devenue indépendante en 1962."
+    },
+    {
+      "id": "cr-date-024",
+      "theme": "droits",
+      "question": "En quelle année la majorité civile a-t-elle été abaissée de 21 ans à 18 ans ?",
+      "reponses": [
+        "1962",
+        "1965",
+        "1974",
+        "1981"
+      ],
+      "bonne_reponse": "C",
+      "explication": "La loi du 5 juillet 1974 a fixé la majorité civile à 18 ans."
+    },
+    {
+      "id": "cr-date-025",
+      "theme": "droits",
+      "question": "De quelle date est la loi Veil relative à l'interruption volontaire de grossesse (IVG) ?",
+      "reponses": [
+        "17 janvier 1975",
+        "9 octobre 1981",
+        "17 mai 2013",
+        "8 mars 2024"
+      ],
+      "bonne_reponse": "A",
+      "explication": "La loi Veil relative à l'IVG date du 17 janvier 1975."
+    },
+    {
+      "id": "cr-date-026",
+      "theme": "droits",
+      "question": "En quelle année la peine de mort a-t-elle été abolie en France ?",
+      "reponses": [
+        "1974",
+        "1975",
+        "1981",
+        "2007"
+      ],
+      "bonne_reponse": "C",
+      "explication": "La peine de mort a été abolie en France en 1981."
+    },
+    {
+      "id": "cr-date-027",
+      "theme": "droits",
+      "question": "À quelle date la loi abolissant la peine de mort a-t-elle été promulguée ?",
+      "reponses": [
+        "17 janvier 1975",
+        "9 octobre 1981",
+        "4 octobre 1958",
+        "8 mars 2024"
+      ],
+      "bonne_reponse": "B",
+      "explication": "La loi abolissant la peine de mort a été promulguée le 9 octobre 1981."
+    },
+    {
+      "id": "cr-date-028",
+      "theme": "institutions",
+      "question": "En quelle année le traité de Maastricht a-t-il été signé ?",
+      "reponses": [
+        "1957",
+        "1986",
+        "1992",
+        "1999"
+      ],
+      "bonne_reponse": "C",
+      "explication": "Le traité de Maastricht a été signé en 1992."
+    },
+    {
+      "id": "cr-date-029",
+      "theme": "societe",
+      "question": "En quelle année le PACS a-t-il été créé en France ?",
+      "reponses": [
+        "1981",
+        "1992",
+        "1999",
+        "2013"
+      ],
+      "bonne_reponse": "C",
+      "explication": "Le pacte civil de solidarité (PACS) a été créé en 1999."
+    },
+    {
+      "id": "cr-date-030",
+      "theme": "institutions",
+      "question": "En quelle année l'euro est-il devenu la monnaie unique pour les opérations scripturales ?",
+      "reponses": [
+        "1992",
+        "1999",
+        "2002",
+        "2007"
+      ],
+      "bonne_reponse": "B",
+      "explication": "L'euro a été introduit comme monnaie unique en 1999 pour les opérations scripturales."
+    },
+    {
+      "id": "cr-date-031",
+      "theme": "institutions",
+      "question": "À quelle date les pièces et billets en euros ont-ils été mis en circulation en France ?",
+      "reponses": [
+        "1er janvier 1999",
+        "1er janvier 2000",
+        "1er janvier 2002",
+        "1er janvier 2007"
+      ],
+      "bonne_reponse": "C",
+      "explication": "Les pièces et billets en euros ont été mis en circulation le 1er janvier 2002."
+    },
+    {
+      "id": "cr-date-032",
+      "theme": "valeurs",
+      "question": "De quelle date est la loi interdisant aux élèves des écoles, collèges et lycées publics les signes religieux ostensibles ?",
+      "reponses": [
+        "9 décembre 1905",
+        "15 mars 2004",
+        "11 octobre 2010",
+        "24 août 2021"
+      ],
+      "bonne_reponse": "B",
+      "explication": "La loi du 15 mars 2004 encadre le port de signes ou tenues manifestant ostensiblement une appartenance religieuse dans les établissements scolaires publics."
+    },
+    {
+      "id": "cr-date-033",
+      "theme": "droits",
+      "question": "En quelle année la Charte de l'environnement a-t-elle été intégrée au bloc de constitutionnalité ?",
+      "reponses": [
+        "1992",
+        "2000",
+        "2005",
+        "2007"
+      ],
+      "bonne_reponse": "C",
+      "explication": "La Charte de l'environnement a été adossée à la Constitution en 2005."
+    },
+    {
+      "id": "cr-date-034",
+      "theme": "droits",
+      "question": "En quelle année l'interdiction de la peine de mort a-t-elle été inscrite dans la Constitution ?",
+      "reponses": [
+        "1981",
+        "1992",
+        "2005",
+        "2007"
       ],
       "bonne_reponse": "D",
-      "explication": "Seul le mariage célébré à la mairie a une valeur légale. Une cérémonie religieuse ne peut avoir lieu qu’après."
+      "explication": "L'interdiction de la peine de mort a été inscrite dans la Constitution en 2007."
+    },
+    {
+      "id": "cr-date-035",
+      "theme": "droits",
+      "question": "À quelle date la loi ouvrant le mariage aux couples de personnes de même sexe a-t-elle été promulguée ?",
+      "reponses": [
+        "17 janvier 1975",
+        "17 mai 2013",
+        "2 août 2021",
+        "8 mars 2024"
+      ],
+      "bonne_reponse": "B",
+      "explication": "La loi ouvrant le mariage aux couples de personnes de même sexe date du 17 mai 2013."
+    },
+    {
+      "id": "cr-date-036",
+      "theme": "societe",
+      "question": "À partir de quelle année l'instruction est-elle obligatoire dès l'âge de 3 ans ?",
+      "reponses": [
+        "2005",
+        "2013",
+        "2019",
+        "2022"
+      ],
+      "bonne_reponse": "C",
+      "explication": "L'abaissement de l'âge de l'instruction obligatoire à 3 ans est entré en vigueur à la rentrée 2019."
+    },
+    {
+      "id": "cr-date-037",
+      "theme": "institutions",
+      "question": "À quelle date le Royaume-Uni a-t-il officiellement quitté l'Union européenne ?",
+      "reponses": [
+        "23 juin 2016",
+        "31 janvier 2020",
+        "1er janvier 2021",
+        "9 mai 2020"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Le Royaume-Uni a officiellement quitté l'Union européenne le 31 janvier 2020."
+    },
+    {
+      "id": "cr-date-038",
+      "theme": "societe",
+      "question": "À partir de quelle année l'obligation de formation des jeunes de 16 à 18 ans est-elle entrée en vigueur ?",
+      "reponses": [
+        "2013",
+        "2019",
+        "2020",
+        "2022"
+      ],
+      "bonne_reponse": "C",
+      "explication": "L'obligation de formation des jeunes de 16 à 18 ans est entrée en vigueur en 2020."
+    },
+    {
+      "id": "cr-date-039",
+      "theme": "droits",
+      "question": "De quelle date est la loi de bioéthique qui a notamment ouvert la PMA aux couples de femmes et aux femmes non mariées ?",
+      "reponses": [
+        "17 mai 2013",
+        "26 juillet 2019",
+        "2 août 2021",
+        "8 mars 2024"
+      ],
+      "bonne_reponse": "C",
+      "explication": "La loi de bioéthique du 2 août 2021 a élargi l'accès à l'assistance médicale à la procréation."
+    },
+    {
+      "id": "cr-date-040",
+      "theme": "droits",
+      "question": "À quelle date la liberté garantie de recourir à l'IVG a-t-elle été inscrite dans la Constitution ?",
+      "reponses": [
+        "17 janvier 1975",
+        "4 mars 2024",
+        "8 mars 2024",
+        "14 juillet 2024"
+      ],
+      "bonne_reponse": "C",
+      "explication": "La loi constitutionnelle a été promulguée le 8 mars 2024, après son adoption définitive par le Congrès le 4 mars 2024."
+    },
+    {
+      "id": "cr-date-041",
+      "theme": "institutions",
+      "question": "Quel jour célèbre-t-on la Journée de l'Europe ?",
+      "reponses": [
+        "8 mai",
+        "9 mai",
+        "14 juillet",
+        "11 novembre"
+      ],
+      "bonne_reponse": "B",
+      "explication": "La Journée de l'Europe est célébrée le 9 mai, en référence à la déclaration Schuman du 9 mai 1950."
+    },
+    {
+      "id": "cr-date-042",
+      "theme": "valeurs",
+      "question": "Quel jour célèbre-t-on la fête nationale française ?",
+      "reponses": [
+        "8 mai",
+        "9 mai",
+        "14 juillet",
+        "11 novembre"
+      ],
+      "bonne_reponse": "C",
+      "explication": "La fête nationale française est célébrée le 14 juillet."
     }
   ]
 }
