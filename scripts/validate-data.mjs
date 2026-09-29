@@ -1,7 +1,8 @@
 // Checks the question banks of src/data/ before a build: `npm run validate:data`.
 // Errors (exit code 1): invalid question, unknown theme, bad correct answer, duplicated id or duplicated question text,
 // a lot reusing a bank id with a different wording, identical answers.
-// Warnings: missing explanation, answer position bias, empty preparation.
+// Errors also: the right answer on the same letter in more than 50 % of the questions.
+// Warnings: missing explanation, answer position bias above 40 %, empty preparation.
 import { readdirSync, readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 
@@ -69,7 +70,8 @@ for (const prep of folders) {
   Object.entries(letters).forEach(([n, row]) => {
     const sum = row.reduce((s, v) => s + v, 0), max = Math.max(...row);
     if (sum >= 20 && max / sum > 0.4) {
-      warnings.push(prep + ' : la bonne réponse est « ' + LET[row.indexOf(max)] + ' » dans ' + Math.round((max / sum) * 100) + ' % des questions à ' + n + ' réponses (' + row.map((v, i) => LET[i] + '=' + v).join(' ') + '). Sans « Mélanger les réponses », c’est devinable.');
+      // Above 50 % it is an error: it usually means a file was edited from an old copy (answers not balanced).
+      (max / sum > 0.5 ? errors : warnings).push(prep + ' : la bonne réponse est « ' + LET[row.indexOf(max)] + ' » dans ' + Math.round((max / sum) * 100) + ' % des questions à ' + n + ' réponses (' + row.map((v, i) => LET[i] + '=' + v).join(' ') + '). Sans « Mélanger les réponses », c’est devinable.');
     }
   });
   console.log('✓ ' + prep + ' : ' + count + ' questions');

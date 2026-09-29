@@ -1,6 +1,6 @@
 {
   "titre": "Questions pièges - Carte de résident",
-  "description": "58 questions pièges ciblant les confusions fréquentes : dates, nombres, institutions, laïcité, droits, Europe, histoire et société.",
+  "description": "53 questions pièges ciblant les confusions fréquentes : dates, nombres, institutions, laïcité, droits, Europe, histoire et société.",
   "questions": [
     {
       "id": "cr-piege-001",
@@ -714,48 +714,6 @@
       ],
       "bonne_reponse": "D",
       "explication": "La population française est d'environ 68 millions d'habitants en 2025.",
-      "piege": true
-    },
-    {
-      "id": "cr-piege-054",
-      "theme": "histoire",
-      "question": "Combien de personnes parlent français dans le monde, selon le support officiel de formation civique ?",
-      "reponses": [
-        "Moins de 100 millions",
-        "Environ 150 millions",
-        "Plus d'un milliard",
-        "Plus de 300 millions"
-      ],
-      "bonne_reponse": "D",
-      "explication": "Le support officiel indique que le français compte plus de 300 millions de locuteurs dans le monde.",
-      "piege": true
-    },
-    {
-      "id": "cr-piege-055",
-      "theme": "histoire",
-      "question": "Quel est le classement du français parmi les langues les plus parlées dans le monde selon le support officiel ?",
-      "reponses": [
-        "5e",
-        "3e",
-        "2e",
-        "8e"
-      ],
-      "bonne_reponse": "A",
-      "explication": "Le support officiel présente le français comme la 5e langue la plus parlée au monde.",
-      "piege": true
-    },
-    {
-      "id": "cr-piege-056",
-      "theme": "histoire",
-      "question": "Quel département est donné comme le plus touristique dans les questions d'entraînement CR ?",
-      "reponses": [
-        "Paris",
-        "La Creuse",
-        "La Lozère",
-        "L'Ariège"
-      ],
-      "bonne_reponse": "A",
-      "explication": "Paris est la réponse attendue dans la banque CR pour cette question.",
       "piege": true
     },
     {

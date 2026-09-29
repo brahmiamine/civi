@@ -51,7 +51,7 @@ Les fichiers sont intégrés au build : pour ajouter des questions, il suffit d�
 
 Une question invalide (thème inconnu, bonne réponse absente, identifiant en double…) est ignorée avec un avertissement dans la console du navigateur, et fait échouer `npm run validate:data`.
 
-**Ne pas réordonner les réponses d’une question déjà publiée** sans augmenter `DATA_REV` dans `src/App.jsx` : les réponses choisies enregistrées (« Ta réponse : … ») sont des positions.
+Réordonner les réponses d’une question est sans risque : l’application enregistre le texte de la réponse choisie, pas sa position.
 
 ## Examen blanc
 
@@ -60,11 +60,13 @@ L’examen tire les questions de toute la préparation en suivant la répartitio
 ## Trois fichiers de banque + lots
 
 - `questions.json`, `pieges.json`, `situations.json` forment la **banque**, utilisée par la révision, l’examen blanc, les thèmes, etc.
-- Les `lot-N.json` apparaissent dans **Tester → Lots de questions**. Leurs nouvelles questions rejoignent aussi la banque, pour que tout ce qui est répondu compte dans la progression. Une question d’un lot qui reprend l’`id` d’une question de la banque est la même question (c’est la version de la banque qui est utilisée).
+- Les `lot-N.json` apparaissent dans **Tester → Lots de questions**. Leurs nouvelles questions comptent dans la progression, la révision intelligente, les thèmes et les flashcards, mais **ne sont jamais tirées à l’examen blanc**. Une question d’un lot qui reprend l’`id` d’une question de la banque est la même question (c’est la version de la banque qui est utilisée).
 
 ## Contrôle automatique
 
-`npm run validate:data` (lancé par la CI avant chaque déploiement) refuse : JSON invalide, thème inconnu, moins de 2 ou plus de 6 réponses, bonne réponse invalide, deux réponses identiques, identifiant en double dans la banque, **même énoncé sous deux identifiants** (réutiliser l’identifiant existant), identifiant de lot qui reprend la banque avec un autre énoncé. Il signale aussi les explications manquantes et un déséquilibre de la position de la bonne réponse (plus de 40 % sur la même lettre).
+`npm run validate:data` (lancé par la CI avant chaque déploiement) refuse : JSON invalide, thème inconnu, moins de 2 ou plus de 6 réponses, bonne réponse invalide, deux réponses identiques, identifiant en double dans la banque, **même énoncé sous deux identifiants** (réutiliser l’identifiant existant), identifiant de lot qui reprend la banque avec un autre énoncé. Il refuse aussi une bonne réponse sur la même lettre dans plus de 50 % des questions (signe d’un fichier modifié à partir d’une ancienne copie) et signale les explications manquantes et un déséquilibre au-delà de 40 %.
+
+**Toujours modifier les fichiers à partir de la dernière version de `main`** (pas d’une copie gardée ailleurs) : sinon les corrections faites entre-temps sont perdues.
 
 ## Format compact (grandes banques)
 
