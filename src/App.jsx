@@ -9,6 +9,7 @@ import { Fiche, Flash, QuestionView, Result } from './components/Study.jsx';
 import { Chips, Group, Empty } from './components/Lists.jsx';
 import { ProposeForm } from './components/ProposeForm.jsx';
 import { sheetData } from './sheets.js';
+import { captureScreen } from './screenshot.js';
 import { PREPS, prepById, hasPrep } from './bank.js';
 import {
   emptyProfile, recordAnswer, isMastered, themeStats, overview, weakThemes, pickSmart, smartPlan, pickWeak, hardPool, pickExam,
@@ -392,9 +393,15 @@ export default class App extends Component {
     return { ...ctx, where: c.from ? 'question (' + c.from + ')' : 'question', chosen: c.chosen ?? null };
   }
 
-  openReport(q) {
+  // A question report attaches a screenshot of the current screen, taken before the sheet covers it.
+  async openReport(q) {
     this.reportQ = q; if (this.state.reportImg) URL.revokeObjectURL(this.state.reportImg.preview);
-    this.setState({ reportReason: null, reportText: '', reportImg: null }); this.openSheet('report');
+    let reportImg = null;
+    if (q) {
+      const blob = await Promise.race([captureScreen().catch(() => null), new Promise((r) => setTimeout(() => r(null), 3000))]);
+      if (blob) reportImg = { file: blob, preview: URL.createObjectURL(blob), auto: true };
+    }
+    this.setState({ reportReason: null, reportText: '', reportImg }); this.openSheet('report');
   }
   pickReportImage(file) {
     const old = this.state.reportImg; if (old) URL.revokeObjectURL(old.preview);
@@ -567,7 +574,7 @@ export default class App extends Component {
         break;
       }
       case 'settings': {
-        const seg = [['system', 'Système'], ['light', 'Clair'], ['dark', 'Sombre']].map(([v, l]) => { const a = st.theme === v; return { label: l, checked: a ? 'true' : 'false', bg: a ? 'var(--segOn)' : 'transparent', color: a ? 'var(--text)' : 'var(--text2)', shadow: a ? '0 1px 3px rgba(0,0,0,.14)' : 'none', weight: a ? 600 : 500, onClick: (e) => { e.stopPropagation(); this.setS('theme', v); } }; });
+        const seg = [['system', 'Système'], ['light', 'Clair'], ['dark', 'Sombre']].map(([v, l]) => { const a = st.theme === v; return { label: l, checked: a, onClick: (e) => { e.stopPropagation(); this.setS('theme', v); } }; });
         groups = [
           G('Préparation · ' + bank.short, [row({ title: 'Type de préparation', value: bank.short, chev: true, onClick: () => this.openSheet('prep') }), row({ title: 'Objectif quotidien', value: st.goal + ' questions', chev: true, onClick: () => this.openSheet('goal') }), row({ title: 'Révision automatique', ...sw('auto', 'Ajoute tes mauvaises réponses à « Mes erreurs »') }), row({ title: 'Longueur de l’examen blanc', value: st.examLength + ' questions', chev: true, onClick: () => this.openSheet('examLength') })]),
           canNotify && G('Notifications', [row({ title: 'Rappels', value: remOn ? 'Activés · ' + st.time : 'Désactivés', chev: true, onClick: () => this.push({ s: 'notifications' }) })]),
@@ -593,12 +600,12 @@ export default class App extends Component {
         const p = s.pf; if (!p) break;
         const filled = p.a.filter((t) => t.trim()).length;
         const complete = p.q.trim() && filled >= 2 && p.c != null && p.a[p.c]?.trim();
-        const ok = complete || p.img || (p.q.trim() && p.note.trim());
+        const ok = p.kind === 'image' ? !!p.img : complete;
         propose = {
           p, preps: PREPS.map((b) => ({ id: b.id, name: b.name })), themes: THEMES.map((t) => ({ id: t.id, name: t.name })), LET,
           set: (patch) => this.setPf(patch), setA: (i, v) => this.setPf({ a: p.a.map((t, j) => (j === i ? v : t)) }), pick: (f) => this.pickImage(f),
         };
-        intro = 'Propose une nouvelle question : remplis les champs, ou envoie simplement une photo (livret, document officiel…). Elle sera vérifiée avant d’être ajoutée.';
+        intro = p.kind === 'image' ? 'Envoie une photo ou une capture d’une question (livret, document officiel…). Elle sera vérifiée avant d’être ajoutée.' : 'Écris la question, ses réponses et coche la bonne. Elle sera vérifiée avant d’être ajoutée.';
         sticky = primary(p.sending ? 'Envoi…' : 'Envoyer la proposition', () => this.submitPropose(), { disabled: !ok || p.sending, op: !ok || p.sending ? 0.45 : 1 });
         break;
       }

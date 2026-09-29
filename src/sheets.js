@@ -52,7 +52,7 @@ export function sheetData(app) {
         options: (q ? REPORT_REASONS : BUG_REASONS).map((r) => opt(r, null, r === reason, () => app.setState({ reportReason: r }), ic('alert'))),
         form: {
           value: text, placeholder: q ? 'Précise le problème (facultatif)' : 'Décris ce qui s’est passé (facultatif)', onChange: (e) => app.setState({ reportText: e.target.value }),
-          image: { preview: img?.preview, label: 'Ajouter une capture d’écran', onPick: (f) => app.pickReportImage(f) },
+          image: { preview: img?.preview, caption: img?.auto ? 'Capture de l’écran jointe automatiquement' : 'Capture jointe', label: 'Ajouter une capture d’écran', onPick: (f) => app.pickReportImage(f) },
           send: { label: 'Envoyer le signalement', disabled: !reason, onClick: send },
         },
       };

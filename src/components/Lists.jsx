@@ -1,4 +1,4 @@
-import { h2s, card } from './ui.jsx';
+import { h2s, card, Segmented } from './ui.jsx';
 
 export function Chips({ chips }) {
   return (
@@ -41,11 +41,7 @@ export function Row({ r }) {
       {r.value && <span style={{ flex: 'none', fontSize: 15, color: 'var(--text2)' }}>{r.value}</span>}
       {r.stat && <span style={{ flex: 'none', font: '600 22px/1 var(--font-heading)' }}>{r.stat}</span>}
       {r.badge && <span style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 4, fontSize: 13, fontWeight: 600, padding: '3px 8px', borderRadius: 4, background: r.badge.bg, color: r.badge.color }}>{r.badge.icon}{r.badge.label}</span>}
-      {r.seg && (
-        <span role="radiogroup" aria-label="Thème" style={{ flex: 'none', display: 'flex', padding: 2, borderRadius: 8, background: 'var(--surface2)' }}>
-          {r.seg.map((sg) => <button key={sg.label} onClick={sg.onClick} role="radio" aria-checked={sg.checked} style={{ height: 34, padding: '0 11px', border: 'none', borderRadius: 6, background: sg.bg, color: sg.color, boxShadow: sg.shadow, fontSize: 14, fontWeight: sg.weight, cursor: 'pointer', transition: 'background .15s' }}>{sg.label}</button>)}
-        </span>
-      )}
+      {r.seg && <Segmented label="Thème" items={r.seg} />}
       {r.sw && <span aria-hidden="true" style={{ flex: 'none', width: 51, height: 31, borderRadius: 16, background: r.sw.track, padding: 2, transition: 'background .2s' }}><span style={{ display: 'block', width: 27, height: 27, borderRadius: '50%', background: '#fff', boxShadow: '0 2px 4px rgba(0,0,0,.2)', transform: 'translateX(' + r.sw.x + ')', transition: 'transform .2s cubic-bezier(.3,.7,.3,1)' }} /></span>}
       {r.chev && <span style={{ flex: 'none', color: 'var(--text2)', opacity: 0.7 }}>{r.chev}</span>}
     </div>

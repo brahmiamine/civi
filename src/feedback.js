@@ -37,7 +37,7 @@ export async function sendReport(ctx, q, reason, comment, img) {
 }
 // « Proposer une question » : optional image goes to Cloudinary (unsigned preset, folder civi-propositions), then the whole proposal is e-mailed via Web3Forms.
 const CLOUDINARY = { cloud: 'dapzqelui', preset: 'civi_propositions', reportPreset: 'civi_signales' };
-export const EMPTY_PROPOSAL = () => ({ prep: null, theme: '', q: '', a: ['', '', '', ''], c: null, x: '', note: '', img: null, preview: null, sending: false });
+export const EMPTY_PROPOSAL = () => ({ kind: 'text', prep: null, theme: '', q: '', a: ['', '', '', ''], c: null, x: '', note: '', img: null, preview: null, sending: false });
 // Shrinks photos before upload (max 1600 px, JPEG) to stay fast on mobile data and small on the free plan.
 function shrinkImage(file, max = 1600) {
   return new Promise((resolve) => {
@@ -59,10 +59,12 @@ async function uploadImage(file, preset) {
   return r.secure_url;
 }
 export async function sendProposal(p, prepName) {
+  if (p.kind === 'image') p = { ...p, q: '', a: [], c: null, x: '' };
+  else p = { ...p, img: null };
   const imageUrl = p.img ? await uploadImage(p.img, CLOUDINARY.preset) : null;
   const answers = p.a.map((t, i) => [t.trim(), i]).filter(([t]) => t);
   const lines = [
-    '=== PROPOSITION DE QUESTION ===', 'Préparation : ' + prepName, 'Thème : ' + (p.theme ? thById(p.theme).name : '—'), '',
+    '=== PROPOSITION DE QUESTION (' + (p.kind === 'image' ? 'image seulement' : 'question écrite') + ') ===', 'Préparation : ' + prepName, 'Thème : ' + (p.theme ? thById(p.theme).name : '—'), '',
     'Énoncé :', p.q.trim() || '—', '', 'Réponses :', ...(answers.length ? answers.map(([t, i]) => LET[i] + '. ' + t + (i === p.c ? '  ✅ bonne réponse' : '')) : ['—']), '',
     'À retenir :', p.x.trim() || '—', '', 'Commentaire :', p.note.trim() || '—', '', 'Image : ' + (imageUrl || 'aucune'), '',
     '=== CONTEXTE ===', ...context(),
