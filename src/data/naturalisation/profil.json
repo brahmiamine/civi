@@ -1,0 +1,101 @@
+{
+  "nom": "Naturalisation",
+  "court": "Naturalisation",
+  "initiales": "NA",
+  "ordre": 3,
+  "description": "Un niveau approfondi : Constitution, grandes étapes de l’histoire de France, culture et devoirs du citoyen.",
+  "essentiel": {
+    "valeurs": [
+      "Bloc de constitutionnalité : Constitution de 1958, Déclaration de 1789, Préambule de 1946 et Charte de l’environnement.",
+      "La souveraineté nationale appartient au peuple (article 3 de la Constitution).",
+      "Depuis 2018, la fraternité a valeur constitutionnelle.",
+      "En Alsace-Moselle, la loi de 1905 ne s’applique pas (régime concordataire)."
+    ],
+    "institutions": [
+      "L’article 49.3 permet au Gouvernement de faire adopter un texte sans vote, sauf motion de censure.",
+      "En cas de vacance, le président du Sénat assure l’intérim de la présidence.",
+      "Cour de cassation (ordre judiciaire) et Conseil d’État (ordre administratif) sont les plus hautes juridictions.",
+      "La Constitution se révise par référendum ou par le Parlement réuni en Congrès."
+    ],
+    "droits": [
+      "Toute personne est présumée innocente tant que sa culpabilité n’est pas établie.",
+      "La France autorise la double nationalité.",
+      "Les citoyens peuvent être tirés au sort comme jurés d’assises.",
+      "La liberté de la presse est garantie par la loi du 29 juillet 1881."
+    ],
+    "histoire": [
+      "Clovis est baptisé à la fin du Ve siècle ; Charlemagne est couronné empereur en 800.",
+      "Jeanne d’Arc combat pendant la guerre de Cent Ans.",
+      "Napoléon promulgue le Code civil en 1804.",
+      "18 juin 1940 : appel du général de Gaulle ; Jean Moulin unifie la Résistance."
+    ],
+    "societe": [
+      "Les élections municipales ont lieu tous les 6 ans.",
+      "Depuis 2019, l’impôt sur le revenu est prélevé à la source.",
+      "Enfance en danger : 119 ; violences faites aux femmes : 3919.",
+      "Paris a accueilli les Jeux olympiques et paralympiques en 2024."
+    ]
+  },
+  "dates": [
+    [
+      "800",
+      "Charlemagne couronné empereur"
+    ],
+    [
+      "1429",
+      "Jeanne d’Arc libère Orléans"
+    ],
+    [
+      "1789",
+      "Révolution française et Déclaration des droits de l’homme et du citoyen"
+    ],
+    [
+      "1804",
+      "Code civil"
+    ],
+    [
+      "1848",
+      "Abolition de l’esclavage et suffrage universel masculin"
+    ],
+    [
+      "1881",
+      "Loi sur la liberté de la presse ; lois Jules Ferry (1881-1882)"
+    ],
+    [
+      "1905",
+      "Loi de séparation des Églises et de l’État"
+    ],
+    [
+      "1936",
+      "Front populaire : premiers congés payés"
+    ],
+    [
+      "1940",
+      "Appel du 18 juin"
+    ],
+    [
+      "1944",
+      "Droit de vote des femmes"
+    ],
+    [
+      "1958",
+      "Constitution de la Ve République"
+    ],
+    [
+      "1962",
+      "Élection du président au suffrage universel direct"
+    ],
+    [
+      "1975",
+      "Loi Veil sur l’IVG"
+    ],
+    [
+      "1981",
+      "Abolition de la peine de mort"
+    ],
+    [
+      "2024",
+      "La liberté de recourir à l’IVG est inscrite dans la Constitution"
+    ]
+  ]
+}

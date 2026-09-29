@@ -1,0 +1,202 @@
+{
+  "titre": "Les bases de la République",
+  "description": "Symboles, institutions et repères essentiels.",
+  "questions": [
+    {
+      "id": "sp-1-01",
+      "theme": "valeurs",
+      "question": "Quelle est la devise de la République française ?",
+      "reponses": [
+        "Liberté, Égalité, Fraternité",
+        "Travail, Famille, Patrie",
+        "Unité, Progrès, Justice",
+        "Paix, Liberté, Solidarité"
+      ],
+      "bonne_reponse": "A",
+      "explication": "La devise figure à l’article 2 de la Constitution de 1958 et sur les bâtiments publics."
+    },
+    {
+      "id": "sp-1-02",
+      "theme": "valeurs",
+      "question": "Quelles sont les couleurs du drapeau français ?",
+      "reponses": [
+        "Bleu, blanc, vert",
+        "Rouge, blanc, noir",
+        "Bleu, jaune, rouge",
+        "Bleu, blanc, rouge"
+      ],
+      "bonne_reponse": "D",
+      "explication": "Le drapeau tricolore bleu, blanc, rouge est l’emblème national (article 2 de la Constitution)."
+    },
+    {
+      "id": "sp-1-03",
+      "theme": "valeurs",
+      "question": "Quel est l’hymne national de la France ?",
+      "reponses": [
+        "L’Internationale",
+        "La Marseillaise",
+        "Le Chant des partisans",
+        "Douce France"
+      ],
+      "bonne_reponse": "B",
+      "explication": "La Marseillaise a été composée par Rouget de Lisle en 1792. Elle est inscrite dans la Constitution."
+    },
+    {
+      "id": "sp-1-04",
+      "theme": "valeurs",
+      "question": "Que représente Marianne ?",
+      "reponses": [
+        "Une reine de France",
+        "Une sainte",
+        "La ville de Paris",
+        "La République française"
+      ],
+      "bonne_reponse": "D",
+      "explication": "Marianne est l’allégorie de la République. Son buste est présent dans les mairies ; elle figure sur les timbres et le logo de l’État."
+    },
+    {
+      "id": "sp-1-05",
+      "theme": "institutions",
+      "question": "Quelle est la durée du mandat du président de la République ?",
+      "reponses": [
+        "4 ans",
+        "6 ans",
+        "7 ans",
+        "5 ans"
+      ],
+      "bonne_reponse": "D",
+      "explication": "Depuis le référendum de 2000, le mandat dure 5 ans (quinquennat). On ne peut pas exercer plus de deux mandats consécutifs."
+    },
+    {
+      "id": "sp-1-06",
+      "theme": "institutions",
+      "question": "Quelle est la capitale de la France ?",
+      "reponses": [
+        "Lyon",
+        "Paris",
+        "Marseille",
+        "Strasbourg"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Paris accueille les principales institutions : l’Élysée, l’Assemblée nationale, le Sénat."
+    },
+    {
+      "id": "sp-1-07",
+      "theme": "institutions",
+      "question": "Qui dirige la commune ?",
+      "reponses": [
+        "Le préfet",
+        "Le maire",
+        "Le député",
+        "Le président de la région"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Le maire est élu par le conseil municipal, lui-même élu par les habitants tous les 6 ans."
+    },
+    {
+      "id": "sp-1-08",
+      "theme": "droits",
+      "question": "À quel âge devient-on majeur en France ?",
+      "reponses": [
+        "16 ans",
+        "20 ans",
+        "18 ans",
+        "21 ans"
+      ],
+      "bonne_reponse": "C",
+      "explication": "À 18 ans, on devient majeur : on peut notamment voter (pour les citoyens français) et signer seul un contrat."
+    },
+    {
+      "id": "sp-1-09",
+      "theme": "droits",
+      "question": "Pour quels âges l’instruction est-elle obligatoire ?",
+      "reponses": [
+        "De 6 à 14 ans",
+        "De 3 à 16 ans",
+        "De 6 à 18 ans",
+        "De 5 à 15 ans"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Depuis 2019, l’instruction est obligatoire de 3 à 16 ans, pour les filles comme pour les garçons."
+    },
+    {
+      "id": "sp-1-10",
+      "theme": "histoire",
+      "question": "En quelle année a commencé la Révolution française ?",
+      "reponses": [
+        "1492",
+        "1848",
+        "1914",
+        "1789"
+      ],
+      "bonne_reponse": "D",
+      "explication": "La prise de la Bastille a lieu le 14 juillet 1789 ; la Déclaration des droits de l’homme et du citoyen est adoptée le 26 août 1789."
+    },
+    {
+      "id": "sp-1-11",
+      "theme": "histoire",
+      "question": "Quel fleuve traverse Paris ?",
+      "reponses": [
+        "La Loire",
+        "Le Rhône",
+        "La Garonne",
+        "La Seine"
+      ],
+      "bonne_reponse": "D",
+      "explication": "La Seine traverse Paris d’est en ouest."
+    },
+    {
+      "id": "sp-1-12",
+      "theme": "histoire",
+      "question": "Quelle est la monnaie utilisée en France ?",
+      "reponses": [
+        "Le franc",
+        "Le dollar",
+        "La livre",
+        "L’euro"
+      ],
+      "bonne_reponse": "D",
+      "explication": "Les pièces et billets en euros ont remplacé le franc le 1er janvier 2002."
+    },
+    {
+      "id": "sp-1-13",
+      "theme": "societe",
+      "question": "Quel numéro appeler pour joindre le SAMU (urgence médicale) ?",
+      "reponses": [
+        "17",
+        "18",
+        "115",
+        "15"
+      ],
+      "bonne_reponse": "D",
+      "explication": "15 : SAMU. 17 : police. 18 : pompiers. 112 : numéro d’urgence européen. 115 : hébergement d’urgence.",
+      "piege": true
+    },
+    {
+      "id": "sp-1-14",
+      "theme": "societe",
+      "question": "Quelle est la langue de la République ?",
+      "reponses": [
+        "L’anglais",
+        "Toutes les langues régionales",
+        "Le français",
+        "Le latin"
+      ],
+      "bonne_reponse": "C",
+      "explication": "L’article 2 de la Constitution indique que la langue de la République est le français."
+    },
+    {
+      "id": "sp-1-15",
+      "theme": "valeurs",
+      "question": "La France est une République laïque. Cela signifie que :",
+      "reponses": [
+        "L’État est neutre et respecte toutes les croyances",
+        "Les religions sont interdites",
+        "L’État finance une religion officielle",
+        "Chacun doit déclarer sa religion"
+      ],
+      "bonne_reponse": "A",
+      "explication": "Depuis la loi de 1905, l’État ne reconnaît ni ne finance aucun culte. Chacun est libre de croire ou de ne pas croire."
+    }
+  ]
+}

@@ -1,0 +1,204 @@
+{
+  "titre": "Principes et institutions",
+  "description": "Constitution, Parlement et grands principes.",
+  "questions": [
+    {
+      "id": "cr-1-01",
+      "theme": "valeurs",
+      "question": "Selon l’article 1er de la Constitution, la France est une République :",
+      "reponses": [
+        "Fédérale, laïque et libérale",
+        "Indivisible, laïque, démocratique et sociale",
+        "Indivisible, chrétienne et sociale",
+        "Démocratique, monarchique et sociale"
+      ],
+      "bonne_reponse": "B",
+      "explication": "L’article 1er affirme aussi l’égalité de tous les citoyens devant la loi, sans distinction d’origine, de race ou de religion."
+    },
+    {
+      "id": "cr-1-02",
+      "theme": "valeurs",
+      "question": "En quelle année a été votée la loi de séparation des Églises et de l’État ?",
+      "reponses": [
+        "1789",
+        "1882",
+        "1905",
+        "1958"
+      ],
+      "bonne_reponse": "C",
+      "explication": "La loi du 9 décembre 1905 garantit le libre exercice des cultes ; l’État n’en reconnaît et n’en finance aucun."
+    },
+    {
+      "id": "cr-1-03",
+      "theme": "valeurs",
+      "question": "Qui a composé La Marseillaise ?",
+      "reponses": [
+        "Victor Hugo",
+        "Napoléon Bonaparte",
+        "Jean Jaurès",
+        "Rouget de Lisle"
+      ],
+      "bonne_reponse": "D",
+      "explication": "Composée en 1792, La Marseillaise est l’hymne national inscrit dans la Constitution de 1958."
+    },
+    {
+      "id": "cr-1-04",
+      "theme": "valeurs",
+      "question": "La Déclaration des droits de l’homme et du citoyen a été adoptée en :",
+      "reponses": [
+        "1789",
+        "1848",
+        "1905",
+        "1946"
+      ],
+      "bonne_reponse": "A",
+      "explication": "Adoptée le 26 août 1789, elle a valeur constitutionnelle : le préambule de la Constitution de 1958 y fait référence."
+    },
+    {
+      "id": "cr-1-05",
+      "theme": "valeurs",
+      "question": "Depuis 2004, à l’école publique, les élèves :",
+      "reponses": [
+        "Peuvent porter tous les signes religieux",
+        "Doivent porter une tenue religieuse",
+        "Doivent déclarer leur religion",
+        "Ne peuvent pas porter de signes religieux ostensibles"
+      ],
+      "bonne_reponse": "D",
+      "explication": "La loi du 15 mars 2004 applique le principe de laïcité dans les écoles, collèges et lycées publics."
+    },
+    {
+      "id": "cr-1-06",
+      "theme": "institutions",
+      "question": "De quand date la Constitution de la Ve République ?",
+      "reponses": [
+        "1946",
+        "1875",
+        "1791",
+        "1958"
+      ],
+      "bonne_reponse": "D",
+      "explication": "Adoptée par référendum le 28 septembre 1958, elle a été promulguée le 4 octobre 1958."
+    },
+    {
+      "id": "cr-1-07",
+      "theme": "institutions",
+      "question": "Qui nomme le Premier ministre ?",
+      "reponses": [
+        "L’Assemblée nationale",
+        "Le président de la République",
+        "Le Sénat",
+        "Les électeurs"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Le Premier ministre dirige l’action du Gouvernement, qui est responsable devant l’Assemblée nationale."
+    },
+    {
+      "id": "cr-1-08",
+      "theme": "institutions",
+      "question": "Combien y a-t-il de députés à l’Assemblée nationale ?",
+      "reponses": [
+        "348",
+        "577",
+        "925",
+        "101"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Les 577 députés sont élus au suffrage universel direct pour 5 ans. Le Sénat compte 348 sénateurs.",
+      "piege": true
+    },
+    {
+      "id": "cr-1-09",
+      "theme": "institutions",
+      "question": "Comment sont élus les sénateurs ?",
+      "reponses": [
+        "Au suffrage universel direct",
+        "Ils sont nommés par le président",
+        "Au suffrage universel indirect, par des grands électeurs",
+        "Ils sont tirés au sort"
+      ],
+      "bonne_reponse": "C",
+      "explication": "Les sénateurs sont élus pour 6 ans par des grands électeurs, principalement des élus locaux."
+    },
+    {
+      "id": "cr-1-10",
+      "theme": "institutions",
+      "question": "Quelle institution vérifie que les lois respectent la Constitution ?",
+      "reponses": [
+        "Le Conseil constitutionnel",
+        "Le Conseil d’État",
+        "La Cour des comptes",
+        "Le Sénat"
+      ],
+      "bonne_reponse": "A",
+      "explication": "Le Conseil constitutionnel peut censurer une loi contraire à la Constitution. Le Conseil d’État, lui, conseille le Gouvernement et juge l’administration.",
+      "piege": true
+    },
+    {
+      "id": "cr-1-11",
+      "theme": "droits",
+      "question": "En quelle année les femmes ont-elles obtenu le droit de vote en France ?",
+      "reponses": [
+        "1848",
+        "1944",
+        "1920",
+        "1968"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Ordonnance du 21 avril 1944. Les femmes votent pour la première fois en 1945."
+    },
+    {
+      "id": "cr-1-12",
+      "theme": "droits",
+      "question": "Le droit de grève est :",
+      "reponses": [
+        "Un droit reconnu par la Constitution",
+        "Interdit",
+        "Réservé aux fonctionnaires",
+        "Soumis à l’accord de l’employeur"
+      ],
+      "bonne_reponse": "A",
+      "explication": "Le Préambule de 1946 le reconnaît ; il s’exerce dans le cadre des lois qui le réglementent."
+    },
+    {
+      "id": "cr-1-13",
+      "theme": "histoire",
+      "question": "En quelle année l’esclavage a-t-il été définitivement aboli en France ?",
+      "reponses": [
+        "1789",
+        "1848",
+        "1905",
+        "1946"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Le décret du 27 avril 1848, porté par Victor Schœlcher, abolit définitivement l’esclavage (une première abolition de 1794 avait été annulée en 1802).",
+      "piege": true
+    },
+    {
+      "id": "cr-1-14",
+      "theme": "histoire",
+      "question": "Combien de régions compte la France métropolitaine ?",
+      "reponses": [
+        "18",
+        "22",
+        "101",
+        "13"
+      ],
+      "bonne_reponse": "D",
+      "explication": "Depuis 2016, la métropole compte 13 régions (dont la Corse). Avec les 5 régions d’outre-mer, la France en compte 18."
+    },
+    {
+      "id": "cr-1-15",
+      "theme": "societe",
+      "question": "Où se célèbre le mariage civil ?",
+      "reponses": [
+        "Dans un lieu de culte",
+        "À la préfecture",
+        "Au tribunal",
+        "À la mairie"
+      ],
+      "bonne_reponse": "D",
+      "explication": "Seul le mariage célébré à la mairie a une valeur légale. Une cérémonie religieuse ne peut avoir lieu qu’après."
+    }
+  ]
+}

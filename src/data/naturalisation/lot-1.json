@@ -1,0 +1,205 @@
+{
+  "titre": "Constitution et institutions",
+  "description": "Fonctionnement des pouvoirs et textes fondateurs.",
+  "questions": [
+    {
+      "id": "nat-1-01",
+      "theme": "institutions",
+      "question": "Qui assure l’intérim si la présidence de la République devient vacante ?",
+      "reponses": [
+        "Le président du Sénat",
+        "Le Premier ministre",
+        "Le président de l’Assemblée nationale",
+        "Le président du Conseil constitutionnel"
+      ],
+      "bonne_reponse": "A",
+      "explication": "L’article 7 de la Constitution confie l’intérim au président du Sénat, jusqu’à l’élection d’un nouveau président.",
+      "piege": true
+    },
+    {
+      "id": "nat-1-02",
+      "theme": "institutions",
+      "question": "Quelle est la durée du mandat des sénateurs ?",
+      "reponses": [
+        "5 ans",
+        "6 ans",
+        "7 ans",
+        "9 ans"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Les sénateurs sont élus pour 6 ans ; le Sénat est renouvelé par moitié tous les 3 ans."
+    },
+    {
+      "id": "nat-1-03",
+      "theme": "institutions",
+      "question": "Quelle est la plus haute juridiction de l’ordre judiciaire ?",
+      "reponses": [
+        "La Cour de cassation",
+        "Le Conseil d’État",
+        "Le Conseil constitutionnel",
+        "La Cour des comptes"
+      ],
+      "bonne_reponse": "A",
+      "explication": "Le Conseil d’État est la plus haute juridiction de l’ordre administratif.",
+      "piege": true
+    },
+    {
+      "id": "nat-1-04",
+      "theme": "institutions",
+      "question": "Depuis quelle année le président de la Ve République est-il élu au suffrage universel direct ?",
+      "reponses": [
+        "1958",
+        "1969",
+        "2000",
+        "1962"
+      ],
+      "bonne_reponse": "D",
+      "explication": "Le référendum de 1962 a instauré l’élection directe ; la première a eu lieu en 1965."
+    },
+    {
+      "id": "nat-1-05",
+      "theme": "institutions",
+      "question": "Comment peut-on réviser la Constitution ?",
+      "reponses": [
+        "Par décret du Premier ministre",
+        "Par décision du Conseil constitutionnel",
+        "Par un vote des maires",
+        "Par référendum ou par le Parlement réuni en Congrès"
+      ],
+      "bonne_reponse": "D",
+      "explication": "L’article 89 prévoit l’adoption par référendum ou par le Congrès à la majorité des trois cinquièmes."
+    },
+    {
+      "id": "nat-1-06",
+      "theme": "institutions",
+      "question": "Combien y a-t-il de départements en France ?",
+      "reponses": [
+        "101",
+        "96",
+        "13",
+        "577"
+      ],
+      "bonne_reponse": "A",
+      "explication": "96 départements en métropole et 5 en outre-mer."
+    },
+    {
+      "id": "nat-1-07",
+      "theme": "institutions",
+      "question": "Que permet l’article 49.3 de la Constitution ?",
+      "reponses": [
+        "Dissoudre le Sénat",
+        "Faire adopter un texte sans vote, sauf si une motion de censure est adoptée",
+        "Fixer la durée du mandat présidentiel",
+        "Changer la devise de la République"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Le Gouvernement engage sa responsabilité ; s’il est renversé par une motion de censure, le texte est rejeté."
+    },
+    {
+      "id": "nat-1-08",
+      "theme": "valeurs",
+      "question": "Quels textes forment le « bloc de constitutionnalité » ?",
+      "reponses": [
+        "Le Code civil et le Code pénal",
+        "Les traités européens uniquement",
+        "Toutes les lois votées depuis 2000",
+        "Constitution de 1958, Déclaration de 1789, Préambule de 1946 et Charte de l’environnement"
+      ],
+      "bonne_reponse": "D",
+      "explication": "Le Conseil constitutionnel contrôle les lois au regard de l’ensemble de ces textes."
+    },
+    {
+      "id": "nat-1-09",
+      "theme": "valeurs",
+      "question": "Dans quelle partie de la France la loi de 1905 ne s’applique-t-elle pas ?",
+      "reponses": [
+        "En Corse",
+        "En Bretagne",
+        "En Île-de-France",
+        "En Alsace-Moselle"
+      ],
+      "bonne_reponse": "D",
+      "explication": "L’Alsace-Moselle, allemande de 1871 à 1918, a conservé le régime concordataire.",
+      "piege": true
+    },
+    {
+      "id": "nat-1-10",
+      "theme": "valeurs",
+      "question": "Que dit l’article 1er de la Déclaration de 1789 ?",
+      "reponses": [
+        "« La loi est l’expression de la volonté générale »",
+        "« Nul ne peut être inquiété pour ses opinions »",
+        "« Les hommes naissent et demeurent libres et égaux en droits »",
+        "« Le principe de toute souveraineté réside dans la Nation »"
+      ],
+      "bonne_reponse": "C",
+      "explication": "Les autres citations viennent des articles 6, 10 et 3 de la Déclaration.",
+      "piege": true
+    },
+    {
+      "id": "nat-1-11",
+      "theme": "valeurs",
+      "question": "En 2018, le Conseil constitutionnel a reconnu la valeur constitutionnelle du principe de :",
+      "reponses": [
+        "Laïcité",
+        "Souveraineté",
+        "Propriété",
+        "Fraternité"
+      ],
+      "bonne_reponse": "D",
+      "explication": "Décision du 6 juillet 2018 : la fraternité implique la liberté d’aider autrui dans un but humanitaire."
+    },
+    {
+      "id": "nat-1-12",
+      "theme": "droits",
+      "question": "Que signifie la présomption d’innocence ?",
+      "reponses": [
+        "Un suspect est coupable jusqu’à preuve du contraire",
+        "Toute personne est considérée innocente tant que sa culpabilité n’a pas été établie",
+        "Seuls les mineurs sont présumés innocents",
+        "Les étrangers ne peuvent pas être jugés"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Ce principe figure à l’article 9 de la Déclaration de 1789."
+    },
+    {
+      "id": "nat-1-13",
+      "theme": "histoire",
+      "question": "Qui a lancé l’appel du 18 juin 1940 ?",
+      "reponses": [
+        "Philippe Pétain",
+        "Charles de Gaulle",
+        "Jean Moulin",
+        "Winston Churchill"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Depuis Londres, à la BBC, le général de Gaulle appelle les Français à poursuivre le combat."
+    },
+    {
+      "id": "nat-1-14",
+      "theme": "histoire",
+      "question": "Quel texte Napoléon Bonaparte a-t-il promulgué en 1804 ?",
+      "reponses": [
+        "La Déclaration des droits de l’homme",
+        "Le Code civil",
+        "La Constitution de 1958",
+        "L’édit de Nantes"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Le Code civil organise encore aujourd’hui le droit des personnes, de la famille et des biens."
+    },
+    {
+      "id": "nat-1-15",
+      "theme": "societe",
+      "question": "Tous les combien d’années ont lieu les élections municipales ?",
+      "reponses": [
+        "4 ans",
+        "5 ans",
+        "6 ans",
+        "7 ans"
+      ],
+      "bonne_reponse": "C",
+      "explication": "Les conseillers municipaux sont élus pour 6 ans ; ils élisent ensuite le maire."
+    }
+  ]
+}

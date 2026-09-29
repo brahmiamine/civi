@@ -1,0 +1,73 @@
+{
+  "nom": "Carte de résident",
+  "court": "Carte de résident",
+  "initiales": "CR",
+  "ordre": 2,
+  "description": "Les principes de la République, les institutions et le monde du travail, avec des mises en situation.",
+  "essentiel": {
+    "valeurs": [
+      "Article 1er de la Constitution : la République est indivisible, laïque, démocratique et sociale.",
+      "La loi de 1905 sépare les Églises et l’État.",
+      "La Déclaration des droits de l’homme et du citoyen date de 1789.",
+      "Depuis 2004, les signes religieux ostensibles sont interdits aux élèves des écoles publiques."
+    ],
+    "institutions": [
+      "La Constitution de la Ve République date de 1958.",
+      "Le Parlement compte 577 députés et 348 sénateurs.",
+      "Le président de la République nomme le Premier ministre.",
+      "Le Conseil constitutionnel vérifie que les lois respectent la Constitution."
+    ],
+    "droits": [
+      "Les femmes votent depuis l’ordonnance de 1944.",
+      "Le droit de grève est reconnu par la Constitution.",
+      "Durée légale du travail : 35 heures ; 5 semaines de congés payés ; salaire minimum : le SMIC.",
+      "Le Défenseur des droits aide les victimes de discrimination."
+    ],
+    "histoire": [
+      "1848 : abolition définitive de l’esclavage.",
+      "11 novembre 1918 : armistice ; 8 mai 1945 : fin de la guerre en Europe.",
+      "Charles de Gaulle est le premier président de la Ve République.",
+      "1981 : abolition de la peine de mort."
+    ],
+    "societe": [
+      "Le mariage civil se célèbre à la mairie, avant toute cérémonie religieuse.",
+      "Le PACS organise la vie commune de deux personnes.",
+      "La CAF verse les allocations familiales.",
+      "Le 114 permet aux personnes sourdes ou malentendantes de joindre les secours."
+    ]
+  },
+  "dates": [
+    [
+      "1789",
+      "Déclaration des droits de l’homme et du citoyen"
+    ],
+    [
+      "1848",
+      "Abolition de l’esclavage et suffrage universel masculin"
+    ],
+    [
+      "1905",
+      "Loi de séparation des Églises et de l’État"
+    ],
+    [
+      "1918",
+      "Armistice du 11 novembre"
+    ],
+    [
+      "1944",
+      "Droit de vote des femmes"
+    ],
+    [
+      "1945",
+      "Fin de la Seconde Guerre mondiale en Europe (8 mai)"
+    ],
+    [
+      "1958",
+      "Constitution de la Ve République"
+    ],
+    [
+      "1981",
+      "Abolition de la peine de mort"
+    ]
+  ]
+}
