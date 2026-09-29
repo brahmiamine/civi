@@ -26,15 +26,18 @@ const APP_VERSION = __APP_VERSION__;
 
 // The official exam gives 45 minutes for 40 questions; shorter tests get proportional time.
 const examMinutes = (n) => Math.max(1, Math.round((EXAM_SECONDS / 60) * (n / 40)));
-// « Signaler » opens a pre-filled GitHub issue for the question (needs a GitHub account).
-const REPORT_REPO = 'brahmiamine/civi';
-function reportUrl(prep, q) {
-  const body = [
-    '**Préparation** : ' + prep, '**Question** : `' + q.id + '`', '**Version** : ' + APP_VERSION, '',
-    '> ' + q.q, ...q.a.map((a, i) => '> ' + LET[i] + '. ' + a + (i === q.c ? ' ✅' : '')), '',
-    '**Problème constaté** (réponse fausse, énoncé ambigu, faute, information périmée…) :', '',
-  ].join('\n');
-  return 'https://github.com/' + REPORT_REPO + '/issues/new?labels=signalement&title=' + encodeURIComponent('Signalement ' + q.id) + '&body=' + encodeURIComponent(body);
+// « Signaler » sends the report by e-mail to the maintainer through Web3Forms (public key, it can only send to that inbox).
+const WEB3FORMS_KEY = '8acd26cf-61e8-4f4c-9075-d0c2d884ba57';
+const REPORT_REASONS = ['Réponse incorrecte', 'Énoncé ambigu', 'Faute ou coquille', 'Information périmée', 'Autre'];
+function sendReport(prep, q, reason, comment) {
+  const lines = [
+    'Préparation : ' + prep, 'Question : ' + q.id, 'Version : ' + APP_VERSION, 'Motif : ' + reason, 'Commentaire : ' + (comment || '—'), '',
+    q.q, ...q.a.map((a, i) => LET[i] + '. ' + a + (i === q.c ? '  ✅' : '')),
+  ];
+  return fetch('https://api.web3forms.com/submit', {
+    method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify({ access_key: WEB3FORMS_KEY, subject: 'Civi · Signalement ' + q.id + ' · ' + reason, from_name: 'Civi', message: lines.join('\n') }),
+  }).then((r) => r.json()).then((j) => { if (!j.success) throw new Error(j.message); });
 }
 const plural = (n, word) => n + ' ' + word + (n > 1 ? 's' : '');
 const fmtWhen = (ts) => {
@@ -426,6 +429,17 @@ export default class App extends Component {
       };
       case 'time': return { title: 'Heure du rappel', options: pick('time', [['08:00', '08:00', 'Le matin'], ['12:30', '12:30', 'À midi'], ['19:00', '19:00', 'En soirée'], ['21:00', '21:00', 'Avant de dormir']]) };
       case 'examLength': return { title: 'Longueur de l’examen blanc', sub: 'L’examen officiel compte 40 questions en 45 minutes.', options: pick('examLength', [[40, '40 questions', 'Conditions réelles · 45 min'], [20, '20 questions', 'Entraînement court · ' + examMinutes(20) + ' min'], [10, '10 questions', 'Démo · ' + examMinutes(10) + ' min']]) };
+      case 'report': {
+        const q = this.reportQ; if (!q) return null;
+        const send = (reason) => {
+          const comment = reason === 'Autre' || reason === 'Réponse incorrecte' ? window.prompt('Précise le problème (facultatif) :') : '';
+          if (comment === null) return;
+          this.closeSheet();
+          if (!navigator.onLine) return this.toast('Pas de connexion : réessaie plus tard');
+          sendReport(bank.name, q, reason, (comment || '').slice(0, 1000)).then(() => this.toast('Merci, signalement envoyé'), () => this.toast('Échec de l’envoi, réessaie plus tard'));
+        };
+        return { title: 'Signaler cette question', sub: 'Choisis le problème. Le signalement est envoyé anonymement à l’auteur de l’application.', options: REPORT_REASONS.map((r) => opt(r, null, false, () => send(r), ic('alert'))) };
+      }
       case 'installHelp': return { title: 'Installer l’application', sub: installHelp() };
     }
     return null;
@@ -455,7 +469,7 @@ export default class App extends Component {
     const primary = (label, onClick, o) => Object.assign({ label, onClick, dir: 'column', op: 1 }, o || {});
     const fsQ = { Petite: '20px', Normale: '23px', Grande: '26px' }[st.text], fsA = { Petite: '15px', Normale: '16px', Grande: '18px' }[st.text];
     const buildQv = (q, states, onPick, disabled, explain, order = q.a.map((_, i) => i)) => ({
-      theme: thById(q.t).short + (q.situation ? ' · Mise en situation' : ''), text: q.q, fs: fsQ, afs: fsA, explain: explain && { ...explain, report: reportUrl(bank.id, q) },
+      theme: thById(q.t).short + (q.situation ? ' · Mise en situation' : ''), text: q.q, fs: fsQ, afs: fsA, explain: explain && { ...explain, onReport: () => { this.reportQ = q; this.openSheet('report'); } },
       answers: order.map((orig, i) => {
         const k = states[orig]; const m = {
           normal: { bg: 'var(--surface)', border: '2px solid var(--divider)', badgeBg: 'var(--surface2)', badgeColor: 'var(--text)', op: 1 },
@@ -563,7 +577,7 @@ export default class App extends Component {
       case 'profile': {
         largeTitle = 'Profil'; profile = { initials: bank.initials, name: bank.name, sub: O.pct + ' % de préparation · ' + plural(O.total, 'question') };
         const rows = [
-          row({ icon: 'target', title: 'Type de préparation', sub: 'Change de profil de préparation', value: bank.short, chev: true, onClick: () => this.openSheet('prep') }),
+          row({ icon: 'target', title: 'Type de préparation', sub: plural(O.total, 'question') + ' · ' + plural(bank.lots.length, 'lot'), value: bank.short, chev: true, onClick: () => this.openSheet('prep') }),
           row({ icon: 'sliders', title: 'Paramètres', chev: true, onClick: () => this.push({ s: 'settings' }) }),
           canNotify && row({ icon: 'bell', title: 'Notifications', value: remOn ? st.time : 'Désactivées', chev: true, onClick: () => this.push({ s: 'notifications' }) }),
           row({ icon: 'sun', title: 'Apparence', value: { system: 'Système', light: 'Clair', dark: 'Sombre' }[st.theme], chev: true, onClick: () => this.openSheet('appearance') }),
@@ -946,7 +960,7 @@ function QuestionView({ qv }) {
           {qv.explain.verdict && <span style={{ display: 'flex', alignItems: 'center', gap: 8, font: '600 18px/1.2 var(--font-heading)', color: qv.explain.vColor }}>{qv.explain.vIcon}{qv.explain.verdict}</span>}
           <span style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 600, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--primaryText)' }}>{qv.explain.bulb}À retenir</span>
           <span style={{ fontSize: 16, lineHeight: 1.5, textWrap: 'pretty' }}>{qv.explain.text}</span>
-          <a href={qv.explain.report} target="_blank" rel="noopener noreferrer" style={{ alignSelf: 'flex-start', fontSize: 14, color: 'var(--text2)', textDecoration: 'underline' }}>Signaler un problème avec cette question</a>
+          <button onClick={qv.explain.onReport} style={{ alignSelf: 'flex-start', padding: 0, border: 'none', background: 'none', font: 'inherit', fontSize: 14, color: 'var(--text2)', textDecoration: 'underline', cursor: 'pointer' }}>Signaler un problème avec cette question</button>
         </div>
       )}
     </div>
