@@ -26,6 +26,16 @@ const APP_VERSION = __APP_VERSION__;
 
 // The official exam gives 45 minutes for 40 questions; shorter tests get proportional time.
 const examMinutes = (n) => Math.max(1, Math.round((EXAM_SECONDS / 60) * (n / 40)));
+// « Signaler » opens a pre-filled GitHub issue for the question (needs a GitHub account).
+const REPORT_REPO = 'brahmiamine/civi';
+function reportUrl(prep, q) {
+  const body = [
+    '**Préparation** : ' + prep, '**Question** : `' + q.id + '`', '**Version** : ' + APP_VERSION, '',
+    '> ' + q.q, ...q.a.map((a, i) => '> ' + LET[i] + '. ' + a + (i === q.c ? ' ✅' : '')), '',
+    '**Problème constaté** (réponse fausse, énoncé ambigu, faute, information périmée…) :', '',
+  ].join('\n');
+  return 'https://github.com/' + REPORT_REPO + '/issues/new?labels=signalement&title=' + encodeURIComponent('Signalement ' + q.id) + '&body=' + encodeURIComponent(body);
+}
 const plural = (n, word) => n + ' ' + word + (n > 1 ? 's' : '');
 const fmtWhen = (ts) => {
   const d = new Date(ts);
@@ -445,7 +455,7 @@ export default class App extends Component {
     const primary = (label, onClick, o) => Object.assign({ label, onClick, dir: 'column', op: 1 }, o || {});
     const fsQ = { Petite: '20px', Normale: '23px', Grande: '26px' }[st.text], fsA = { Petite: '15px', Normale: '16px', Grande: '18px' }[st.text];
     const buildQv = (q, states, onPick, disabled, explain, order = q.a.map((_, i) => i)) => ({
-      theme: thById(q.t).short + (q.situation ? ' · Mise en situation' : ''), text: q.q, fs: fsQ, afs: fsA, explain,
+      theme: thById(q.t).short + (q.situation ? ' · Mise en situation' : ''), text: q.q, fs: fsQ, afs: fsA, explain: explain && { ...explain, report: reportUrl(bank.id, q) },
       answers: order.map((orig, i) => {
         const k = states[orig]; const m = {
           normal: { bg: 'var(--surface)', border: '2px solid var(--divider)', badgeBg: 'var(--surface2)', badgeColor: 'var(--text)', op: 1 },
@@ -936,6 +946,7 @@ function QuestionView({ qv }) {
           {qv.explain.verdict && <span style={{ display: 'flex', alignItems: 'center', gap: 8, font: '600 18px/1.2 var(--font-heading)', color: qv.explain.vColor }}>{qv.explain.vIcon}{qv.explain.verdict}</span>}
           <span style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 600, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--primaryText)' }}>{qv.explain.bulb}À retenir</span>
           <span style={{ fontSize: 16, lineHeight: 1.5, textWrap: 'pretty' }}>{qv.explain.text}</span>
+          <a href={qv.explain.report} target="_blank" rel="noopener noreferrer" style={{ alignSelf: 'flex-start', fontSize: 14, color: 'var(--text2)', textDecoration: 'underline' }}>Signaler un problème avec cette question</a>
         </div>
       )}
     </div>
