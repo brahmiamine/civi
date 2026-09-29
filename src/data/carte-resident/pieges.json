@@ -1,0 +1,91 @@
+{
+ "titre": "Questions pièges",
+ "description": "Questions où l’on se trompe souvent.",
+ "questions": [
+  {
+   "id": "cr-1-08",
+   "theme": "institutions",
+   "question": "Combien y a-t-il de députés à l’Assemblée nationale ?",
+   "reponses": [
+    "348",
+    "577",
+    "925",
+    "101"
+   ],
+   "bonne_reponse": "B",
+   "explication": "Les 577 députés sont élus au suffrage universel direct pour 5 ans. Le Sénat compte 348 sénateurs.",
+   "piege": true
+  },
+  {
+   "id": "cr-1-10",
+   "theme": "institutions",
+   "question": "Quelle institution vérifie que les lois respectent la Constitution ?",
+   "reponses": [
+    "Le Conseil constitutionnel",
+    "Le Conseil d’État",
+    "La Cour des comptes",
+    "Le Sénat"
+   ],
+   "bonne_reponse": "A",
+   "explication": "Le Conseil constitutionnel peut censurer une loi contraire à la Constitution. Le Conseil d’État, lui, conseille le Gouvernement et juge l’administration.",
+   "piege": true
+  },
+  {
+   "id": "cr-1-13",
+   "theme": "histoire",
+   "question": "En quelle année l’esclavage a-t-il été définitivement aboli en France ?",
+   "reponses": [
+    "1789",
+    "1848",
+    "1905",
+    "1946"
+   ],
+   "bonne_reponse": "B",
+   "explication": "Le décret du 27 avril 1848, porté par Victor Schœlcher, abolit définitivement l’esclavage (une première abolition de 1794 avait été annulée en 1802).",
+   "piege": true
+  },
+  {
+   "id": "cr-2-07",
+   "theme": "droits",
+   "question": "Depuis 2020, jusqu’à quel âge la formation est-elle obligatoire pour les jeunes ?",
+   "reponses": [
+    "18 ans",
+    "16 ans",
+    "21 ans",
+    "25 ans"
+   ],
+   "bonne_reponse": "A",
+   "explication": "Après l’instruction obligatoire (3-16 ans), les jeunes de 16 à 18 ans doivent être en études, en apprentissage, en emploi ou en service civique.",
+   "piege": true
+  },
+  {
+   "id": "cr-2-12",
+   "theme": "histoire",
+   "question": "Quel est le plus long fleuve de France ?",
+   "reponses": [
+    "La Seine",
+    "Le Rhône",
+    "La Loire",
+    "La Garonne"
+   ],
+   "bonne_reponse": "C",
+   "explication": "La Loire mesure environ 1 000 km. La Seine, qui traverse Paris, est plus courte.",
+   "piege": true
+  },
+  {
+   "id": "cr-3-09",
+   "theme": "droits",
+   "question": "L’impôt est prélevé à la source. Devez-vous quand même déclarer vos revenus ?",
+   "reponses": [
+    "Non, c’est inutile",
+    "Seulement si vous êtes français",
+    "Seulement tous les 5 ans",
+    "Oui, chaque année, même si vous ne payez pas d’impôt"
+   ],
+   "bonne_reponse": "D",
+   "explication": "La déclaration annuelle reste obligatoire : elle permet de calculer le taux de prélèvement et l’accès à certaines aides.",
+   "situation": true,
+   "piege": true
+  }
+ ]
+}

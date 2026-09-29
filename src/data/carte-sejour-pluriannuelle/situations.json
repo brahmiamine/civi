@@ -1,0 +1,174 @@
+{
+ "titre": "Mises en situation",
+ "description": "Cas concrets du quotidien.",
+ "questions": [
+  {
+   "id": "sp-3-01",
+   "theme": "valeurs",
+   "question": "À la mairie, un agent au guichet porte un signe religieux visible. Est-ce normal ?",
+   "reponses": [
+    "Non, les agents publics doivent respecter la neutralité religieuse",
+    "Oui, c’est sa liberté",
+    "Oui, si les usagers sont d’accord",
+    "Oui, seulement certains jours"
+   ],
+   "bonne_reponse": "A",
+   "explication": "Les agents du service public doivent être neutres. Les usagers, eux, peuvent en principe porter des signes religieux (sauf les élèves des écoles publiques).",
+   "situation": true
+  },
+  {
+   "id": "sp-3-02",
+   "theme": "valeurs",
+   "question": "Un collègue refuse de travailler sous les ordres d’une femme. Qu’en pensez-vous ?",
+   "reponses": [
+    "C’est son droit",
+    "C’est contraire à l’égalité entre les femmes et les hommes",
+    "Il faut changer de responsable",
+    "C’est acceptable pour des raisons culturelles"
+   ],
+   "bonne_reponse": "B",
+   "explication": "L’égalité entre les femmes et les hommes s’applique partout, y compris au travail.",
+   "situation": true
+  },
+  {
+   "id": "sp-3-03",
+   "theme": "valeurs",
+   "question": "Une entreprise refuse d’embaucher un candidat à cause de son origine. C’est :",
+   "reponses": [
+    "Autorisé pour une entreprise privée",
+    "Une discrimination punie par la loi",
+    "Autorisé pour un poste à l’accueil",
+    "Normal dans une petite entreprise"
+   ],
+   "bonne_reponse": "B",
+   "explication": "La discrimination à l’embauche est un délit. On peut saisir le Défenseur des droits ou porter plainte.",
+   "situation": true
+  },
+  {
+   "id": "sp-3-04",
+   "theme": "valeurs",
+   "question": "Un voisin vous insulte en raison de votre religion. Que pouvez-vous faire ?",
+   "reponses": [
+    "Porter plainte : l’injure en raison de la religion est un délit",
+    "Rien, c’est la liberté d’expression",
+    "Lui répondre par la violence",
+    "Déménager, c’est la seule solution"
+   ],
+   "bonne_reponse": "A",
+   "explication": "Les injures à caractère raciste ou religieux sont punies plus sévèrement. Il ne faut jamais se faire justice soi-même.",
+   "situation": true
+  },
+  {
+   "id": "sp-3-05",
+   "theme": "valeurs",
+   "question": "Dans la rue, deux hommes se tiennent la main. Qu’en pensez-vous ?",
+   "reponses": [
+    "C’est interdit",
+    "Il faut appeler la police",
+    "C’est autorisé seulement dans les grandes villes",
+    "C’est leur liberté ; l’homophobie est punie par la loi"
+   ],
+   "bonne_reponse": "D",
+   "explication": "L’orientation sexuelle relève de la vie privée. Les insultes et violences homophobes sont punies.",
+   "situation": true
+  },
+  {
+   "id": "sp-3-06",
+   "theme": "valeurs",
+   "question": "Votre fille veut choisir elle-même la personne qu’elle épousera. Qu’en pensez-vous ?",
+   "reponses": [
+    "Ce sont les parents qui choisissent",
+    "C’est son droit : le mariage exige son libre consentement",
+    "C’est le frère aîné qui décide",
+    "C’est le maire qui décide"
+   ],
+   "bonne_reponse": "B",
+   "explication": "Chacun choisit librement son conjoint. Le mariage n’est possible qu’à partir de 18 ans.",
+   "situation": true
+  },
+  {
+   "id": "sp-3-07",
+   "theme": "droits",
+   "question": "Vous êtes témoin d’un accident et une personne est blessée. Que faites-vous ?",
+   "reponses": [
+    "Je pars",
+    "Je filme la scène",
+    "Je porte secours ou j’appelle les secours (15, 18 ou 112)",
+    "J’attends qu’une autre personne agisse"
+   ],
+   "bonne_reponse": "C",
+   "explication": "Ne pas porter assistance à une personne en danger est un délit, si on peut le faire sans risque.",
+   "situation": true
+  },
+  {
+   "id": "sp-3-08",
+   "theme": "droits",
+   "question": "Votre enfant de 10 ans ne veut plus aller à l’école. Que faites-vous ?",
+   "reponses": [
+    "Il doit continuer : l’instruction est obligatoire jusqu’à 16 ans",
+    "Il peut arrêter s’il le souhaite",
+    "Il peut travailler à la place",
+    "C’est à lui de décider"
+   ],
+   "bonne_reponse": "A",
+   "explication": "Les parents sont responsables de l’instruction de leurs enfants de 3 à 16 ans.",
+   "situation": true
+  },
+  {
+   "id": "sp-3-09",
+   "theme": "droits",
+   "question": "Votre employeur vous paie en liquide, sans fiche de paie ni déclaration. C’est :",
+   "reponses": [
+    "Normal",
+    "Légal si vous êtes d’accord",
+    "Du travail dissimulé, interdit par la loi",
+    "Légal pour les étrangers"
+   ],
+   "bonne_reponse": "C",
+   "explication": "Sans déclaration, vous perdez vos droits (retraite, chômage, assurance maladie). L’inspection du travail peut être saisie.",
+   "situation": true
+  },
+  {
+   "id": "sp-3-10",
+   "theme": "droits",
+   "question": "Votre conjoint vous interdit de travailler. Est-ce possible ?",
+   "reponses": [
+    "Non, chaque époux peut exercer librement une profession",
+    "Oui, c’est son droit",
+    "Oui, avec l’accord de la famille",
+    "Oui, avec l’autorisation du maire"
+   ],
+   "bonne_reponse": "A",
+   "explication": "Le Code civil garantit à chaque époux le droit d’exercer la profession de son choix.",
+   "situation": true
+  },
+  {
+   "id": "sp-3-11",
+   "theme": "institutions",
+   "question": "Vous avez une question sur votre titre de séjour. À qui vous adresser ?",
+   "reponses": [
+    "À la mairie",
+    "À la préfecture",
+    "Au commissariat",
+    "À l’école"
+   ],
+   "bonne_reponse": "B",
+   "explication": "La préfecture (représentante de l’État) est compétente pour les titres de séjour ; de nombreuses démarches se font en ligne.",
+   "situation": true
+  },
+  {
+   "id": "sp-3-15",
+   "theme": "societe",
+   "question": "Un incendie se déclare dans votre immeuble. Quel numéro appelez-vous ?",
+   "reponses": [
+    "Le 15",
+    "Le 17",
+    "Le 18 (pompiers)",
+    "Le 3919"
+   ],
+   "bonne_reponse": "C",
+   "explication": "Le 18 joint les pompiers. Le 112 fonctionne aussi partout en Europe.",
+   "situation": true
+  }
+ ]
+}

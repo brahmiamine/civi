@@ -9,6 +9,7 @@ const { version } = JSON.parse(readFileSync(new URL('./package.json', import.met
 
 export default defineConfig({
   base,
+  build: { target: 'es2022' },
   define: { __APP_VERSION__: JSON.stringify(version) },
   plugins: [
     react(),

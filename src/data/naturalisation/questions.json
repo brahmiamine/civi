@@ -1,0 +1,396 @@
+{
+ "titre": "Banque générale",
+ "description": "Questions de révision et d’examen.",
+ "questions": [
+  {
+   "id": "nat-1-02",
+   "theme": "institutions",
+   "question": "Quelle est la durée du mandat des sénateurs ?",
+   "reponses": [
+    "5 ans",
+    "6 ans",
+    "7 ans",
+    "9 ans"
+   ],
+   "bonne_reponse": "B",
+   "explication": "Les sénateurs sont élus pour 6 ans ; le Sénat est renouvelé par moitié tous les 3 ans."
+  },
+  {
+   "id": "nat-1-04",
+   "theme": "institutions",
+   "question": "Depuis quelle année le président de la Ve République est-il élu au suffrage universel direct ?",
+   "reponses": [
+    "1958",
+    "1969",
+    "2000",
+    "1962"
+   ],
+   "bonne_reponse": "D",
+   "explication": "Le référendum de 1962 a instauré l’élection directe ; la première a eu lieu en 1965."
+  },
+  {
+   "id": "nat-1-05",
+   "theme": "institutions",
+   "question": "Comment peut-on réviser la Constitution ?",
+   "reponses": [
+    "Par décret du Premier ministre",
+    "Par décision du Conseil constitutionnel",
+    "Par un vote des maires",
+    "Par référendum ou par le Parlement réuni en Congrès"
+   ],
+   "bonne_reponse": "D",
+   "explication": "L’article 89 prévoit l’adoption par référendum ou par le Congrès à la majorité des trois cinquièmes."
+  },
+  {
+   "id": "nat-1-06",
+   "theme": "institutions",
+   "question": "Combien y a-t-il de départements en France ?",
+   "reponses": [
+    "101",
+    "96",
+    "13",
+    "577"
+   ],
+   "bonne_reponse": "A",
+   "explication": "96 départements en métropole et 5 en outre-mer."
+  },
+  {
+   "id": "nat-1-07",
+   "theme": "institutions",
+   "question": "Que permet l’article 49.3 de la Constitution ?",
+   "reponses": [
+    "Dissoudre le Sénat",
+    "Faire adopter un texte sans vote, sauf si une motion de censure est adoptée",
+    "Fixer la durée du mandat présidentiel",
+    "Changer la devise de la République"
+   ],
+   "bonne_reponse": "B",
+   "explication": "Le Gouvernement engage sa responsabilité ; s’il est renversé par une motion de censure, le texte est rejeté."
+  },
+  {
+   "id": "nat-1-08",
+   "theme": "valeurs",
+   "question": "Quels textes forment le « bloc de constitutionnalité » ?",
+   "reponses": [
+    "Le Code civil et le Code pénal",
+    "Les traités européens uniquement",
+    "Toutes les lois votées depuis 2000",
+    "Constitution de 1958, Déclaration de 1789, Préambule de 1946 et Charte de l’environnement"
+   ],
+   "bonne_reponse": "D",
+   "explication": "Le Conseil constitutionnel contrôle les lois au regard de l’ensemble de ces textes."
+  },
+  {
+   "id": "nat-1-11",
+   "theme": "valeurs",
+   "question": "En 2018, le Conseil constitutionnel a reconnu la valeur constitutionnelle du principe de :",
+   "reponses": [
+    "Laïcité",
+    "Souveraineté",
+    "Propriété",
+    "Fraternité"
+   ],
+   "bonne_reponse": "D",
+   "explication": "Décision du 6 juillet 2018 : la fraternité implique la liberté d’aider autrui dans un but humanitaire."
+  },
+  {
+   "id": "nat-1-12",
+   "theme": "droits",
+   "question": "Que signifie la présomption d’innocence ?",
+   "reponses": [
+    "Un suspect est coupable jusqu’à preuve du contraire",
+    "Toute personne est considérée innocente tant que sa culpabilité n’a pas été établie",
+    "Seuls les mineurs sont présumés innocents",
+    "Les étrangers ne peuvent pas être jugés"
+   ],
+   "bonne_reponse": "B",
+   "explication": "Ce principe figure à l’article 9 de la Déclaration de 1789."
+  },
+  {
+   "id": "nat-1-13",
+   "theme": "histoire",
+   "question": "Qui a lancé l’appel du 18 juin 1940 ?",
+   "reponses": [
+    "Philippe Pétain",
+    "Charles de Gaulle",
+    "Jean Moulin",
+    "Winston Churchill"
+   ],
+   "bonne_reponse": "B",
+   "explication": "Depuis Londres, à la BBC, le général de Gaulle appelle les Français à poursuivre le combat."
+  },
+  {
+   "id": "nat-1-14",
+   "theme": "histoire",
+   "question": "Quel texte Napoléon Bonaparte a-t-il promulgué en 1804 ?",
+   "reponses": [
+    "La Déclaration des droits de l’homme",
+    "Le Code civil",
+    "La Constitution de 1958",
+    "L’édit de Nantes"
+   ],
+   "bonne_reponse": "B",
+   "explication": "Le Code civil organise encore aujourd’hui le droit des personnes, de la famille et des biens."
+  },
+  {
+   "id": "nat-1-15",
+   "theme": "societe",
+   "question": "Tous les combien d’années ont lieu les élections municipales ?",
+   "reponses": [
+    "4 ans",
+    "5 ans",
+    "6 ans",
+    "7 ans"
+   ],
+   "bonne_reponse": "C",
+   "explication": "Les conseillers municipaux sont élus pour 6 ans ; ils élisent ensuite le maire."
+  },
+  {
+   "id": "nat-2-01",
+   "theme": "histoire",
+   "question": "Quel roi des Francs s’est fait baptiser à la fin du Ve siècle ?",
+   "reponses": [
+    "Clovis",
+    "Charlemagne",
+    "Louis XIV",
+    "Hugues Capet"
+   ],
+   "bonne_reponse": "A",
+   "explication": "Clovis est baptisé à Reims, traditionnellement vers 496."
+  },
+  {
+   "id": "nat-2-02",
+   "theme": "histoire",
+   "question": "En quelle année Charlemagne a-t-il été couronné empereur ?",
+   "reponses": [
+    "1066",
+    "800",
+    "1515",
+    "1789"
+   ],
+   "bonne_reponse": "B",
+   "explication": "Il est couronné à Rome le 25 décembre 800."
+  },
+  {
+   "id": "nat-2-03",
+   "theme": "histoire",
+   "question": "Pendant quelle guerre Jeanne d’Arc a-t-elle combattu ?",
+   "reponses": [
+    "Les guerres de Religion",
+    "La Première Guerre mondiale",
+    "La guerre de Trente Ans",
+    "La guerre de Cent Ans"
+   ],
+   "bonne_reponse": "D",
+   "explication": "Elle libère Orléans en 1429 et meurt à Rouen en 1431."
+  },
+  {
+   "id": "nat-2-04",
+   "theme": "histoire",
+   "question": "Quel roi a fait du château de Versailles sa résidence et le siège du pouvoir ?",
+   "reponses": [
+    "François Ier",
+    "Louis XIV",
+    "Henri IV",
+    "Louis XVI"
+   ],
+   "bonne_reponse": "B",
+   "explication": "Le « Roi-Soleil » s’y installe avec la cour en 1682."
+  },
+  {
+   "id": "nat-2-05",
+   "theme": "histoire",
+   "question": "Quel ministre a rendu l’école primaire gratuite, laïque et obligatoire ?",
+   "reponses": [
+    "Jean Jaurès",
+    "Léon Blum",
+    "Jules Ferry",
+    "Victor Hugo"
+   ],
+   "bonne_reponse": "C",
+   "explication": "Les lois Jules Ferry datent de 1881 et 1882."
+  },
+  {
+   "id": "nat-2-06",
+   "theme": "histoire",
+   "question": "Quel gouvernement a instauré les premiers congés payés en 1936 ?",
+   "reponses": [
+    "Le régime de Vichy",
+    "Le Second Empire",
+    "Le gouvernement de Charles de Gaulle",
+    "Le Front populaire de Léon Blum"
+   ],
+   "bonne_reponse": "D",
+   "explication": "Les accords de 1936 instaurent deux semaines de congés payés."
+  },
+  {
+   "id": "nat-2-07",
+   "theme": "histoire",
+   "question": "Quelle ministre a porté la loi de 1975 sur l’interruption volontaire de grossesse ?",
+   "reponses": [
+    "Simone Veil",
+    "Marie Curie",
+    "Olympe de Gouges",
+    "Simone de Beauvoir"
+   ],
+   "bonne_reponse": "A",
+   "explication": "La loi Veil du 17 janvier 1975 ; en 2024, la liberté de recourir à l’IVG a été inscrite dans la Constitution."
+  },
+  {
+   "id": "nat-2-09",
+   "theme": "histoire",
+   "question": "Qui a écrit « Les Misérables » ?",
+   "reponses": [
+    "Molière",
+    "Émile Zola",
+    "Voltaire",
+    "Victor Hugo"
+   ],
+   "bonne_reponse": "D",
+   "explication": "Publié en 1862. Victor Hugo repose au Panthéon."
+  },
+  {
+   "id": "nat-2-11",
+   "theme": "histoire",
+   "question": "Quel résistant a unifié les mouvements de la Résistance intérieure ?",
+   "reponses": [
+    "Jean Jaurès",
+    "Georges Clemenceau",
+    "Léon Gambetta",
+    "Jean Moulin"
+   ],
+   "bonne_reponse": "D",
+   "explication": "Il fonde le Conseil national de la Résistance en 1943 et meurt la même année. Il est au Panthéon depuis 1964."
+  },
+  {
+   "id": "nat-2-12",
+   "theme": "valeurs",
+   "question": "À quelle période le drapeau tricolore est-il né ?",
+   "reponses": [
+    "Pendant la Révolution française",
+    "Sous Louis XIV",
+    "Pendant la Première Guerre mondiale",
+    "Sous la Ve République"
+   ],
+   "bonne_reponse": "A",
+   "explication": "Le bleu et le rouge, couleurs de Paris, entourent le blanc, couleur du roi."
+  },
+  {
+   "id": "nat-2-14",
+   "theme": "societe",
+   "question": "Depuis 2019, comment l’impôt sur le revenu est-il payé ?",
+   "reponses": [
+    "Il est prélevé à la source, sur le salaire ou la pension",
+    "Il a été supprimé",
+    "Il est payé uniquement par les entreprises",
+    "Il est payé tous les 5 ans"
+   ],
+   "bonne_reponse": "A",
+   "explication": "Le prélèvement à la source adapte l’impôt aux revenus du moment ; la déclaration annuelle reste obligatoire."
+  },
+  {
+   "id": "nat-2-15",
+   "theme": "societe",
+   "question": "Quel événement Paris a-t-il accueilli en 2024 ?",
+   "reponses": [
+    "La Coupe du monde de football",
+    "L’Exposition universelle",
+    "Les Jeux olympiques et paralympiques",
+    "Le sommet du G20"
+   ],
+   "bonne_reponse": "C",
+   "explication": "C’était la troisième fois que Paris accueillait les Jeux olympiques, après 1900 et 1924."
+  },
+  {
+   "id": "nat-3-01",
+   "theme": "droits",
+   "question": "Un Français peut-il avoir une autre nationalité ?",
+   "reponses": [
+    "Oui, la France autorise la double nationalité",
+    "Non, c’est interdit",
+    "Seulement avant 18 ans",
+    "Seulement avec un pays européen"
+   ],
+   "bonne_reponse": "A",
+   "explication": "Devenir français n’oblige pas à renoncer à sa nationalité d’origine (selon les règles de l’autre pays)."
+  },
+  {
+   "id": "nat-3-02",
+   "theme": "droits",
+   "question": "Qu’est-ce que la JDC ?",
+   "reponses": [
+    "Un diplôme",
+    "La Journée défense et citoyenneté, obligatoire pour les jeunes Français",
+    "Une fête nationale",
+    "Un impôt"
+   ],
+   "bonne_reponse": "B",
+   "explication": "Elle a lieu entre 16 et 25 ans, après le recensement citoyen."
+  },
+  {
+   "id": "nat-3-03",
+   "theme": "droits",
+   "question": "Un citoyen français peut être tiré au sort pour être :",
+   "reponses": [
+    "Juré d’assises",
+    "Ministre",
+    "Préfet",
+    "Député"
+   ],
+   "bonne_reponse": "A",
+   "explication": "Les jurés, tirés au sort sur les listes électorales, participent au jugement des crimes."
+  },
+  {
+   "id": "nat-3-04",
+   "theme": "droits",
+   "question": "Le droit d’asile en France est :",
+   "reponses": [
+    "Interdit",
+    "Un droit reconnu par la Constitution",
+    "Réservé aux Européens",
+    "Une décision du maire"
+   ],
+   "bonne_reponse": "B",
+   "explication": "Le Préambule de 1946 protège « tout homme persécuté en raison de son action en faveur de la liberté »."
+  },
+  {
+   "id": "nat-3-06",
+   "theme": "droits",
+   "question": "Pour voter, un citoyen français doit :",
+   "reponses": [
+    "Payer un impôt spécial",
+    "Être inscrit sur les listes électorales",
+    "Être propriétaire",
+    "Avoir plus de 21 ans"
+   ],
+   "bonne_reponse": "B",
+   "explication": "L’inscription est automatique à 18 ans pour les jeunes recensés ; sinon, on s’inscrit en mairie ou en ligne."
+  },
+  {
+   "id": "nat-3-15",
+   "theme": "institutions",
+   "question": "Qui peut dissoudre l’Assemblée nationale ?",
+   "reponses": [
+    "Le président de la République",
+    "Le Premier ministre",
+    "Le Sénat",
+    "Le Conseil constitutionnel"
+   ],
+   "bonne_reponse": "A",
+   "explication": "Article 12 : après consultation du Premier ministre et des présidents des assemblées ; pas de nouvelle dissolution dans l’année qui suit les élections."
+  },
+  {
+   "id": "nat-3-16",
+   "theme": "valeurs",
+   "question": "Selon la Constitution, à qui appartient la souveraineté nationale ?",
+   "reponses": [
+    "Au peuple, qui l’exerce par ses représentants et par le référendum",
+    "Au président de la République",
+    "Au Parlement seulement",
+    "Aux régions"
+   ],
+   "bonne_reponse": "A",
+   "explication": "Article 3 de la Constitution de 1958."
+  }
+ ]
+}

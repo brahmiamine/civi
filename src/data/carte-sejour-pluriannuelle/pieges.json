@@ -1,0 +1,62 @@
+{
+ "titre": "Questions pièges",
+ "description": "Questions où l’on se trompe souvent.",
+ "questions": [
+  {
+   "id": "sp-1-13",
+   "theme": "societe",
+   "question": "Quel numéro appeler pour joindre le SAMU (urgence médicale) ?",
+   "reponses": [
+    "17",
+    "18",
+    "115",
+    "15"
+   ],
+   "bonne_reponse": "D",
+   "explication": "15 : SAMU. 17 : police. 18 : pompiers. 112 : numéro d’urgence européen. 115 : hébergement d’urgence.",
+   "piege": true
+  },
+  {
+   "id": "sp-2-03",
+   "theme": "droits",
+   "question": "Un étranger non européen peut-il voter aux élections municipales ?",
+   "reponses": [
+    "Oui, toujours",
+    "Non, ce droit est réservé aux Français et aux citoyens de l’Union européenne",
+    "Oui, après 5 ans de résidence",
+    "Oui, s’il paie des impôts"
+   ],
+   "bonne_reponse": "B",
+   "explication": "Les citoyens de l’Union européenne résidant en France peuvent voter aux élections municipales et européennes. Les autres étrangers ne votent pas.",
+   "piege": true
+  },
+  {
+   "id": "sp-2-04",
+   "theme": "droits",
+   "question": "Frapper son enfant pour l’éduquer est :",
+   "reponses": [
+    "Autorisé à la maison",
+    "Autorisé s’il n’y a pas de marque",
+    "Autorisé à partir de 10 ans",
+    "Interdit par la loi"
+   ],
+   "bonne_reponse": "D",
+   "explication": "Depuis la loi du 10 juillet 2019, l’autorité parentale s’exerce sans violences physiques ou psychologiques.",
+   "piege": true
+  },
+  {
+   "id": "sp-2-15",
+   "theme": "valeurs",
+   "question": "La liberté d’expression permet-elle de tout dire ?",
+   "reponses": [
+    "Oui, sans aucune limite",
+    "Non, il est interdit de critiquer le Gouvernement",
+    "Oui, sauf sur Internet",
+    "Non : l’injure, la diffamation et l’incitation à la haine sont punies"
+   ],
+   "bonne_reponse": "D",
+   "explication": "On peut critiquer librement, y compris le Gouvernement, mais la loi punit l’injure, la diffamation et la provocation à la haine.",
+   "piege": true
+  }
+ ]
+}
