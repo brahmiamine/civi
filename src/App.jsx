@@ -48,6 +48,44 @@ function sendReport(ctx, q, reason, comment) {
     body: JSON.stringify({ access_key: WEB3FORMS_KEY, subject: 'Civi · Signalement ' + q.id + ' · ' + reason, from_name: 'Civi · ' + ctx.prep, message: lines.join('\n') }),
   }).then((r) => r.json()).then((j) => { if (!j.success) throw new Error(j.message); });
 }
+// « Proposer une question » : optional image goes to Cloudinary (unsigned preset, folder civi-propositions), then the whole proposal is e-mailed via Web3Forms.
+const CLOUDINARY = { cloud: 'dapzqelui', preset: 'civi_propositions' };
+const EMPTY_PROPOSAL = () => ({ prep: null, theme: '', q: '', a: ['', '', '', ''], c: null, x: '', note: '', img: null, preview: null, sending: false });
+// Shrinks photos before upload (max 1600 px, JPEG) to stay fast on mobile data and small on the free plan.
+function shrinkImage(file, max = 1600) {
+  return new Promise((resolve) => {
+    const url = URL.createObjectURL(file), img = new Image();
+    img.onload = () => {
+      const k = Math.min(1, max / Math.max(img.width, img.height)), cv = document.createElement('canvas');
+      cv.width = Math.round(img.width * k); cv.height = Math.round(img.height * k);
+      cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height); URL.revokeObjectURL(url);
+      cv.toBlob((b) => resolve(b || file), 'image/jpeg', 0.85);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); resolve(file); };
+    img.src = url;
+  });
+}
+async function sendProposal(p, prepName) {
+  let imageUrl = null;
+  if (p.img) {
+    const fd = new FormData(); fd.append('file', await shrinkImage(p.img)); fd.append('upload_preset', CLOUDINARY.preset);
+    const r = await fetch('https://api.cloudinary.com/v1_1/' + CLOUDINARY.cloud + '/image/upload', { method: 'POST', body: fd }).then((x) => x.json());
+    if (!r.secure_url) throw new Error(r.error?.message || 'upload');
+    imageUrl = r.secure_url;
+  }
+  const answers = p.a.map((t, i) => [t.trim(), i]).filter(([t]) => t);
+  const lines = [
+    '=== PROPOSITION DE QUESTION ===', 'Préparation : ' + prepName, 'Thème : ' + (p.theme ? thById(p.theme).name : '—'), '',
+    'Énoncé :', p.q.trim() || '—', '', 'Réponses :', ...(answers.length ? answers.map(([t, i]) => LET[i] + '. ' + t + (i === p.c ? '  ✅ bonne réponse' : '')) : ['—']), '',
+    'À retenir :', p.x.trim() || '—', '', 'Commentaire :', p.note.trim() || '—', '', 'Image : ' + (imageUrl || 'aucune'), '',
+    '=== CONTEXTE ===', 'Version : ' + APP_VERSION, 'Date : ' + new Date().toLocaleString('fr-FR'), 'Appareil : ' + navigator.userAgent,
+  ];
+  const j = await fetch('https://api.web3forms.com/submit', {
+    method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify({ access_key: WEB3FORMS_KEY, subject: 'Civi · Proposition de question · ' + prepName + (imageUrl ? ' · avec image' : ''), from_name: 'Civi · ' + prepName, message: lines.join('\n') }),
+  }).then((r) => r.json());
+  if (!j.success) throw new Error(j.message);
+}
 const plural = (n, word) => n + ' ' + word + (n > 1 ? 's' : '');
 const fmtWhen = (ts) => {
   const d = new Date(ts);
@@ -417,6 +455,25 @@ export default class App extends Component {
     return { ...ctx, where: c.from ? 'question (' + c.from + ')' : 'question', chosen: c.chosen ?? null };
   }
 
+  openPropose() { this.setState({ pf: { ...EMPTY_PROPOSAL(), prep: this.state.prep } }); this.push({ s: 'propose' }); }
+  setPf(patch) { this.setState((s) => ({ pf: { ...s.pf, ...patch } })); }
+  pickImage(file) {
+    const old = this.state.pf.preview; if (old) URL.revokeObjectURL(old);
+    if (!file) return this.setPf({ img: null, preview: null });
+    if (!file.type.startsWith('image/')) return this.toast('Choisis une image');
+    if (file.size > 15e6) return this.toast('Image trop lourde (15 Mo max)');
+    this.setPf({ img: file, preview: URL.createObjectURL(file) });
+  }
+  submitPropose() {
+    const p = this.state.pf; if (!p || p.sending) return;
+    if (!navigator.onLine) return this.toast('Pas de connexion : réessaie plus tard');
+    this.setPf({ sending: true });
+    sendProposal(p, prepById(p.prep).name).then(() => {
+      if (p.preview) URL.revokeObjectURL(p.preview);
+      this.toast('Merci, proposition envoyée'); this.setState({ pf: null }); this.back();
+    }, () => { this.setPf({ sending: false }); this.toast('Échec de l’envoi, réessaie plus tard'); });
+  }
+
   sheetData() {
     const s = this.state, st = this.settings(), bank = this.bank(), P = this.prof(), TS = themeStats(bank, P);
     const opt = (label, sub, sel, fn, icon) => ({ label, sub, onClick: fn, icon, check: sel ? ic('check', 20, 2) : null, color: sel ? 'var(--primaryText)' : 'var(--text)', weight: sel ? 600 : 500, bg: sel ? 'var(--tint)' : 'transparent' });
@@ -487,7 +544,7 @@ export default class App extends Component {
     const answerSub = (q, chosen, none) => (chosen != null ? 'Ta réponse : ' + q.a[chosen] : none);
     const verdictBadge = (ok) => ({ label: ok ? 'Réussi' : 'Échoué', icon: ic(ok ? 'check' : 'x', 14, 2.5), bg: ok ? 'var(--successTint)' : 'var(--errorTint)', color: ok ? 'var(--success)' : 'var(--error)' });
     const back = { show: true, backIcon: ic('chevL', 26), backLabel: 'Retour', onBack: () => this.back() };
-    let bar = { show: false }, largeTitle = null, home = null, testHero = null, progHero = null, profile = null, intro = null, fiche = null, flash = null, qv = null, res = null, chips = null, groups = [], empty = null, sticky = null, quizBar = null;
+    let propose = null, bar = { show: false }, largeTitle = null, home = null, testHero = null, progHero = null, profile = null, intro = null, fiche = null, flash = null, qv = null, res = null, chips = null, groups = [], empty = null, sticky = null, quizBar = null;
     const primary = (label, onClick, o) => Object.assign({ label, onClick, dir: 'column', op: 1 }, o || {});
     const fsQ = { Petite: '20px', Normale: '23px', Grande: '26px' }[st.text], fsA = { Petite: '15px', Normale: '16px', Grande: '18px' }[st.text];
     const buildQv = (q, states, onPick, disabled, explain, order = q.a.map((_, i) => i)) => ({
@@ -506,7 +563,7 @@ export default class App extends Component {
     });
     const favBtn = (id) => { const f = P.favs.includes(id); return { icon: ic('star', 22, 1.5, f), color: f ? 'var(--primary)' : 'var(--text2)', label: f ? 'Retirer des favoris' : 'Ajouter aux favoris', pressed: f ? 'true' : 'false', onClick: () => this.toggleFav(id) }; };
     const resumeRow = () => { const q = P.quiz; return row({ icon: 'clock', iconBg: 'var(--warnTint)', iconColor: 'var(--warn)', title: 'Reprendre : ' + q.title, sub: 'Question ' + (q.idx + 1) + ' / ' + q.qs.length + (q.timed ? ' · ' + fmt(q.timeLeft) + ' restantes' : '') + ' · sauvegardé', chev: true, onClick: () => this.resumeQuiz() }); };
-    const T = { theme: 'Thème', errors: 'Mes erreurs', favs: 'Mes favoris', traps: 'Questions pièges', dates: 'Dates à retenir', flash: 'Flashcards', question: 'Question', examIntro: 'Examen blanc', review: 'Correction des erreurs', history: 'Historique', settings: 'Paramètres', notifications: 'Notifications', about: 'À propos', lot: 'Lot de questions', result: 'Résultat' };
+    const T = { propose: 'Proposer une question', theme: 'Thème', errors: 'Mes erreurs', favs: 'Mes favoris', traps: 'Questions pièges', dates: 'Dates à retenir', flash: 'Flashcards', question: 'Question', examIntro: 'Examen blanc', review: 'Correction des erreurs', history: 'Historique', settings: 'Paramètres', notifications: 'Notifications', about: 'À propos', lot: 'Lot de questions', result: 'Résultat' };
     if (T[c.s]) bar = { ...back, title: T[c.s] };
 
     switch (c.s) {
@@ -600,6 +657,7 @@ export default class App extends Component {
         largeTitle = 'Profil'; profile = { initials: bank.initials, name: bank.name, sub: O.pct + ' % de préparation · ' + plural(O.total, 'question') };
         const rows = [
           row({ icon: 'target', title: 'Type de préparation', sub: plural(O.total, 'question') + ' · ' + plural(bank.lots.length, 'lot'), value: bank.short, chev: true, onClick: () => this.openSheet('prep') }),
+          row({ icon: 'sparkles', title: 'Proposer une question', sub: 'Texte ou photo, envoyé à l’auteur', chev: true, onClick: () => this.openPropose() }),
           row({ icon: 'sliders', title: 'Paramètres', chev: true, onClick: () => this.push({ s: 'settings' }) }),
           canNotify && row({ icon: 'bell', title: 'Notifications', value: remOn ? st.time : 'Désactivées', chev: true, onClick: () => this.push({ s: 'notifications' }) }),
           row({ icon: 'sun', title: 'Apparence', value: { system: 'Système', light: 'Clair', dark: 'Sombre' }[st.theme], chev: true, onClick: () => this.openSheet('appearance') }),
@@ -632,11 +690,25 @@ export default class App extends Component {
         if (granted) groups.push(G(null, [row({ icon: 'bell', title: 'Envoyer une notification de test', chev: true, onClick: () => { testNotification('Les rappels de Civi fonctionnent sur cet appareil.'); this.toast('Notification envoyée'); } })]));
         break;
       }
+      case 'propose': {
+        const p = s.pf; if (!p) break;
+        const filled = p.a.filter((t) => t.trim()).length;
+        const complete = p.q.trim() && filled >= 2 && p.c != null && p.a[p.c]?.trim();
+        const ok = complete || p.img || (p.q.trim() && p.note.trim());
+        propose = {
+          p, preps: PREPS.map((b) => ({ id: b.id, name: b.name })), themes: THEMES.map((t) => ({ id: t.id, name: t.name })), LET,
+          set: (patch) => this.setPf(patch), setA: (i, v) => this.setPf({ a: p.a.map((t, j) => (j === i ? v : t)) }), pick: (f) => this.pickImage(f),
+          imgIcon: ic('download', 20),
+        };
+        intro = 'Propose une nouvelle question : remplis les champs, ou envoie simplement une photo (livret, document officiel…). Elle sera vérifiée avant d’être ajoutée.';
+        sticky = primary(p.sending ? 'Envoi…' : 'Envoyer la proposition', () => this.submitPropose(), { disabled: !ok || p.sending, op: !ok || p.sending ? 0.45 : 1 });
+        break;
+      }
       case 'about':
         groups = [
           G(null, [row({ title: 'Version', value: APP_VERSION }), row({ title: 'Préparation', value: bank.short }), row({ title: 'Banque de questions', value: plural(O.total, 'question') + ' · ' + plural(bank.lots.length, 'lot') })]),
           G('Sources officielles', [row({ title: 'Livret du citoyen', sub: 'Ministère de l’Intérieur' }), row({ title: 'Service-Public.fr', sub: 'Démarches et droits' }), row({ title: 'Légifrance', sub: 'Constitution et lois' })]),
-          G('Confidentialité', [row({ title: 'Tes données restent sur ton téléphone', sub: 'Aucun compte requis. Aucune donnée partagée.' })]),
+          G('Confidentialité', [row({ title: 'Tes données restent sur ton téléphone', sub: 'Aucun compte requis. Seuls les signalements et propositions que tu choisis d’envoyer sont transmis à l’auteur.' })]),
         ]; break;
       case 'history': {
         const exams = P.history.filter((h) => h.mode === 'exam');
@@ -755,7 +827,7 @@ export default class App extends Component {
     const tabs = TABS.map(([id, label, icn]) => { const a = s.tab === id; return { id, label, icon: ic(icn, 22, a ? 2 : 1.5), color: a ? 'var(--primaryText)' : 'var(--text2)', pill: a ? 'var(--tint)' : 'transparent', weight: a ? 600 : 500, current: a ? 'page' : undefined, onClick: () => this.switchTab(id) }; });
     const toastPx = (showNav ? 72 : 0) + (sticky ? (sticky.secondary && sticky.dir === 'column' ? 140 : 86) : 0) + 24;
     const toast = s.toast ? { m: s.toast.m, icon: ic(s.toast.icon, 18, 2.5), bottom: 'calc(' + toastPx + 'px + var(--safe-bottom))' } : null;
-    return { bar, quizBar, largeTitle, home, testHero, progHero, profile, intro, fiche, flash, qv, res, chips, groups, empty, sticky, showNav, tabs, toast, sheet, safeBg: showNav ? 'var(--surface)' : 'var(--bg)' };
+    return { propose, bar, quizBar, largeTitle, home, testHero, progHero, profile, intro, fiche, flash, qv, res, chips, groups, empty, sticky, showNav, tabs, toast, sheet, safeBg: showNav ? 'var(--surface)' : 'var(--bg)' };
   }
 
   onSheetDown = (e) => { this.dragY = e.clientY; this.setState({ dragging: true }); if (e.currentTarget.setPointerCapture) e.currentTarget.setPointerCapture(e.pointerId); };
@@ -780,6 +852,7 @@ export default class App extends Component {
             {v.fiche && <Fiche f={v.fiche} />}
             {v.flash && <Flash f={v.flash} cardRef={this.cardRef} />}
             {v.qv && <QuestionView qv={v.qv} />}
+            {v.propose && <ProposeForm f={v.propose} />}
             {v.res && <Result r={v.res} />}
             {v.chips && <Chips chips={v.chips} />}
             {v.groups.map((g, gi) => <Group key={gi} g={g} />)}
@@ -1090,6 +1163,48 @@ function Nav({ tabs }) {
         </button>
       ))}
     </nav>
+  );
+}
+
+function ProposeForm({ f }) {
+  const { p } = f;
+  const field = { width: '100%', boxSizing: 'border-box', padding: 12, borderRadius: 10, border: '1px solid var(--line)', background: 'var(--surface)', color: 'var(--text)', font: '400 16px/1.4 var(--font-body)' };
+  const label = { fontSize: 13, fontWeight: 600, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--text2)' };
+  const box = { display: 'flex', flexDirection: 'column', gap: 8 };
+  return (
+    <div style={{ padding: '0 20px', display: 'flex', flexDirection: 'column', gap: 18 }}>
+      <div style={{ display: 'flex', gap: 10 }}>
+        <label style={{ ...box, flex: 1 }}><span style={label}>Préparation</span>
+          <select value={p.prep} onChange={(e) => f.set({ prep: e.target.value })} style={field}>{f.preps.map((o) => <option key={o.id} value={o.id}>{o.name}</option>)}</select></label>
+        <label style={{ ...box, flex: 1 }}><span style={label}>Thème</span>
+          <select value={p.theme} onChange={(e) => f.set({ theme: e.target.value })} style={field}><option value="">Je ne sais pas</option>{f.themes.map((o) => <option key={o.id} value={o.id}>{o.name}</option>)}</select></label>
+      </div>
+      <label style={box}><span style={label}>Question</span>
+        <textarea value={p.q} onChange={(e) => f.set({ q: e.target.value })} rows={3} maxLength={600} placeholder="Ex. : Quelle est la devise de la République ?" style={{ ...field, resize: 'vertical' }} /></label>
+      <div style={box}><span style={label}>Réponses · touche la lettre de la bonne</span>
+        {p.a.map((t, i) => {
+          const good = p.c === i;
+          return (
+            <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <button type="button" onClick={() => f.set({ c: good ? null : i })} aria-label={'Bonne réponse : ' + f.LET[i]} aria-pressed={good} style={{ width: 44, height: 44, flex: 'none', borderRadius: 8, border: good ? 'none' : '1px solid var(--line)', background: good ? 'var(--success)' : 'var(--surface)', color: good ? '#fff' : 'var(--text)', font: '600 18px/1 var(--font-heading)', cursor: 'pointer' }}>{good ? '✓' : f.LET[i]}</button>
+              <input value={t} onChange={(e) => f.setA(i, e.target.value)} maxLength={300} placeholder={'Réponse ' + f.LET[i] + (i >= 2 ? ' (facultative)' : '')} style={field} />
+            </div>
+          );
+        })}
+      </div>
+      <label style={box}><span style={label}>À retenir (facultatif)</span>
+        <textarea value={p.x} onChange={(e) => f.set({ x: e.target.value })} rows={2} maxLength={600} placeholder="Explication ou source" style={{ ...field, resize: 'vertical' }} /></label>
+      <div style={box}><span style={label}>Photo (facultative)</span>
+        {p.preview
+          ? <div style={{ position: 'relative' }}><img src={p.preview} alt="Aperçu" style={{ width: '100%', maxHeight: 260, objectFit: 'contain', borderRadius: 10, background: 'var(--surface2)' }} />
+              <button type="button" onClick={() => f.pick(null)} style={{ position: 'absolute', top: 8, right: 8, padding: '6px 10px', border: 'none', borderRadius: 8, background: 'var(--scrim)', color: '#fff', font: '600 14px/1 var(--font-body)', cursor: 'pointer' }}>Retirer</button></div>
+          : <label style={{ ...field, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, minHeight: 64, borderStyle: 'dashed', color: 'var(--primaryText)', fontWeight: 600, cursor: 'pointer' }}>
+              {f.imgIcon}Ajouter une photo ou une capture
+              <input type="file" accept="image/*" onChange={(e) => f.pick(e.target.files[0])} style={{ display: 'none' }} /></label>}
+      </div>
+      <label style={box}><span style={label}>Commentaire (facultatif)</span>
+        <textarea value={p.note} onChange={(e) => f.set({ note: e.target.value })} rows={2} maxLength={600} placeholder="Source, contexte…" style={{ ...field, resize: 'vertical' }} /></label>
+    </div>
   );
 }
 
