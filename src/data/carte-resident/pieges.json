@@ -1,91 +1,818 @@
 {
- "titre": "Questions pièges",
- "description": "Questions où l’on se trompe souvent.",
- "questions": [
-  {
-   "id": "cr-1-08",
-   "theme": "institutions",
-   "question": "Combien y a-t-il de députés à l’Assemblée nationale ?",
-   "reponses": [
-    "348",
-    "577",
-    "925",
-    "101"
-   ],
-   "bonne_reponse": "B",
-   "explication": "Les 577 députés sont élus au suffrage universel direct pour 5 ans. Le Sénat compte 348 sénateurs.",
-   "piege": true
-  },
-  {
-   "id": "cr-1-10",
-   "theme": "institutions",
-   "question": "Quelle institution vérifie que les lois respectent la Constitution ?",
-   "reponses": [
-    "Le Conseil constitutionnel",
-    "Le Conseil d’État",
-    "La Cour des comptes",
-    "Le Sénat"
-   ],
-   "bonne_reponse": "A",
-   "explication": "Le Conseil constitutionnel peut censurer une loi contraire à la Constitution. Le Conseil d’État, lui, conseille le Gouvernement et juge l’administration.",
-   "piege": true
-  },
-  {
-   "id": "cr-1-13",
-   "theme": "histoire",
-   "question": "En quelle année l’esclavage a-t-il été définitivement aboli en France ?",
-   "reponses": [
-    "1789",
-    "1848",
-    "1905",
-    "1946"
-   ],
-   "bonne_reponse": "B",
-   "explication": "Le décret du 27 avril 1848, porté par Victor Schœlcher, abolit définitivement l’esclavage (une première abolition de 1794 avait été annulée en 1802).",
-   "piege": true
-  },
-  {
-   "id": "cr-2-07",
-   "theme": "droits",
-   "question": "Depuis 2020, jusqu’à quel âge la formation est-elle obligatoire pour les jeunes ?",
-   "reponses": [
-    "18 ans",
-    "16 ans",
-    "21 ans",
-    "25 ans"
-   ],
-   "bonne_reponse": "A",
-   "explication": "Après l’instruction obligatoire (3-16 ans), les jeunes de 16 à 18 ans doivent être en études, en apprentissage, en emploi ou en service civique.",
-   "piege": true
-  },
-  {
-   "id": "cr-2-12",
-   "theme": "histoire",
-   "question": "Quel est le plus long fleuve de France ?",
-   "reponses": [
-    "La Seine",
-    "Le Rhône",
-    "La Loire",
-    "La Garonne"
-   ],
-   "bonne_reponse": "C",
-   "explication": "La Loire mesure environ 1 000 km. La Seine, qui traverse Paris, est plus courte.",
-   "piege": true
-  },
-  {
-   "id": "cr-3-09",
-   "theme": "droits",
-   "question": "L’impôt est prélevé à la source. Devez-vous quand même déclarer vos revenus ?",
-   "reponses": [
-    "Non, c’est inutile",
-    "Seulement si vous êtes français",
-    "Seulement tous les 5 ans",
-    "Oui, chaque année, même si vous ne payez pas d’impôt"
-   ],
-   "bonne_reponse": "D",
-   "explication": "La déclaration annuelle reste obligatoire : elle permet de calculer le taux de prélèvement et l’accès à certaines aides.",
-   "situation": true,
-   "piege": true
-  }
- ]
+  "titre": "Questions pièges - Carte de résident",
+  "description": "58 questions pièges ciblant les confusions fréquentes : dates, nombres, institutions, laïcité, droits, Europe, histoire et société.",
+  "questions": [
+    {
+      "id": "cr-piege-001",
+      "theme": "institutions",
+      "question": "Combien de membres composent l'Assemblée nationale, et non le Sénat ?",
+      "reponses": [
+        "348",
+        "577",
+        "720",
+        "925"
+      ],
+      "bonne_reponse": "B",
+      "explication": "L'Assemblée nationale compte 577 députés. Le Sénat compte 348 sénateurs.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-002",
+      "theme": "institutions",
+      "question": "Combien de sénateurs compte le Sénat français ?",
+      "reponses": [
+        "577",
+        "348",
+        "81",
+        "101"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Le Sénat compte 348 sénateurs ; 577 correspond au nombre de députés.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-003",
+      "theme": "institutions",
+      "question": "Pour combien de temps un sénateur est-il élu ?",
+      "reponses": [
+        "3 ans",
+        "5 ans",
+        "6 ans",
+        "7 ans"
+      ],
+      "bonne_reponse": "C",
+      "explication": "Le mandat d'un sénateur est de 6 ans. Le Sénat est renouvelé par moitié tous les 3 ans.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-004",
+      "theme": "institutions",
+      "question": "Quelle est la durée du mandat du président de la République ?",
+      "reponses": [
+        "4 ans",
+        "5 ans",
+        "6 ans",
+        "7 ans"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Le mandat présidentiel est de 5 ans.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-005",
+      "theme": "institutions",
+      "question": "Quelle est la durée du mandat du maire et des conseillers municipaux ?",
+      "reponses": [
+        "5 ans",
+        "6 ans",
+        "7 ans",
+        "3 ans"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Le mandat municipal est de 6 ans.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-006",
+      "theme": "institutions",
+      "question": "Combien la France compte-t-elle de régions au total, outre-mer compris ?",
+      "reponses": [
+        "13",
+        "18",
+        "22",
+        "101"
+      ],
+      "bonne_reponse": "B",
+      "explication": "La France compte 18 régions au total : 13 en métropole, en comptant la Corse, et 5 régions d'outre-mer.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-007",
+      "theme": "institutions",
+      "question": "Combien de régions compte la France métropolitaine, Corse comprise ?",
+      "reponses": [
+        "13",
+        "18",
+        "22",
+        "101"
+      ],
+      "bonne_reponse": "A",
+      "explication": "La France métropolitaine compte 13 régions, Corse comprise.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-008",
+      "theme": "institutions",
+      "question": "Combien la France compte-t-elle de départements ?",
+      "reponses": [
+        "18",
+        "96",
+        "101",
+        "577"
+      ],
+      "bonne_reponse": "C",
+      "explication": "La France compte 101 départements, dont 5 ultramarins.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-009",
+      "theme": "institutions",
+      "question": "Qui représente l'État dans le département ?",
+      "reponses": [
+        "Le maire",
+        "Le préfet",
+        "Le président du conseil régional",
+        "Le député"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Le préfet est le représentant de l'État dans le département.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-010",
+      "theme": "institutions",
+      "question": "Le Parlement français est composé de :",
+      "reponses": [
+        "L'Assemblée nationale et le Sénat",
+        "Le Gouvernement et le Sénat",
+        "Le Conseil constitutionnel et l'Assemblée nationale",
+        "Le Président et le Gouvernement"
+      ],
+      "bonne_reponse": "A",
+      "explication": "Le Parlement comprend deux chambres : l'Assemblée nationale et le Sénat.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-011",
+      "theme": "institutions",
+      "question": "Qui exerce le pouvoir législatif ?",
+      "reponses": [
+        "Le Parlement",
+        "Le Gouvernement seul",
+        "Les préfets",
+        "Les tribunaux"
+      ],
+      "bonne_reponse": "A",
+      "explication": "Le Parlement vote la loi et contrôle l'action du Gouvernement.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-012",
+      "theme": "institutions",
+      "question": "Un texte présenté par le Gouvernement s'appelle :",
+      "reponses": [
+        "Une proposition de loi",
+        "Un projet de loi",
+        "Un décret municipal",
+        "Une motion"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Un projet de loi vient du Gouvernement ; une proposition de loi vient d'un parlementaire.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-013",
+      "theme": "institutions",
+      "question": "Après l'adoption d'une loi, dans quel délai le président de la République la promulgue-t-il en principe ?",
+      "reponses": [
+        "5 jours",
+        "10 jours",
+        "15 jours",
+        "30 jours"
+      ],
+      "bonne_reponse": "C",
+      "explication": "La Constitution prévoit la promulgation dans les 15 jours suivant la transmission au Gouvernement de la loi définitivement adoptée.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-014",
+      "theme": "institutions",
+      "question": "Quel est le dernier niveau de juridiction de l'ordre judiciaire ?",
+      "reponses": [
+        "Le Conseil d'État",
+        "La Cour de cassation",
+        "Le Conseil constitutionnel",
+        "La Cour des comptes"
+      ],
+      "bonne_reponse": "B",
+      "explication": "La Cour de cassation est la juridiction suprême de l'ordre judiciaire ; le Conseil d'État l'est pour l'ordre administratif.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-015",
+      "theme": "institutions",
+      "question": "Quel est le dernier niveau de juridiction de l'ordre administratif ?",
+      "reponses": [
+        "La Cour de cassation",
+        "Le Conseil d'État",
+        "Le Sénat",
+        "Le Défenseur des droits"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Le Conseil d'État est la juridiction suprême de l'ordre administratif.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-016",
+      "theme": "institutions",
+      "question": "Combien d'États membres compte l'Union européenne ?",
+      "reponses": [
+        "12",
+        "19",
+        "27",
+        "28"
+      ],
+      "bonne_reponse": "C",
+      "explication": "L'Union européenne compte 27 États membres.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-017",
+      "theme": "institutions",
+      "question": "Combien d'étoiles figurent sur le drapeau européen ?",
+      "reponses": [
+        "6",
+        "12",
+        "27",
+        "28"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Le drapeau européen comporte 12 étoiles. Ce nombre ne correspond pas au nombre d'États membres.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-018",
+      "theme": "institutions",
+      "question": "Quand célèbre-t-on la Journée de l'Europe ?",
+      "reponses": [
+        "8 mai",
+        "9 mai",
+        "14 juillet",
+        "11 novembre"
+      ],
+      "bonne_reponse": "B",
+      "explication": "La Journée de l'Europe est le 9 mai, anniversaire de la déclaration Schuman du 9 mai 1950.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-019",
+      "theme": "institutions",
+      "question": "En quelle année le traité de Maastricht a-t-il été signé ?",
+      "reponses": [
+        "1957",
+        "1985",
+        "1992",
+        "2002"
+      ],
+      "bonne_reponse": "C",
+      "explication": "Le traité de Maastricht a été signé en 1992.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-020",
+      "theme": "institutions",
+      "question": "L'euro est devenu monnaie unique pour les opérations scripturales en :",
+      "reponses": [
+        "1992",
+        "1999",
+        "2002",
+        "2007"
+      ],
+      "bonne_reponse": "B",
+      "explication": "L'euro a été introduit comme monnaie unique en 1999 ; les pièces et billets ont circulé à partir de 2002.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-021",
+      "theme": "institutions",
+      "question": "Les pièces et billets en euros ont été mis en circulation en France en :",
+      "reponses": [
+        "1999",
+        "2000",
+        "2002",
+        "2007"
+      ],
+      "bonne_reponse": "C",
+      "explication": "Les pièces et billets en euros circulent depuis le 1er janvier 2002.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-022",
+      "theme": "institutions",
+      "question": "Où se trouve le siège officiel du Parlement européen ?",
+      "reponses": [
+        "Bruxelles",
+        "Strasbourg",
+        "Luxembourg",
+        "Paris"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Le siège officiel du Parlement européen est à Strasbourg ; une grande partie de son travail se déroule aussi à Bruxelles.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-023",
+      "theme": "institutions",
+      "question": "Où se trouve le siège principal de la Commission européenne ?",
+      "reponses": [
+        "Strasbourg",
+        "Bruxelles",
+        "Luxembourg",
+        "Francfort"
+      ],
+      "bonne_reponse": "B",
+      "explication": "La Commission européenne siège principalement à Bruxelles.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-024",
+      "theme": "institutions",
+      "question": "Où siège la Cour de justice de l'Union européenne ?",
+      "reponses": [
+        "Paris",
+        "Bruxelles",
+        "Strasbourg",
+        "Luxembourg"
+      ],
+      "bonne_reponse": "D",
+      "explication": "La Cour de justice de l'Union européenne siège à Luxembourg.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-025",
+      "theme": "valeurs",
+      "question": "La loi séparant les Églises et l'État date de :",
+      "reponses": [
+        "1789",
+        "1882",
+        "1905",
+        "2004"
+      ],
+      "bonne_reponse": "C",
+      "explication": "La grande loi de séparation des Églises et de l'État date de 1905.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-026",
+      "theme": "valeurs",
+      "question": "La loi interdisant les signes religieux ostensibles aux élèves dans les écoles, collèges et lycées publics date de :",
+      "reponses": [
+        "1905",
+        "1958",
+        "2004",
+        "2010"
+      ],
+      "bonne_reponse": "C",
+      "explication": "Cette règle résulte de la loi du 15 mars 2004.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-027",
+      "theme": "valeurs",
+      "question": "L'interdiction de dissimuler son visage dans l'espace public date de :",
+      "reponses": [
+        "1905",
+        "2004",
+        "2010",
+        "2021"
+      ],
+      "bonne_reponse": "C",
+      "explication": "La loi du 11 octobre 2010 interdit la dissimulation du visage dans l'espace public, sous les réserves prévues par la loi.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-028",
+      "theme": "valeurs",
+      "question": "Un usager qui vient à la mairie peut-il porter un signe religieux ?",
+      "reponses": [
+        "Oui, en respectant le fonctionnement du service",
+        "Non, jamais",
+        "Seulement s'il est fonctionnaire",
+        "Seulement avec l'autorisation du maire"
+      ],
+      "bonne_reponse": "A",
+      "explication": "L'obligation de neutralité religieuse s'impose aux agents publics, pas aux usagers, sous réserve du respect de l'ordre public et du service.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-029",
+      "theme": "valeurs",
+      "question": "Un agent public peut-il porter un signe religieux visible pendant son service ?",
+      "reponses": [
+        "Oui, toujours",
+        "Oui, si le signe est discret",
+        "Non, il est soumis à la neutralité",
+        "Seulement le vendredi"
+      ],
+      "bonne_reponse": "C",
+      "explication": "Les agents publics doivent respecter une stricte neutralité religieuse dans l'exercice de leurs fonctions.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-030",
+      "theme": "valeurs",
+      "question": "Le blasphème est-il interdit en France ?",
+      "reponses": [
+        "Oui, toujours",
+        "Non, la critique d'une religion est permise ; les injures ou appels à la haine contre des personnes restent interdits",
+        "Oui, seulement sur internet",
+        "Oui, si la religion est majoritaire"
+      ],
+      "bonne_reponse": "B",
+      "explication": "La liberté d'expression permet de critiquer une religion ; elle ne permet pas les injures, la haine ou la discrimination envers des personnes.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-031",
+      "theme": "valeurs",
+      "question": "Quel symbole n'est pas un symbole officiel de la République ?",
+      "reponses": [
+        "Le drapeau tricolore",
+        "Marianne",
+        "La Marseillaise",
+        "Le coq"
+      ],
+      "bonne_reponse": "D",
+      "explication": "Le coq est un symbole national très utilisé mais il n'est pas un symbole officiel de la République.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-032",
+      "theme": "valeurs",
+      "question": "Quelle est l'unique langue officielle de la République française ?",
+      "reponses": [
+        "Le français",
+        "Le français et le breton",
+        "Le français et le corse",
+        "Toutes les langues régionales"
+      ],
+      "bonne_reponse": "A",
+      "explication": "L'article 2 de la Constitution dispose que la langue de la République est le français.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-033",
+      "theme": "droits",
+      "question": "Le vote est-il obligatoire en France ?",
+      "reponses": [
+        "Oui",
+        "Non, c'est un droit",
+        "Oui seulement à la présidentielle",
+        "Oui seulement aux municipales"
+      ],
+      "bonne_reponse": "B",
+      "explication": "En France, le vote est un droit et n'est pas obligatoire.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-034",
+      "theme": "droits",
+      "question": "Peut-on voter à la place d'une autre personne ?",
+      "reponses": [
+        "Jamais",
+        "Oui, avec une procuration régulière",
+        "Oui, entre membres d'une même famille sans formalité",
+        "Oui, si la personne est malade, sans procuration"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Le vote par procuration permet à un électeur de mandater une autre personne selon la procédure prévue.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-035",
+      "theme": "histoire",
+      "question": "En quelle année les femmes françaises ont-elles obtenu le droit de vote ?",
+      "reponses": [
+        "1936",
+        "1944",
+        "1945",
+        "1958"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Le droit de vote des femmes a été accordé par l'ordonnance du 21 avril 1944 ; elles ont voté pour la première fois en 1945.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-036",
+      "theme": "histoire",
+      "question": "Depuis quelle année le président de la République est-il élu au suffrage universel direct ?",
+      "reponses": [
+        "1958",
+        "1962",
+        "1965",
+        "1974"
+      ],
+      "bonne_reponse": "B",
+      "explication": "La réforme instituant l'élection présidentielle au suffrage universel direct date de 1962 ; la première élection selon ce mode a eu lieu en 1965.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-037",
+      "theme": "histoire",
+      "question": "La peine de mort a été abolie en France en :",
+      "reponses": [
+        "1945",
+        "1968",
+        "1981",
+        "2007"
+      ],
+      "bonne_reponse": "C",
+      "explication": "La peine de mort a été abolie par la loi du 9 octobre 1981 ; son interdiction a été inscrite dans la Constitution en 2007.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-038",
+      "theme": "droits",
+      "question": "La loi Veil autorisant l'IVG date de :",
+      "reponses": [
+        "1965",
+        "1975",
+        "1981",
+        "2024"
+      ],
+      "bonne_reponse": "B",
+      "explication": "La loi Veil date de 1975. En 2024, la liberté garantie de recourir à l'IVG a été inscrite dans la Constitution.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-039",
+      "theme": "droits",
+      "question": "Depuis quelle année la liberté garantie de recourir à l'IVG est-elle inscrite dans la Constitution ?",
+      "reponses": [
+        "1975",
+        "1981",
+        "2000",
+        "2024"
+      ],
+      "bonne_reponse": "D",
+      "explication": "La révision constitutionnelle du 8 mars 2024 a inscrit cette liberté dans la Constitution.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-040",
+      "theme": "droits",
+      "question": "Depuis 2021, la PMA est ouverte en France :",
+      "reponses": [
+        "Uniquement aux couples mariés homme-femme",
+        "À toutes les femmes, seules ou en couple, dans les conditions prévues par la loi",
+        "Uniquement aux femmes de nationalité française",
+        "Uniquement aux couples ayant déjà un enfant"
+      ],
+      "bonne_reponse": "B",
+      "explication": "La loi de bioéthique du 2 août 2021 a ouvert la PMA aux couples de femmes et aux femmes non mariées.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-041",
+      "theme": "societe",
+      "question": "À quel âge commence l'instruction obligatoire ?",
+      "reponses": [
+        "2 ans",
+        "3 ans",
+        "6 ans",
+        "16 ans"
+      ],
+      "bonne_reponse": "B",
+      "explication": "L'instruction est obligatoire à partir de 3 ans.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-042",
+      "theme": "societe",
+      "question": "Jusqu'à quel âge l'instruction est-elle obligatoire ?",
+      "reponses": [
+        "14 ans",
+        "16 ans",
+        "18 ans",
+        "21 ans"
+      ],
+      "bonne_reponse": "B",
+      "explication": "L'instruction obligatoire concerne les enfants de 3 à 16 ans. Une obligation de formation s'applique ensuite aux jeunes de 16 à 18 ans.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-043",
+      "theme": "societe",
+      "question": "Quel est l'âge de la majorité civile en France ?",
+      "reponses": [
+        "16 ans",
+        "17 ans",
+        "18 ans",
+        "21 ans"
+      ],
+      "bonne_reponse": "C",
+      "explication": "La majorité civile est fixée à 18 ans.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-044",
+      "theme": "societe",
+      "question": "Quel numéro appelle-t-on en priorité pour joindre la police ou la gendarmerie en urgence ?",
+      "reponses": [
+        "15",
+        "17",
+        "18",
+        "119"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Le 17 permet de joindre la police ou la gendarmerie en urgence.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-045",
+      "theme": "droits",
+      "question": "Quel est l'ordre correct des infractions de la moins grave à la plus grave ?",
+      "reponses": [
+        "Crime, délit, contravention",
+        "Contravention, délit, crime",
+        "Délit, crime, contravention",
+        "Contravention, crime, délit"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Les infractions sont classées, par gravité croissante : contravention, délit, crime.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-046",
+      "theme": "histoire",
+      "question": "Quel fleuve traverse Paris ?",
+      "reponses": [
+        "La Loire",
+        "La Seine",
+        "Le Rhône",
+        "La Garonne"
+      ],
+      "bonne_reponse": "B",
+      "explication": "La Seine traverse Paris ; la Loire est le plus long fleuve entièrement français.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-047",
+      "theme": "histoire",
+      "question": "Quelle chaîne de montagnes sépare la France de l'Espagne ?",
+      "reponses": [
+        "Les Alpes",
+        "Le Jura",
+        "Les Pyrénées",
+        "Les Vosges"
+      ],
+      "bonne_reponse": "C",
+      "explication": "Les Pyrénées forment une frontière naturelle entre la France et l'Espagne.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-048",
+      "theme": "histoire",
+      "question": "Quelle île française se situe dans l'océan Indien ?",
+      "reponses": [
+        "La Corse",
+        "La Martinique",
+        "La Réunion",
+        "La Guadeloupe"
+      ],
+      "bonne_reponse": "C",
+      "explication": "La Réunion est une île française de l'océan Indien.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-049",
+      "theme": "histoire",
+      "question": "Que commémore le 8 mai ?",
+      "reponses": [
+        "L'armistice de 1918",
+        "La victoire de 1945 en Europe",
+        "La prise de la Bastille",
+        "L'appel du 18 juin"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Le 8 mai commémore la victoire de 1945 et la fin de la Seconde Guerre mondiale en Europe.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-050",
+      "theme": "histoire",
+      "question": "Que commémore le 11 novembre ?",
+      "reponses": [
+        "La victoire de 1945",
+        "L'armistice de 1918",
+        "La fête nationale",
+        "Le débarquement de Normandie"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Le 11 novembre commémore l'armistice du 11 novembre 1918.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-051",
+      "theme": "histoire",
+      "question": "Le débarquement allié du 6 juin 1944 a eu lieu principalement :",
+      "reponses": [
+        "En Provence",
+        "En Normandie",
+        "En Bretagne",
+        "En Corse"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Le débarquement du 6 juin 1944 a eu lieu en Normandie. Un autre débarquement allié a eu lieu en Provence le 15 août 1944.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-052",
+      "theme": "histoire",
+      "question": "Quelle est la région la plus peuplée de France ?",
+      "reponses": [
+        "Bretagne",
+        "Île-de-France",
+        "Corse",
+        "Centre-Val de Loire"
+      ],
+      "bonne_reponse": "B",
+      "explication": "L'Île-de-France est la région la plus peuplée.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-053",
+      "theme": "histoire",
+      "question": "Environ combien d'habitants compte la France en 2025 ?",
+      "reponses": [
+        "48 millions",
+        "58 millions",
+        "68 millions",
+        "88 millions"
+      ],
+      "bonne_reponse": "C",
+      "explication": "La population française est d'environ 68 millions d'habitants en 2025.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-054",
+      "theme": "histoire",
+      "question": "Combien de personnes parlent français dans le monde, selon le support officiel de formation civique ?",
+      "reponses": [
+        "Moins de 100 millions",
+        "Environ 150 millions",
+        "Plus de 300 millions",
+        "Plus d'un milliard"
+      ],
+      "bonne_reponse": "C",
+      "explication": "Le support officiel indique que le français compte plus de 300 millions de locuteurs dans le monde.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-055",
+      "theme": "histoire",
+      "question": "Quel est le classement du français parmi les langues les plus parlées dans le monde selon le support officiel ?",
+      "reponses": [
+        "2e",
+        "3e",
+        "5e",
+        "8e"
+      ],
+      "bonne_reponse": "C",
+      "explication": "Le support officiel présente le français comme la 5e langue la plus parlée au monde.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-056",
+      "theme": "histoire",
+      "question": "Quel département est donné comme le plus touristique dans les questions d'entraînement CR ?",
+      "reponses": [
+        "La Creuse",
+        "Paris",
+        "La Lozère",
+        "L'Ariège"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Paris est la réponse attendue dans la banque CR pour cette question.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-057",
+      "theme": "histoire",
+      "question": "Quelle date est la fête nationale française ?",
+      "reponses": [
+        "8 mai",
+        "9 mai",
+        "14 juillet",
+        "11 novembre"
+      ],
+      "bonne_reponse": "C",
+      "explication": "La fête nationale est célébrée le 14 juillet.",
+      "piege": true
+    },
+    {
+      "id": "cr-piege-058",
+      "theme": "histoire",
+      "question": "Quelle année correspond au début du Premier Empire de Napoléon Ier ?",
+      "reponses": [
+        "1789",
+        "1792",
+        "1804",
+        "1815"
+      ],
+      "bonne_reponse": "C",
+      "explication": "Napoléon Ier devient empereur en 1804.",
+      "piege": true
+    }
+  ]
 }
