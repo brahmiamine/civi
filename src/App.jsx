@@ -450,14 +450,17 @@ export default class App extends Component {
       case 'examLength': return { title: 'Longueur de l’examen blanc', sub: 'L’examen officiel compte 40 questions en 45 minutes.', options: pick('examLength', [[40, '40 questions', 'Conditions réelles · 45 min'], [20, '20 questions', 'Entraînement court · ' + examMinutes(20) + ' min'], [10, '10 questions', 'Démo · ' + examMinutes(10) + ' min']]) };
       case 'report': {
         const q = this.reportQ; if (!q) return null;
-        const send = (reason) => {
-          const comment = reason === 'Autre' || reason === 'Réponse incorrecte' ? window.prompt('Précise le problème (facultatif) :') : '';
-          if (comment === null) return;
+        const reason = s.reportReason, text = s.reportText || '';
+        const send = () => {
           this.closeSheet();
           if (!navigator.onLine) return this.toast('Pas de connexion : réessaie plus tard');
-          sendReport(this.reportCtx(bank, q), q, reason, (comment || '').slice(0, 1000)).then(() => this.toast('Merci, signalement envoyé'), () => this.toast('Échec de l’envoi, réessaie plus tard'));
+          sendReport(this.reportCtx(bank, q), q, reason, text.trim().slice(0, 1000)).then(() => this.toast('Merci, signalement envoyé'), () => this.toast('Échec de l’envoi, réessaie plus tard'));
         };
-        return { title: 'Signaler cette question', sub: 'Choisis le problème. Le signalement est envoyé anonymement à l’auteur de l’application.', options: REPORT_REASONS.map((r) => opt(r, null, false, () => send(r), ic('alert'))) };
+        return {
+          title: 'Signaler cette question', sub: 'Choisis le problème. Le signalement est envoyé anonymement à l’auteur de l’application.',
+          options: REPORT_REASONS.map((r) => opt(r, null, r === reason, () => this.setState({ reportReason: r }), ic('alert'))),
+          form: { value: text, placeholder: 'Précise le problème (facultatif)', onChange: (e) => this.setState({ reportText: e.target.value }), send: { label: 'Envoyer le signalement', disabled: !reason, onClick: send } },
+        };
       }
       case 'installHelp': return { title: 'Installer l’application', sub: installHelp() };
     }
@@ -488,7 +491,7 @@ export default class App extends Component {
     const primary = (label, onClick, o) => Object.assign({ label, onClick, dir: 'column', op: 1 }, o || {});
     const fsQ = { Petite: '20px', Normale: '23px', Grande: '26px' }[st.text], fsA = { Petite: '15px', Normale: '16px', Grande: '18px' }[st.text];
     const buildQv = (q, states, onPick, disabled, explain, order = q.a.map((_, i) => i)) => ({
-      theme: thById(q.t).short + (q.situation ? ' · Mise en situation' : ''), text: q.q, fs: fsQ, afs: fsA, explain, onReport: () => { this.reportQ = q; this.openSheet('report'); },
+      theme: thById(q.t).short + (q.situation ? ' · Mise en situation' : ''), text: q.q, fs: fsQ, afs: fsA, explain, onReport: () => { this.reportQ = q; this.setState({ reportReason: null, reportText: '' }); this.openSheet('report'); },
       answers: order.map((orig, i) => {
         const k = states[orig]; const m = {
           normal: { bg: 'var(--surface)', border: '2px solid var(--divider)', badgeBg: 'var(--surface2)', badgeColor: 'var(--text)', op: 1 },
@@ -1109,6 +1112,12 @@ function Sheet({ sheet, onClose, onDown, onMove, onUp }) {
                 {o.check && <span style={{ flex: 'none' }}>{o.check}</span>}
               </button>
             ))}
+          </div>
+        )}
+        {sheet.form && (
+          <div style={{ padding: '12px 20px 0', display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <textarea value={sheet.form.value} onChange={sheet.form.onChange} placeholder={sheet.form.placeholder} maxLength={1000} rows={3} aria-label={sheet.form.placeholder} style={{ resize: 'none', padding: 12, borderRadius: 10, border: '1px solid var(--line)', background: 'var(--surface)', color: 'var(--text)', font: '400 16px/1.4 var(--font-body)' }} />
+            <button className="p-btn" onClick={sheet.form.send.onClick} disabled={sheet.form.send.disabled} style={{ ...btnPrimary, height: 54, opacity: sheet.form.send.disabled ? 0.45 : 1, cursor: sheet.form.send.disabled ? 'default' : 'pointer' }}>{sheet.form.send.label}</button>
           </div>
         )}
         {sheet.confirm && (
