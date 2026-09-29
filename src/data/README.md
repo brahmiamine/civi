@@ -6,7 +6,10 @@ Chaque dossier est un **type de préparation** (un profil dans l’application) 
 src/data/
   carte-sejour-pluriannuelle/
     profil.json   ← nom, description, « L’essentiel » par thème, dates à retenir
-    lot-1.json    ← un lot de questions
+    questions.json  ← banque générale (révision, examen blanc, thèmes, erreurs…)
+    pieges.json     ← questions pièges (piege=true automatique)
+    situations.json ← mises en situation (situation=true automatique)
+    lot-1.json      ← lots : utilisés uniquement dans Tester → Lots de questions
     lot-2.json
   carte-resident/
   naturalisation/
@@ -51,3 +54,19 @@ Une question invalide (thème inconnu, bonne réponse absente, identifiant en do
 ## Examen blanc
 
 L’examen tire les questions de toute la préparation en suivant la répartition officielle par thème (sur 40 questions : 11 valeurs, 6 institutions, 11 droits et devoirs, 8 histoire-géographie-culture, 4 société). Pour un examen complet sans doublon, prévoir au moins ce nombre de questions par thème.
+
+## Trois fichiers de banque + lots
+
+- `questions.json`, `pieges.json`, `situations.json` forment la **banque** utilisée partout sauf dans « Lots de questions ».
+- Les `lot-N.json` ne servent qu’à **Tester → Lots de questions**. Une question d’un lot qui reprend l’`id` d’une question de la banque est la même question (progression partagée).
+- Sans ces trois fichiers, tous les lots forment la banque.
+
+## Format compact (grandes banques)
+
+Clés courtes acceptées en plus des clés longues : `t` (theme), `q` (question), `r` (reponses), `c` (bonne_reponse), `x` (explication), `p` (piege), `s` (situation). Un `theme` au niveau du fichier sert de valeur par défaut, et un `id` absent devient `<fichier>-<n>` (ne jamais réordonner ni supprimer : ajouter à la fin).
+
+```json
+{ "theme": "droits", "questions": [ { "q": "…", "r": ["…", "…", "…"], "c": "B", "x": "…" } ] }
+```
+
+Les fichiers sont des morceaux séparés du build (mis en cache hors ligne), ce qui permet plusieurs milliers de questions.

@@ -1,0 +1,118 @@
+{
+ "titre": "Mises en situation",
+ "description": "Cas concrets du quotidien.",
+ "questions": [
+  {
+   "id": "nat-3-07",
+   "theme": "droits",
+   "question": "Lors d’un entretien d’embauche, on vous demande votre religion. Que faire ?",
+   "reponses": [
+    "Je dois répondre",
+    "Rien ne m’oblige à répondre : l’employeur n’a pas le droit de le demander",
+    "Je dois répondre si l’entreprise est grande",
+    "Je dois fournir un certificat"
+   ],
+   "bonne_reponse": "B",
+   "explication": "Les questions sur la religion, l’origine ou la vie privée sont interdites lorsqu’elles sont sans lien avec le poste.",
+   "situation": true
+  },
+  {
+   "id": "nat-3-08",
+   "theme": "droits",
+   "question": "Un agent public vous propose d’accélérer votre dossier contre de l’argent. C’est :",
+   "reponses": [
+    "Normal",
+    "Autorisé pour une petite somme",
+    "De la corruption, un délit pour lui comme pour vous",
+    "Autorisé si le dossier est urgent"
+   ],
+   "bonne_reponse": "C",
+   "explication": "Proposer ou accepter un avantage pour obtenir une décision est puni par la loi.",
+   "situation": true
+  },
+  {
+   "id": "nat-3-09",
+   "theme": "droits",
+   "question": "Vous ne voulez pas faire vacciner votre bébé. Que dit la loi ?",
+   "reponses": [
+    "Aucun vaccin n’est obligatoire",
+    "C’est entièrement votre choix",
+    "Seul le vaccin contre la grippe est obligatoire",
+    "11 vaccins sont obligatoires pour les enfants nés depuis 2018, sauf contre-indication"
+   ],
+   "bonne_reponse": "D",
+   "explication": "Ces vaccins sont notamment exigés pour l’entrée en crèche et à l’école.",
+   "situation": true
+  },
+  {
+   "id": "nat-3-10",
+   "theme": "valeurs",
+   "question": "Un maire refuse de célébrer un mariage entre deux femmes au nom de ses convictions. Peut-il le faire ?",
+   "reponses": [
+    "Oui, c’est sa liberté de conscience",
+    "Oui, s’il prévient la préfecture",
+    "Non : il doit appliquer la loi et faire célébrer le mariage",
+    "Oui, dans les petites communes"
+   ],
+   "bonne_reponse": "C",
+   "explication": "Il n’existe pas de clause de conscience pour les officiers d’état civil ; le mariage peut être célébré par un adjoint.",
+   "situation": true
+  },
+  {
+   "id": "nat-3-12",
+   "theme": "valeurs",
+   "question": "Un parent demande que son enfant ne soit pas assis à côté d’un élève d’une autre religion. Que fait l’école ?",
+   "reponses": [
+    "Elle accepte",
+    "Elle refuse : c’est une discrimination contraire aux valeurs de la République",
+    "Elle accepte seulement dans le privé",
+    "Elle demande l’avis du maire"
+   ],
+   "bonne_reponse": "B",
+   "explication": "L’école publique accueille tous les enfants sans distinction.",
+   "situation": true
+  },
+  {
+   "id": "nat-3-13",
+   "theme": "valeurs",
+   "question": "Une personne affirme que les femmes ne peuvent pas diriger une entreprise. Qu’en pensez-vous ?",
+   "reponses": [
+    "C’est faux : l’égalité entre les femmes et les hommes est garantie",
+    "C’est vrai",
+    "C’est vrai pour les grandes entreprises",
+    "C’est vrai si le mari n’est pas d’accord"
+   ],
+   "bonne_reponse": "A",
+   "explication": "La Constitution favorise l’égal accès des femmes et des hommes aux responsabilités professionnelles et sociales.",
+   "situation": true
+  },
+  {
+   "id": "nat-3-14",
+   "theme": "societe",
+   "question": "Vous pensez qu’un enfant est maltraité par ses parents. Que faites-vous ?",
+   "reponses": [
+    "Je ne dis rien",
+    "J’appelle le 119 (Allô enfance en danger), ou le 17 en urgence",
+    "J’attends qu’il soit majeur",
+    "J’en parle seulement à sa famille"
+   ],
+   "bonne_reponse": "B",
+   "explication": "Le 119 est gratuit et joignable 24 h/24. Ne pas signaler des mauvais traitements peut être puni.",
+   "situation": true
+  },
+  {
+   "id": "nat-3-17",
+   "theme": "droits",
+   "question": "Vous êtes cité comme témoin dans un procès. Que devez-vous faire ?",
+   "reponses": [
+    "Me présenter et dire la vérité",
+    "Je peux refuser sans raison",
+    "Envoyer un proche à ma place",
+    "Répondre seulement si je suis français"
+   ],
+   "bonne_reponse": "A",
+   "explication": "Un témoin cité doit comparaître ; le faux témoignage est puni.",
+   "situation": true
+  }
+ ]
+}

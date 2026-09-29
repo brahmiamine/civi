@@ -1,0 +1,370 @@
+{
+ "titre": "Banque générale",
+ "description": "Questions de révision et d’examen.",
+ "questions": [
+  {
+   "id": "cr-1-01",
+   "theme": "valeurs",
+   "question": "Selon l’article 1er de la Constitution, la France est une République :",
+   "reponses": [
+    "Fédérale, laïque et libérale",
+    "Indivisible, laïque, démocratique et sociale",
+    "Indivisible, chrétienne et sociale",
+    "Démocratique, monarchique et sociale"
+   ],
+   "bonne_reponse": "B",
+   "explication": "L’article 1er affirme aussi l’égalité de tous les citoyens devant la loi, sans distinction d’origine, de race ou de religion."
+  },
+  {
+   "id": "cr-1-02",
+   "theme": "valeurs",
+   "question": "En quelle année a été votée la loi de séparation des Églises et de l’État ?",
+   "reponses": [
+    "1789",
+    "1882",
+    "1905",
+    "1958"
+   ],
+   "bonne_reponse": "C",
+   "explication": "La loi du 9 décembre 1905 garantit le libre exercice des cultes ; l’État n’en reconnaît et n’en finance aucun."
+  },
+  {
+   "id": "cr-1-03",
+   "theme": "valeurs",
+   "question": "Qui a composé La Marseillaise ?",
+   "reponses": [
+    "Victor Hugo",
+    "Napoléon Bonaparte",
+    "Jean Jaurès",
+    "Rouget de Lisle"
+   ],
+   "bonne_reponse": "D",
+   "explication": "Composée en 1792, La Marseillaise est l’hymne national inscrit dans la Constitution de 1958."
+  },
+  {
+   "id": "cr-1-04",
+   "theme": "valeurs",
+   "question": "La Déclaration des droits de l’homme et du citoyen a été adoptée en :",
+   "reponses": [
+    "1789",
+    "1848",
+    "1905",
+    "1946"
+   ],
+   "bonne_reponse": "A",
+   "explication": "Adoptée le 26 août 1789, elle a valeur constitutionnelle : le préambule de la Constitution de 1958 y fait référence."
+  },
+  {
+   "id": "cr-1-05",
+   "theme": "valeurs",
+   "question": "Depuis 2004, à l’école publique, les élèves :",
+   "reponses": [
+    "Peuvent porter tous les signes religieux",
+    "Doivent porter une tenue religieuse",
+    "Doivent déclarer leur religion",
+    "Ne peuvent pas porter de signes religieux ostensibles"
+   ],
+   "bonne_reponse": "D",
+   "explication": "La loi du 15 mars 2004 applique le principe de laïcité dans les écoles, collèges et lycées publics."
+  },
+  {
+   "id": "cr-1-06",
+   "theme": "institutions",
+   "question": "De quand date la Constitution de la Ve République ?",
+   "reponses": [
+    "1946",
+    "1875",
+    "1791",
+    "1958"
+   ],
+   "bonne_reponse": "D",
+   "explication": "Adoptée par référendum le 28 septembre 1958, elle a été promulguée le 4 octobre 1958."
+  },
+  {
+   "id": "cr-1-07",
+   "theme": "institutions",
+   "question": "Qui nomme le Premier ministre ?",
+   "reponses": [
+    "L’Assemblée nationale",
+    "Le président de la République",
+    "Le Sénat",
+    "Les électeurs"
+   ],
+   "bonne_reponse": "B",
+   "explication": "Le Premier ministre dirige l’action du Gouvernement, qui est responsable devant l’Assemblée nationale."
+  },
+  {
+   "id": "cr-1-09",
+   "theme": "institutions",
+   "question": "Comment sont élus les sénateurs ?",
+   "reponses": [
+    "Au suffrage universel direct",
+    "Ils sont nommés par le président",
+    "Au suffrage universel indirect, par des grands électeurs",
+    "Ils sont tirés au sort"
+   ],
+   "bonne_reponse": "C",
+   "explication": "Les sénateurs sont élus pour 6 ans par des grands électeurs, principalement des élus locaux."
+  },
+  {
+   "id": "cr-1-11",
+   "theme": "droits",
+   "question": "En quelle année les femmes ont-elles obtenu le droit de vote en France ?",
+   "reponses": [
+    "1848",
+    "1944",
+    "1920",
+    "1968"
+   ],
+   "bonne_reponse": "B",
+   "explication": "Ordonnance du 21 avril 1944. Les femmes votent pour la première fois en 1945."
+  },
+  {
+   "id": "cr-1-12",
+   "theme": "droits",
+   "question": "Le droit de grève est :",
+   "reponses": [
+    "Un droit reconnu par la Constitution",
+    "Interdit",
+    "Réservé aux fonctionnaires",
+    "Soumis à l’accord de l’employeur"
+   ],
+   "bonne_reponse": "A",
+   "explication": "Le Préambule de 1946 le reconnaît ; il s’exerce dans le cadre des lois qui le réglementent."
+  },
+  {
+   "id": "cr-1-14",
+   "theme": "histoire",
+   "question": "Combien de régions compte la France métropolitaine ?",
+   "reponses": [
+    "18",
+    "22",
+    "101",
+    "13"
+   ],
+   "bonne_reponse": "D",
+   "explication": "Depuis 2016, la métropole compte 13 régions (dont la Corse). Avec les 5 régions d’outre-mer, la France en compte 18."
+  },
+  {
+   "id": "cr-1-15",
+   "theme": "societe",
+   "question": "Où se célèbre le mariage civil ?",
+   "reponses": [
+    "Dans un lieu de culte",
+    "À la préfecture",
+    "Au tribunal",
+    "À la mairie"
+   ],
+   "bonne_reponse": "D",
+   "explication": "Seul le mariage célébré à la mairie a une valeur légale. Une cérémonie religieuse ne peut avoir lieu qu’après."
+  },
+  {
+   "id": "cr-2-01",
+   "theme": "droits",
+   "question": "Quelle est la durée légale du travail pour un salarié à temps plein ?",
+   "reponses": [
+    "39 heures par semaine",
+    "35 heures par semaine",
+    "40 heures par semaine",
+    "48 heures par semaine"
+   ],
+   "bonne_reponse": "B",
+   "explication": "Au-delà de 35 heures, les heures supplémentaires sont majorées ou compensées."
+  },
+  {
+   "id": "cr-2-02",
+   "theme": "droits",
+   "question": "Combien de semaines de congés payés un salarié a-t-il par an ?",
+   "reponses": [
+    "5 semaines",
+    "2 semaines",
+    "3 semaines",
+    "8 semaines"
+   ],
+   "bonne_reponse": "A",
+   "explication": "Un salarié acquiert 2,5 jours ouvrables par mois de travail, soit 5 semaines par an."
+  },
+  {
+   "id": "cr-2-03",
+   "theme": "droits",
+   "question": "Qu’est-ce que le SMIC ?",
+   "reponses": [
+    "Le salaire minimum légal",
+    "Une aide au logement",
+    "Un impôt",
+    "Une allocation chômage"
+   ],
+   "bonne_reponse": "A",
+   "explication": "Le salaire minimum interprofessionnel de croissance est revalorisé au moins une fois par an."
+  },
+  {
+   "id": "cr-2-04",
+   "theme": "droits",
+   "question": "Quelle autorité indépendante peut-on saisir gratuitement en cas de discrimination ?",
+   "reponses": [
+    "Le Défenseur des droits",
+    "Le préfet",
+    "La Sécurité sociale",
+    "La CAF"
+   ],
+   "bonne_reponse": "A",
+   "explication": "Le Défenseur des droits défend aussi les usagers des services publics et les droits des enfants."
+  },
+  {
+   "id": "cr-2-05",
+   "theme": "droits",
+   "question": "Deux personnes de même sexe peuvent-elles se marier en France ?",
+   "reponses": [
+    "Non",
+    "Seulement à l’étranger",
+    "Non, elles peuvent seulement se pacser",
+    "Oui, depuis 2013"
+   ],
+   "bonne_reponse": "D",
+   "explication": "La loi du 17 mai 2013 a ouvert le mariage aux couples de même sexe."
+  },
+  {
+   "id": "cr-2-06",
+   "theme": "droits",
+   "question": "La polygamie en France est :",
+   "reponses": [
+    "Interdite",
+    "Autorisée si les épouses sont d’accord",
+    "Autorisée pour les étrangers",
+    "Autorisée avec un contrat"
+   ],
+   "bonne_reponse": "A",
+   "explication": "On ne peut pas se marier une seconde fois tant que le premier mariage n’est pas dissous. La bigamie est un délit."
+  },
+  {
+   "id": "cr-2-08",
+   "theme": "valeurs",
+   "question": "Depuis quand une femme mariée peut-elle ouvrir un compte bancaire et travailler sans l’autorisation de son mari ?",
+   "reponses": [
+    "1945",
+    "1981",
+    "2000",
+    "1965"
+   ],
+   "bonne_reponse": "D",
+   "explication": "La loi du 13 juillet 1965 a donné aux femmes mariées ces libertés."
+  },
+  {
+   "id": "cr-2-09",
+   "theme": "valeurs",
+   "question": "Le principe de fraternité se traduit notamment par :",
+   "reponses": [
+    "L’obligation d’avoir des frères et sœurs",
+    "La préférence nationale",
+    "Une obligation religieuse",
+    "La solidarité entre les personnes"
+   ],
+   "bonne_reponse": "D",
+   "explication": "La Sécurité sociale, les aides sociales ou le bénévolat sont des formes de solidarité."
+  },
+  {
+   "id": "cr-2-10",
+   "theme": "societe",
+   "question": "Quel organisme verse les allocations familiales ?",
+   "reponses": [
+    "La mairie",
+    "Le Trésor public",
+    "La CAF (Caisse d’allocations familiales)",
+    "France Travail"
+   ],
+   "bonne_reponse": "C",
+   "explication": "La CAF verse aussi les aides au logement, la prime d’activité ou le RSA."
+  },
+  {
+   "id": "cr-2-11",
+   "theme": "societe",
+   "question": "Qu’est-ce que le PACS ?",
+   "reponses": [
+    "Un contrat qui organise la vie commune de deux personnes",
+    "Un mariage religieux",
+    "Un titre de séjour",
+    "Une assurance"
+   ],
+   "bonne_reponse": "A",
+   "explication": "Le pacte civil de solidarité, créé en 1999, est ouvert aux couples de même sexe ou de sexe différent."
+  },
+  {
+   "id": "cr-2-13",
+   "theme": "histoire",
+   "question": "Quelle date marque la fin de la Seconde Guerre mondiale en Europe ?",
+   "reponses": [
+    "Le 11 novembre 1918",
+    "Le 14 juillet 1789",
+    "Le 8 mai 1945",
+    "Le 6 juin 1944"
+   ],
+   "bonne_reponse": "C",
+   "explication": "Le 8 mai est un jour férié. Le 6 juin 1944 est la date du débarquement en Normandie."
+  },
+  {
+   "id": "cr-2-14",
+   "theme": "histoire",
+   "question": "Que commémore le 11 novembre ?",
+   "reponses": [
+    "La prise de la Bastille",
+    "La fin de la Seconde Guerre mondiale",
+    "L’armistice de la Première Guerre mondiale",
+    "La Libération de Paris"
+   ],
+   "bonne_reponse": "C",
+   "explication": "L’armistice a été signé le 11 novembre 1918. C’est un jour férié."
+  },
+  {
+   "id": "cr-2-15",
+   "theme": "institutions",
+   "question": "Quelles sont les trois principales collectivités territoriales ?",
+   "reponses": [
+    "La commune, le département et la région",
+    "La ville, le canton et l’État",
+    "La mairie, la préfecture et le ministère",
+    "Le quartier, la ville et le pays"
+   ],
+   "bonne_reponse": "A",
+   "explication": "Chaque collectivité a des compétences propres : écoles primaires pour la commune, collèges pour le département, lycées pour la région."
+  },
+  {
+   "id": "cr-3-12",
+   "theme": "histoire",
+   "question": "Quel ministre a fait abolir la peine de mort en 1981 ?",
+   "reponses": [
+    "Robert Badinter",
+    "Jules Ferry",
+    "Charles de Gaulle",
+    "Jean Jaurès"
+   ],
+   "bonne_reponse": "A",
+   "explication": "La loi du 9 octobre 1981 abolit la peine de mort ; l’interdiction est inscrite dans la Constitution depuis 2007."
+  },
+  {
+   "id": "cr-3-13",
+   "theme": "histoire",
+   "question": "Qui a été le premier président de la Ve République ?",
+   "reponses": [
+    "Charles de Gaulle",
+    "François Mitterrand",
+    "Georges Pompidou",
+    "Jacques Chirac"
+   ],
+   "bonne_reponse": "A",
+   "explication": "Charles de Gaulle a été président de 1959 à 1969."
+  },
+  {
+   "id": "cr-3-14",
+   "theme": "histoire",
+   "question": "Lesquels de ces territoires sont des départements d’outre-mer ?",
+   "reponses": [
+    "Corse, Bretagne et Alsace",
+    "Québec, Belgique et Suisse",
+    "Guadeloupe, Martinique, Guyane, La Réunion et Mayotte",
+    "Maroc, Algérie et Tunisie"
+   ],
+   "bonne_reponse": "C",
+   "explication": "Ces cinq territoires sont à la fois départements et régions d’outre-mer."
+  }
+ ]
+}

@@ -1,0 +1,383 @@
+{
+ "titre": "Banque générale",
+ "description": "Questions de révision et d’examen.",
+ "questions": [
+  {
+   "id": "sp-1-01",
+   "theme": "valeurs",
+   "question": "Quelle est la devise de la République française ?",
+   "reponses": [
+    "Liberté, Égalité, Fraternité",
+    "Travail, Famille, Patrie",
+    "Unité, Progrès, Justice",
+    "Paix, Liberté, Solidarité"
+   ],
+   "bonne_reponse": "A",
+   "explication": "La devise figure à l’article 2 de la Constitution de 1958 et sur les bâtiments publics."
+  },
+  {
+   "id": "sp-1-02",
+   "theme": "valeurs",
+   "question": "Quelles sont les couleurs du drapeau français ?",
+   "reponses": [
+    "Bleu, blanc, vert",
+    "Rouge, blanc, noir",
+    "Bleu, jaune, rouge",
+    "Bleu, blanc, rouge"
+   ],
+   "bonne_reponse": "D",
+   "explication": "Le drapeau tricolore bleu, blanc, rouge est l’emblème national (article 2 de la Constitution)."
+  },
+  {
+   "id": "sp-1-03",
+   "theme": "valeurs",
+   "question": "Quel est l’hymne national de la France ?",
+   "reponses": [
+    "L’Internationale",
+    "La Marseillaise",
+    "Le Chant des partisans",
+    "Douce France"
+   ],
+   "bonne_reponse": "B",
+   "explication": "La Marseillaise a été composée par Rouget de Lisle en 1792. Elle est inscrite dans la Constitution."
+  },
+  {
+   "id": "sp-1-04",
+   "theme": "valeurs",
+   "question": "Que représente Marianne ?",
+   "reponses": [
+    "Une reine de France",
+    "Une sainte",
+    "La ville de Paris",
+    "La République française"
+   ],
+   "bonne_reponse": "D",
+   "explication": "Marianne est l’allégorie de la République. Son buste est présent dans les mairies ; elle figure sur les timbres et le logo de l’État."
+  },
+  {
+   "id": "sp-1-05",
+   "theme": "institutions",
+   "question": "Quelle est la durée du mandat du président de la République ?",
+   "reponses": [
+    "4 ans",
+    "6 ans",
+    "7 ans",
+    "5 ans"
+   ],
+   "bonne_reponse": "D",
+   "explication": "Depuis le référendum de 2000, le mandat dure 5 ans (quinquennat). On ne peut pas exercer plus de deux mandats consécutifs."
+  },
+  {
+   "id": "sp-1-06",
+   "theme": "institutions",
+   "question": "Quelle est la capitale de la France ?",
+   "reponses": [
+    "Lyon",
+    "Paris",
+    "Marseille",
+    "Strasbourg"
+   ],
+   "bonne_reponse": "B",
+   "explication": "Paris accueille les principales institutions : l’Élysée, l’Assemblée nationale, le Sénat."
+  },
+  {
+   "id": "sp-1-07",
+   "theme": "institutions",
+   "question": "Qui dirige la commune ?",
+   "reponses": [
+    "Le préfet",
+    "Le maire",
+    "Le député",
+    "Le président de la région"
+   ],
+   "bonne_reponse": "B",
+   "explication": "Le maire est élu par le conseil municipal, lui-même élu par les habitants tous les 6 ans."
+  },
+  {
+   "id": "sp-1-08",
+   "theme": "droits",
+   "question": "À quel âge devient-on majeur en France ?",
+   "reponses": [
+    "16 ans",
+    "20 ans",
+    "18 ans",
+    "21 ans"
+   ],
+   "bonne_reponse": "C",
+   "explication": "À 18 ans, on devient majeur : on peut notamment voter (pour les citoyens français) et signer seul un contrat."
+  },
+  {
+   "id": "sp-1-09",
+   "theme": "droits",
+   "question": "Pour quels âges l’instruction est-elle obligatoire ?",
+   "reponses": [
+    "De 6 à 14 ans",
+    "De 3 à 16 ans",
+    "De 6 à 18 ans",
+    "De 5 à 15 ans"
+   ],
+   "bonne_reponse": "B",
+   "explication": "Depuis 2019, l’instruction est obligatoire de 3 à 16 ans, pour les filles comme pour les garçons."
+  },
+  {
+   "id": "sp-1-10",
+   "theme": "histoire",
+   "question": "En quelle année a commencé la Révolution française ?",
+   "reponses": [
+    "1492",
+    "1848",
+    "1914",
+    "1789"
+   ],
+   "bonne_reponse": "D",
+   "explication": "La prise de la Bastille a lieu le 14 juillet 1789 ; la Déclaration des droits de l’homme et du citoyen est adoptée le 26 août 1789."
+  },
+  {
+   "id": "sp-1-11",
+   "theme": "histoire",
+   "question": "Quel fleuve traverse Paris ?",
+   "reponses": [
+    "La Loire",
+    "Le Rhône",
+    "La Garonne",
+    "La Seine"
+   ],
+   "bonne_reponse": "D",
+   "explication": "La Seine traverse Paris d’est en ouest."
+  },
+  {
+   "id": "sp-1-12",
+   "theme": "histoire",
+   "question": "Quelle est la monnaie utilisée en France ?",
+   "reponses": [
+    "Le franc",
+    "Le dollar",
+    "La livre",
+    "L’euro"
+   ],
+   "bonne_reponse": "D",
+   "explication": "Les pièces et billets en euros ont remplacé le franc le 1er janvier 2002."
+  },
+  {
+   "id": "sp-1-14",
+   "theme": "societe",
+   "question": "Quelle est la langue de la République ?",
+   "reponses": [
+    "L’anglais",
+    "Toutes les langues régionales",
+    "Le français",
+    "Le latin"
+   ],
+   "bonne_reponse": "C",
+   "explication": "L’article 2 de la Constitution indique que la langue de la République est le français."
+  },
+  {
+   "id": "sp-1-15",
+   "theme": "valeurs",
+   "question": "La France est une République laïque. Cela signifie que :",
+   "reponses": [
+    "L’État est neutre et respecte toutes les croyances",
+    "Les religions sont interdites",
+    "L’État finance une religion officielle",
+    "Chacun doit déclarer sa religion"
+   ],
+   "bonne_reponse": "A",
+   "explication": "Depuis la loi de 1905, l’État ne reconnaît ni ne finance aucun culte. Chacun est libre de croire ou de ne pas croire."
+  },
+  {
+   "id": "sp-2-01",
+   "theme": "droits",
+   "question": "Payer ses impôts est :",
+   "reponses": [
+    "Un choix personnel",
+    "Réservé aux Français",
+    "Réservé aux entreprises",
+    "Un devoir pour toutes les personnes concernées"
+   ],
+   "bonne_reponse": "D",
+   "explication": "La contribution commune aux dépenses publiques est prévue par l’article 13 de la Déclaration de 1789."
+  },
+  {
+   "id": "sp-2-02",
+   "theme": "droits",
+   "question": "En France, les femmes et les hommes ont :",
+   "reponses": [
+    "Des droits différents selon la religion",
+    "Des droits différents une fois mariés",
+    "Les mêmes droits",
+    "Les mêmes droits seulement au travail"
+   ],
+   "bonne_reponse": "C",
+   "explication": "Le Préambule de 1946 précise : « La loi garantit à la femme, dans tous les domaines, des droits égaux à ceux de l’homme »."
+  },
+  {
+   "id": "sp-2-05",
+   "theme": "droits",
+   "question": "Les violences au sein du couple sont :",
+   "reponses": [
+    "Une affaire privée",
+    "Punies par la loi",
+    "Autorisées dans le mariage",
+    "Punies seulement s’il y a des témoins"
+   ],
+   "bonne_reponse": "B",
+   "explication": "Les violences conjugales sont des délits ou des crimes. Le 3919 est un numéro d’écoute gratuit et anonyme ; en urgence, appeler le 17."
+  },
+  {
+   "id": "sp-2-06",
+   "theme": "droits",
+   "question": "Le mariage forcé est-il autorisé en France ?",
+   "reponses": [
+    "Non, le mariage exige le libre consentement des deux époux",
+    "Oui, si la famille est d’accord",
+    "Oui, à partir de 16 ans",
+    "Oui, dans certaines religions"
+   ],
+   "bonne_reponse": "A",
+   "explication": "Il n’y a pas de mariage sans consentement (Code civil). L’âge minimum pour se marier est de 18 ans pour les deux époux."
+  },
+  {
+   "id": "sp-2-07",
+   "theme": "institutions",
+   "question": "Qui vote les lois en France ?",
+   "reponses": [
+    "Le Parlement",
+    "Le président de la République",
+    "Le Gouvernement",
+    "Le maire"
+   ],
+   "bonne_reponse": "A",
+   "explication": "Le Parlement, composé de l’Assemblée nationale et du Sénat, vote la loi."
+  },
+  {
+   "id": "sp-2-08",
+   "theme": "institutions",
+   "question": "Le Parlement est composé de :",
+   "reponses": [
+    "Le Gouvernement et le Sénat",
+    "L’Assemblée nationale et le Conseil constitutionnel",
+    "Les maires et les préfets",
+    "L’Assemblée nationale et le Sénat"
+   ],
+   "bonne_reponse": "D",
+   "explication": "Les députés siègent à l’Assemblée nationale, les sénateurs au Sénat."
+  },
+  {
+   "id": "sp-2-09",
+   "theme": "institutions",
+   "question": "Comment le président de la République est-il élu ?",
+   "reponses": [
+    "Par les députés",
+    "Au suffrage universel direct, par les citoyens",
+    "Par le Gouvernement",
+    "Par les maires"
+   ],
+   "bonne_reponse": "B",
+   "explication": "Depuis 1962, le président est élu directement par les citoyens."
+  },
+  {
+   "id": "sp-2-10",
+   "theme": "histoire",
+   "question": "Quelle est la date de la fête nationale française ?",
+   "reponses": [
+    "Le 1er mai",
+    "Le 11 novembre",
+    "Le 8 mai",
+    "Le 14 juillet"
+   ],
+   "bonne_reponse": "D",
+   "explication": "Elle rappelle la prise de la Bastille (1789) et la fête de la Fédération (1790). C’est la fête nationale depuis 1880."
+  },
+  {
+   "id": "sp-2-11",
+   "theme": "histoire",
+   "question": "Lequel de ces pays a une frontière avec la France métropolitaine ?",
+   "reponses": [
+    "L’Espagne",
+    "Le Portugal",
+    "Les Pays-Bas",
+    "L’Autriche"
+   ],
+   "bonne_reponse": "A",
+   "explication": "Voisins de la métropole : Belgique, Luxembourg, Allemagne, Suisse, Italie, Monaco, Andorre et Espagne."
+  },
+  {
+   "id": "sp-2-12",
+   "theme": "histoire",
+   "question": "De quelle organisation la France est-elle un membre fondateur ?",
+   "reponses": [
+    "L’ALENA",
+    "L’Union africaine",
+    "L’Union européenne",
+    "Le Mercosur"
+   ],
+   "bonne_reponse": "C",
+   "explication": "La France fait partie des six pays fondateurs de la construction européenne (traité de Rome, 1957)."
+  },
+  {
+   "id": "sp-2-13",
+   "theme": "societe",
+   "question": "Quel organisme rembourse une partie des frais de santé ?",
+   "reponses": [
+    "L’Assurance maladie (Sécurité sociale)",
+    "La mairie",
+    "La préfecture",
+    "La banque"
+   ],
+   "bonne_reponse": "A",
+   "explication": "La carte Vitale permet d’être remboursé par l’Assurance maladie."
+  },
+  {
+   "id": "sp-2-14",
+   "theme": "societe",
+   "question": "L’école publique en France est :",
+   "reponses": [
+    "Gratuite et laïque",
+    "Payante",
+    "Réservée aux Français",
+    "Religieuse"
+   ],
+   "bonne_reponse": "A",
+   "explication": "Les lois Jules Ferry (1881-1882) ont rendu l’école primaire gratuite, laïque et obligatoire."
+  },
+  {
+   "id": "sp-3-12",
+   "theme": "institutions",
+   "question": "Qui représente l’État dans le département ?",
+   "reponses": [
+    "Le maire",
+    "Le député",
+    "Le préfet",
+    "Le juge"
+   ],
+   "bonne_reponse": "C",
+   "explication": "Le préfet est nommé par le Gouvernement. Il veille à l’application des lois et à l’ordre public."
+  },
+  {
+   "id": "sp-3-13",
+   "theme": "histoire",
+   "question": "Quelle mer borde le sud de la France ?",
+   "reponses": [
+    "La mer du Nord",
+    "La mer Méditerranée",
+    "La mer Baltique",
+    "La mer Noire"
+   ],
+   "bonne_reponse": "B",
+   "explication": "La France est bordée par la Méditerranée au sud, l’océan Atlantique à l’ouest, la Manche et la mer du Nord au nord."
+  },
+  {
+   "id": "sp-3-14",
+   "theme": "histoire",
+   "question": "Quelle est la plus haute montagne de France ?",
+   "reponses": [
+    "Le puy de Dôme",
+    "Le mont Ventoux",
+    "Le mont Blanc",
+    "Le Canigou"
+   ],
+   "bonne_reponse": "C",
+   "explication": "Le mont Blanc, dans les Alpes, culmine à environ 4 800 mètres."
+  }
+ ]
+}
