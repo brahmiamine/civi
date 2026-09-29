@@ -31,7 +31,7 @@ export function Row({ r }) {
   return (
     <div className="p-row" onClick={r.onClick} onKeyDown={onKeyDown} role={r.role} tabIndex={r.tab} aria-checked={r.role === 'switch' ? r.checked : undefined} style={{ display: 'flex', alignItems: 'center', gap: 14, minHeight: 58, padding: '10px 16px', borderBottom: r.sep, cursor: r.cursor, opacity: r.op, transition: 'background .12s' }}>
       {r.icon && <span style={{ width: 40, height: 40, flex: 'none', display: 'grid', placeItems: 'center', borderRadius: 8, background: r.iconBg, color: r.iconColor }}>{r.icon}</span>}
-      {r.year && <span style={{ width: 58, flex: 'none', font: '600 28px/1 var(--font-heading)', color: 'var(--primaryText)' }}>{r.year}</span>}
+      {r.year && <span style={{ width: r.yearW || 58, flex: 'none', font: '600 ' + (r.yearFs || 28) + 'px/1 var(--font-heading)', color: 'var(--primaryText)' }}>{r.year}</span>}
       <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 3, padding: '3px 0' }}>
         {r.tag && <span style={{ alignSelf: 'flex-start', fontSize: 12, fontWeight: 600, padding: '2px 7px', borderRadius: 4, background: r.tag.bg, color: r.tag.color }}>{r.tag.label}</span>}
         <span style={{ fontSize: 16, fontWeight: 500, lineHeight: 1.3, color: r.color, textWrap: 'pretty' }}>{r.title}</span>

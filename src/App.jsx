@@ -10,6 +10,7 @@ import { Fiche, Flash, QuestionView, Result } from './components/Study.jsx';
 import { Chips, Group, Empty } from './components/Lists.jsx';
 import { ProposeForm } from './components/ProposeForm.jsx';
 import { sheetData } from './sheets.js';
+import { SYMBOLS, RULES, EXAMPLES, CENTURIES, toRoman, romanOrdinal, centuryYears } from './roman.js';
 import { captureScreen } from './screenshot.js';
 import { PREPS, prepById, hasPrep } from './bank.js';
 import {
@@ -549,7 +550,7 @@ export default class App extends Component {
     });
     const favBtn = (id) => { const f = P.favs.includes(id); return { icon: ic('star', 22, 1.5, f), color: f ? 'var(--primary)' : 'var(--text2)', label: f ? 'Retirer des favoris' : 'Ajouter aux favoris', pressed: f ? 'true' : 'false', onClick: () => this.toggleFav(id) }; };
     const resumeRow = () => { const q = P.quiz; return row({ icon: 'clock', iconBg: 'var(--warnTint)', iconColor: 'var(--warn)', title: 'Reprendre : ' + q.title, sub: 'Question ' + (q.idx + 1) + ' / ' + q.qs.length + (q.timed ? ' · ' + fmt(secondsLeft(q)) + ' restantes' : '') + ' · sauvegardé', chev: true, onClick: () => this.resumeQuiz() }); };
-    const T = { propose: 'Proposer une question', theme: 'Thème', errors: 'Mes erreurs', favs: 'Mes favoris', traps: 'Questions pièges', dates: 'Dates à retenir', flash: 'Flashcards', question: 'Question', examIntro: 'Examen blanc', review: 'Correction des erreurs', history: 'Historique', settings: 'Paramètres', notifications: 'Notifications', about: 'À propos', lot: 'Lot de questions', result: 'Résultat' };
+    const T = { propose: 'Proposer une question', theme: 'Thème', errors: 'Mes erreurs', favs: 'Mes favoris', traps: 'Questions pièges', dates: 'Dates à retenir', flash: 'Flashcards', question: 'Question', examIntro: 'Examen blanc', review: 'Correction des erreurs', history: 'Historique', roman: 'Chiffres romains', settings: 'Paramètres', notifications: 'Notifications', about: 'À propos', lot: 'Lot de questions', result: 'Résultat' };
     if (T[c.s]) bar = { ...back, title: T[c.s] };
 
     switch (c.s) {
@@ -643,6 +644,7 @@ export default class App extends Component {
         largeTitle = 'Profil'; profile = { initials: bank.initials, name: bank.name, sub: O.pct + ' % de préparation · ' + plural(O.total, 'question') };
         const rows = [
           row({ icon: 'target', title: 'Type de préparation', sub: plural(O.total, 'question') + ' · ' + plural(bank.lots.length, 'lot'), value: bank.short, chev: true, onClick: () => this.openSheet('prep') }),
+          row({ icon: 'scroll', title: 'Chiffres romains', sub: 'Ve République, XVe siècle, Louis XIV… : savoir les lire', chev: true, onClick: () => this.push({ s: 'roman' }) }),
           row({ icon: 'alert', title: 'Signaler un bug', sub: 'Avec une capture d’écran si besoin', chev: true, onClick: () => this.openReport(null) }),
           row({ icon: 'sparkles', title: 'Proposer une question', sub: 'Texte ou photo, envoyé à l’auteur', chev: true, onClick: () => this.openPropose() }),
           row({ icon: 'sliders', title: 'Paramètres', chev: true, onClick: () => this.push({ s: 'settings' }) }),
@@ -700,6 +702,18 @@ export default class App extends Component {
           G('Sources officielles', SOURCES.map(([title, sub, url]) => row({ icon: 'info', title, sub, chev: true, onClick: () => window.open(url, '_blank', 'noopener') }))),
           G('Confidentialité', PRIVACY.map(([title, sub]) => row({ title, sub }))),
         ]; break;
+      case 'roman': {
+        intro = 'Le test utilise souvent les chiffres romains : Ve République, XVIIIe siècle, Louis XIV… Voici tout ce qu’il faut savoir pour les lire sans erreur.';
+        const wide = (o) => row({ ...o, yearW: 72, yearFs: 24 });
+        groups = [
+          G('Les 7 symboles', SYMBOLS.map(([sym, n, word]) => row({ year: sym, title: String(n), sub: word }))),
+          G('Les règles', RULES.map(([title, sub]) => row({ icon: 'info', title, sub }))),
+          G('À connaître pour le test', EXAMPLES.map(([n, before, after, sub]) => wide({ year: toRoman(n) + (after === 'er' ? 'er' : ''), title: before + toRoman(n) + after, sub }))),
+          G('Les siècles', [row({ icon: 'bulb', title: 'Trouver le siècle d’une année', sub: 'Chiffre des centaines + 1 : 1789 → 17 + 1 = 18 → XVIIIe siècle. Attention : 1900 est encore au XIXe siècle.' })]
+            .concat(CENTURIES.map(([n, sub]) => { const [a, b] = centuryYears(n); return wide({ year: romanOrdinal(n), title: n + 'e siècle · ' + a + ' à ' + b, sub }); }))),
+        ];
+        break;
+      }
       case 'history': {
         const exams = P.history.filter((h) => h.mode === 'exam');
         const f = c.filter || (exams.length || !P.history.length ? 'exam' : 'all');
