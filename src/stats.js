@@ -30,11 +30,12 @@ export const isMastered = (st) => !!st && st.s >= 2;
 
 // « Mes erreurs » after an answer: a wrong answer is added (when automatic revision is on),
 // a question leaves the list once it is mastered, or as soon as it is answered right in « Mes erreurs » mode.
-export function updateErrors(p, id, ok, chosen, { auto, errorsMode }) {
+// `pick` is the text of the chosen answer (not its position, which changes when the answers of a question are reordered).
+export function updateErrors(p, id, ok, pick, { auto, errorsMode }) {
   const has = p.errors.some((e) => e.id === id);
   if (!ok) {
     if (!auto && !has) return p;
-    return { ...p, errors: has ? p.errors.map((e) => (e.id === id ? { id, chosen } : e)) : p.errors.concat([{ id, chosen }]) };
+    return { ...p, errors: has ? p.errors.map((e) => (e.id === id ? { id, pick } : e)) : p.errors.concat([{ id, pick }]) };
   }
   if (has && (errorsMode || isMastered(p.stats[id]))) return { ...p, errors: p.errors.filter((e) => e.id !== id) };
   return p;
@@ -77,7 +78,9 @@ export function overview(bank, p, now = Date.now()) {
   });
   const total = bank.questions.length;
   const exams = p.history.filter((h) => h.mode === 'exam');
-  const best = exams.reduce((b, h) => (!b || h.score / h.total > b.score / b.total ? h : b), null);
+  // Best score among the longest exams taken (a 10/10 short demo must not beat a 38/40 full exam).
+  const full = exams.reduce((m, h) => Math.max(m, h.total), 0);
+  const best = exams.filter((h) => h.total === full).reduce((b, h) => (!b || h.score > b.score ? h : b), null);
   return {
     total, mastered, seen, unseen: total - seen, due, attempts: n, correct: ok,
     pct: total ? Math.round((mastered / total) * 100) : 0,
@@ -127,6 +130,15 @@ export function pickWeak(bank, p, n = 10) {
   return shuffle(pool).sort((a, b) => acc(a) - acc(b)).slice(0, n).map((q) => q.id);
 }
 
+// Picks at most n questions of a pool for a quiz: questions not mastered yet first, the most missed first, random otherwise.
+export function pickPool(pool, p, n) {
+  const S = p.stats, acc = (q) => (S[q.id] ? S[q.id].ok / S[q.id].n : 0.5);
+  return shuffle(pool).sort((a, b) => isMastered(S[a.id]) - isMastered(S[b.id]) || acc(a) - acc(b)).slice(0, n).map((q) => q.id);
+}
+
+// Questions that can be drawn for the mock exam: the bank, without the questions that only exist in a lot.
+export const examPool = (bank) => bank.questions.filter((q) => !q.lotOnly);
+
 // Hard questions: those flagged as traps plus those the learner misses most often.
 export function hardPool(bank, p) {
   const S = p.stats;
@@ -146,12 +158,33 @@ export function examSplit(n) {
 
 // Exam: follows the official split by theme, scaled to the requested length; gaps are filled from other themes.
 export function pickExam(bank, n) {
-  n = Math.min(n, bank.questions.length);
+  const pool = examPool(bank);
+  n = Math.min(n, pool.length);
   const split = examSplit(n);
-  const by = {}; THEMES.forEach((t) => { by[t.id] = shuffle(bank.questions.filter((q) => q.t === t.id)); });
+  const by = {}; THEMES.forEach((t) => { by[t.id] = shuffle(pool.filter((q) => q.t === t.id)); });
   let pick = [];
   THEMES.forEach((t) => { pick = pick.concat(by[t.id].splice(0, split[t.id])); });
   const rest = shuffle(THEMES.flatMap((t) => by[t.id]));
   pick = pick.concat(rest.slice(0, n - pick.length));
   return shuffle(pick).map((q) => q.id);
+}
+
+// History entry of a finished test (also used when a saved timed test runs out of time while the app is closed).
+export function resultEntry(bank, q, now = Date.now()) {
+  const byId = new Map(q.answers.map((a) => [a.id, a]));
+  const score = q.answers.filter((a) => a.ok).length, total = q.qs.length;
+  const wrong = q.qs.filter((id) => !byId.get(id)?.ok).map((id) => ({ id, pick: byId.get(id)?.pick ?? null }));
+  const themes = {};
+  q.qs.forEach((id) => { const t = bank.byId.get(id).t; const o = themes[t] || (themes[t] = [0, 0]); o[1]++; if (byId.get(id)?.ok) o[0]++; });
+  const used = q.timed ? Math.max(0, Math.min(q.limit, Math.round((Math.min(now, q.endsAt) - (q.endsAt - q.limit * 1000)) / 1000))) : null;
+  return { id: now, at: now, mode: q.mode, title: q.title, lot: q.lot || null, score, total, answered: q.answers.length, used, passed: score >= passMark(total), wrong, themes };
+}
+
+// Fingerprint of the answers of the questions of a saved test: if a question file changed since, the saved positions
+// (selected answer, shuffled order) no longer match and are reset.
+export function answersPrint(bank, qs) {
+  let h = 0;
+  const str = qs.map((id) => { const q = bank.byId.get(id); return q ? q.a.join('\u0001') + '\u0002' + q.c : '?'; }).join('\u0003');
+  for (let i = 0; i < str.length; i++) h = (Math.imul(h, 31) + str.charCodeAt(i)) | 0;
+  return h;
 }

@@ -36,6 +36,24 @@ const isNum = (v) => typeof v === 'number' && Number.isFinite(v);
 const obj = (v) => (isObj(v) ? v : {});
 const arr = (v) => (Array.isArray(v) ? v : []);
 const idx = (v) => (Number.isInteger(v) && v >= 0 ? v : null);
+// Chosen answers are kept as text; older versions stored a position, which is dropped (it may point to another answer now).
+const pick = (v) => (typeof v === 'string' ? v : null);
+const oneOf = (list) => (v) => list.includes(v);
+// Allowed values of each setting (device-wide and per preparation). Anything else is dropped and the default applies.
+const SETTING_RULES = {
+  theme: oneOf(['system', 'light', 'dark']), text: oneOf(['Petite', 'Normale', 'Grande']), time: (v) => typeof v === 'string' && /^([01]\d|2[0-3]):[0-5]\d$/.test(v),
+  goal: oneOf([5, 10, 20, 30]), examLength: oneOf([10, 20, 40]),
+  instant: 'bool', shuffle: 'bool', sound: 'bool', vibration: 'bool', reminder: 'bool', streak: 'bool', installDismissed: 'bool', auto: 'bool',
+};
+export function normSettings(v) {
+  const out = {};
+  Object.entries(obj(v)).forEach(([k, val]) => {
+    const rule = SETTING_RULES[k];
+    if (k === 'prep' && typeof val === 'string') out.prep = val;
+    else if (rule === 'bool' ? typeof val === 'boolean' : rule && rule(val)) out[k] = val;
+  });
+  return out;
+}
 
 function normStats(v) {
   const out = {};
@@ -54,7 +72,7 @@ function normHistory(v) {
     answered: isNum(h.answered) ? h.answered : h.total,
     used: isNum(h.used) ? h.used : null,
     passed: !!h.passed,
-    wrong: arr(h.wrong).filter((w) => isObj(w) && typeof w.id === 'string').map((w) => ({ id: w.id, chosen: idx(w.chosen) })),
+    wrong: arr(h.wrong).filter((w) => isObj(w) && typeof w.id === 'string').map((w) => ({ id: w.id, pick: pick(w.pick) })),
     themes: obj(h.themes),
   }));
 }
@@ -69,7 +87,7 @@ function normDays(v) {
 function normQuiz(q) {
   if (!isObj(q) || !Array.isArray(q.qs) || !q.qs.length || !q.qs.every((id) => typeof id === 'string')) return null;
   if (!Number.isInteger(q.idx) || q.idx < 0 || q.idx >= q.qs.length) return null;
-  const answers = arr(q.answers).filter((a) => isObj(a) && typeof a.id === 'string');
+  const answers = arr(q.answers).filter((a) => isObj(a) && typeof a.id === 'string').map((a) => ({ id: a.id, chosen: idx(a.chosen), pick: pick(a.pick), ok: !!a.ok }));
   if (q.validated && !answers.length) return null;
   return {
     ...q, answers, orders: obj(q.orders), sel: idx(q.sel), validated: !!q.validated, timed: !!q.timed,
@@ -83,11 +101,11 @@ export function normProfile(p, quiz) {
   return {
     ...emptyProfile(),
     stats: normStats(p.stats),
-    errors: arr(p.errors).filter((e) => isObj(e) && typeof e.id === 'string').map((e) => ({ id: e.id, chosen: idx(e.chosen) })),
+    errors: arr(p.errors).filter((e) => isObj(e) && typeof e.id === 'string').map((e) => ({ id: e.id, pick: pick(e.pick) })),
     favs: arr(p.favs).filter((id) => typeof id === 'string'),
     history: normHistory(p.history),
     days: normDays(p.days),
-    settings: obj(p.settings),
+    settings: normSettings(p.settings),
     quiz: normQuiz(quiz),
   };
 }
@@ -95,12 +113,12 @@ export function normProfile(p, quiz) {
 // Returns null on first launch.
 export function loadSettings() {
   const s = read(SETTINGS);
-  if (isObj(s)) return s;
+  if (isObj(s)) return normSettings(s);
   const old = read(LEGACY);
   if (!isObj(old?.settings)) return null;
   // The first version stored demo errors against another question bank: only the settings are kept.
   const { prep, ...rest } = old.settings;
-  return { ...rest, prep: LEGACY_PREP[prep] };
+  return normSettings({ ...rest, prep: LEGACY_PREP[prep] });
 }
 
 export const saveSettings = (s) => write(SETTINGS, s);

@@ -15,7 +15,7 @@ import { captureScreen } from './screenshot.js';
 import { PREPS, prepById, hasPrep } from './bank.js';
 import {
   emptyProfile, recordAnswer, updateErrors, secondsLeft, isMastered, themeStats, overview, weakThemes, pickSmart, smartPlan, pickWeak, hardPool, pickExam,
-  passMark, dayKey, lastActiveDay,
+  pickPool, examPool, resultEntry, answersPrint, passMark, dayKey, lastActiveDay,
 } from './stats.js';
 import { loadSettings, saveSettings, loadProfile, saveProfile, saveQuiz, persistStorage, exportData, importData } from './storage.js';
 import { canInstall, isIOS, isStandalone, onInstallChange, promptInstall } from './install.js';
@@ -32,9 +32,8 @@ const DEFAULT_PREP = 'carte-resident';
 const EMPTY_STACKS = () => ({ home: [], revise: [], test: [], progress: [], profile: [] });
 const EMPTY_MSG = { weak: 'Aucun point faible détecté pour l’instant', hard: 'Aucune question difficile pour l’instant', errors: 'Aucune erreur à revoir' };
 const darkQuery = typeof window !== 'undefined' && window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
-// Bumped when the answers of existing questions are reordered in src/data/: saved answer indices then no longer
-// point to the same text, so they are forgotten (the score, stats and errors themselves are kept).
-const DATA_REV = 2;
+// Longest quiz for « Quiz par thème » and « Questions difficiles » (the least mastered questions first).
+const MAX_POOL_QUIZ = 20;
 const TEXT_TAGS = /^(INPUT|TEXTAREA|SELECT)$/;
 const SOURCES = [
   ['Ministère de l’Intérieur', 'Livret du citoyen et formation civique', 'https://www.interieur.gouv.fr'],
@@ -48,11 +47,6 @@ const PRIVACY = [
   ['Sauvegarde', 'Exporte ta progression depuis Paramètres → Données pour la conserver ou la transférer sur un autre appareil.'],
 ];
 
-function forgetChosen(p) {
-  const q = p.quiz && { ...p.quiz, sel: null, answers: p.quiz.answers.map((a) => ({ ...a, chosen: null })) };
-  return { ...p, errors: p.errors.map((e) => ({ ...e, chosen: null })), history: p.history.map((h) => ({ ...h, wrong: h.wrong.map((w) => ({ ...w, chosen: null })) })), quiz: q };
-}
-
 // Drops references to questions that no longer exist in the bank (lot files edited or removed).
 function cleanProfile(bank, p) {
   const has = (id) => bank.byId.has(id);
@@ -60,7 +54,21 @@ function cleanProfile(bank, p) {
   if (quiz && !quiz.qs.every(has)) quiz = null;
   // Tests saved by older versions paused their timer while closed: give them a deadline from the time they had left.
   if (quiz && quiz.timed && !quiz.abs) quiz = { ...quiz, abs: true, endsAt: Date.now() + quiz.timeLeft * 1000 };
-  return { ...p, errors: p.errors.filter((e) => has(e.id)), favs: p.favs.filter(has), quiz };
+  // Answers of a question edited since the test was saved: positions (selection, shuffled order) are reset.
+  const fp = quiz && answersPrint(bank, quiz.qs);
+  if (quiz && quiz.fp !== fp) {
+    const orders = {};
+    quiz.qs.forEach((id) => { const o = quiz.orders[id], n = bank.byId.get(id).a.length; if (Array.isArray(o) && o.length === n && [...o].sort().every((v, i) => v === i)) orders[id] = o; });
+    quiz = { ...quiz, fp, sel: null, orders, answers: quiz.answers.map((a) => ({ ...a, chosen: null })) };
+  }
+  return expireQuiz(bank, { ...p, errors: p.errors.filter((e) => has(e.id)), favs: p.favs.filter(has), quiz });
+}
+
+// A saved timed test whose deadline passed (app closed or test left) is finished and added to the history.
+function expireQuiz(bank, p, now = Date.now()) {
+  const q = p.quiz;
+  if (!q || !q.timed || q.open || secondsLeft(q, now) > 0) return p;
+  return { ...p, quiz: null, history: [resultEntry(bank, q, now)].concat(p.history).slice(0, 200) };
 }
 
 export default class App extends Component {
@@ -76,14 +84,13 @@ export default class App extends Component {
     const saved = loadSettings();
     // The preparation picker is only shown at first launch when there is a choice to make.
     this.firstRun = (!saved || !hasPrep(saved.prep)) && PREPS.length > 1;
-    const { prep: savedPrep, dataRev, ...device } = saved || {};
+    const { prep: savedPrep, ...device } = saved || {};
     const prep = hasPrep(savedPrep) ? savedPrep : (hasPrep(DEFAULT_PREP) ? DEFAULT_PREP : PREPS[0].id);
-    const migrate = saved && (dataRev || 0) < DATA_REV;
     const profiles = {};
     PREPS.forEach((b) => {
-      const p = cleanProfile(b, loadProfile(b.id));
-      profiles[b.id] = migrate ? forgetChosen(p) : p;
-      if (migrate) { saveProfile(b.id, profiles[b.id]); saveQuiz(b.id, profiles[b.id].quiz); }
+      const loaded = loadProfile(b.id), p = cleanProfile(b, loaded);
+      profiles[b.id] = p;
+      if (p.history !== loaded.history) { saveProfile(b.id, p); saveQuiz(b.id, p.quiz); }
     });
     // A quiz that was on screen when the page was closed or reloaded is reopened where it was.
     const stacks = EMPTY_STACKS();
@@ -104,8 +111,9 @@ export default class App extends Component {
   componentDidMount() {
     this.sig = this.sigOf();
     persistStorage();
-    // A new version of the app is only installed (page reload) when no test, form or sheet is on screen.
-    setUpdateGuard(() => { const c = this.cur(); return c.s === 'quiz' || c.s === 'propose' || !!this.state.sheet; });
+    // A new version of the app is only installed (page reload) on the main screen of a tab, with no sheet open:
+    // never during a test, a form, a result just displayed, flashcards or a correction being read.
+    setUpdateGuard(() => !!this.state.sheet || this.state.stacks[this.state.tab].length > 0);
     this.onScheme = (e) => this.setState({ systemDark: e.matches });
     darkQuery?.addEventListener?.('change', this.onScheme);
     this.offInstall = onInstallChange(() => {
@@ -142,13 +150,14 @@ export default class App extends Component {
     this.onVisible = () => {
       if (document.visibilityState !== 'visible') return;
       this.setState({ notif: notifPermission() });
+      this.expireSaved();
       this.tick();
       checkReminders();
       applyUpdate();
     };
     document.addEventListener('visibilitychange', this.onVisible);
     this.applyChrome();
-    saveSettings({ ...this.state.device, prep: this.state.prep, dataRev: DATA_REV });
+    saveSettings({ ...this.state.device, prep: this.state.prep });
     const q = this.prof().quiz;
     if (q && q.open) this.startTimer(q);
     else if (this.firstRun) this.openSheet('prep');
@@ -156,7 +165,7 @@ export default class App extends Component {
     else if (go === 'smart') this.startQuiz('smart');
     else if (go === 'resume' && q) this.resumeQuiz();
     this.syncReminders();
-    this.remTimer = setInterval(() => checkReminders(), 60 * 1000);
+    this.remTimer = setInterval(() => { checkReminders(); this.expireSaved(); }, 60 * 1000);
   }
 
   componentWillUnmount() {
@@ -172,7 +181,7 @@ export default class App extends Component {
 
   componentDidUpdate(_, ps) {
     const s = this.state;
-    if (ps.device !== s.device || ps.prep !== s.prep) saveSettings({ ...s.device, prep: s.prep, dataRev: DATA_REV });
+    if (ps.device !== s.device || ps.prep !== s.prep) saveSettings({ ...s.device, prep: s.prep });
     if (ps.profiles !== s.profiles) {
       Object.keys(s.profiles).forEach((id) => {
         const a = ps.profiles[id], b = s.profiles[id];
@@ -218,6 +227,13 @@ export default class App extends Component {
   // Values migrated from the first version (goal, exam length…) act as defaults for every profile.
   settings() { return { ...PROFILE_DEFAULTS, ...this.state.device, ...this.prof().settings }; }
   updP(fn) { this.setState((s) => ({ profiles: { ...s.profiles, [s.prep]: fn(s.profiles[s.prep]) } })); }
+  expireSaved() {
+    const P = this.prof(), q = P.quiz;
+    if (!q || !q.timed || q.open || secondsLeft(q) > 0) return;
+    const bank = this.bank();
+    this.updP((p) => expireQuiz(bank, p));
+    this.toast('Temps écoulé : « ' + q.title + ' » est terminé', 3500, 'clock');
+  }
   setQuiz(q) { this.updP((p) => ({ ...p, quiz: q })); }
 
   sigOf() { const c = this.cur(); return this.state.prep + '/' + this.state.tab + '/' + c.s + '/' + (c.id || c.hid || ''); }
@@ -281,8 +297,8 @@ export default class App extends Component {
     const st = this.settings(), bank = this.bank(), P = this.prof();
     const ids = (list) => list.map((q) => q.id);
     let qs = [], title = MODE_T[mode], timed = false, lot = null;
-    if (mode === 'theme') { qs = ids(shuffle(bank.questions.filter((q) => q.t === arg))); title = 'Quiz · ' + thById(arg).short; }
-    if (mode === 'hard') qs = ids(shuffle(hardPool(bank, P)));
+    if (mode === 'theme') { qs = pickPool(bank.questions.filter((q) => q.t === arg), P, MAX_POOL_QUIZ); title = 'Quiz · ' + thById(arg).short; }
+    if (mode === 'hard') qs = pickPool(hardPool(bank, P), P, MAX_POOL_QUIZ);
     if (mode === 'weak') qs = pickWeak(bank, P, 10);
     if (mode === 'smart') qs = pickSmart(bank, P, Math.max(5, st.goal));
     if (mode === 'errors') qs = shuffle(P.errors.map((e) => e.id));
@@ -298,7 +314,7 @@ export default class App extends Component {
     const limit = timed ? examMinutes(qs.length) * 60 : 0;
     return {
       mode, lot, title, qs, orders, idx: 0, sel: null, validated: false, answers: [], instant: !timed && st.instant,
-      timed, limit, timeLeft: limit, endsAt: timed ? Date.now() + limit * 1000 : 0, abs: true, startedAt: Date.now(), open: true, tab: this.state.tab,
+      timed, limit, timeLeft: limit, endsAt: timed ? Date.now() + limit * 1000 : 0, abs: true, fp: answersPrint(bank, qs), startedAt: Date.now(), open: true, tab: this.state.tab,
     };
   }
   startQuiz(mode, arg, force) {
@@ -331,11 +347,12 @@ export default class App extends Component {
   select(i) { const q = this.prof().quiz; if (!q || q.validated) return; this.setQuiz({ ...q, sel: i }); }
   primaryQuiz() {
     const q = this.prof().quiz; if (!q) return; if (q.validated) return this.nextQ(); if (q.sel == null) return;
-    const id = q.qs[q.idx]; const ok = this.bank().byId.get(id).c === q.sel; const answers = q.answers.concat([{ id, chosen: q.sel, ok }]);
+    const id = q.qs[q.idx], Q = this.bank().byId.get(id), ok = Q.c === q.sel, pick = Q.a[q.sel] ?? null;
+    const answers = q.answers.concat([{ id, chosen: q.sel, pick, ok }]);
     this.feedback(ok, q.instant);
     // Stats and « Mes erreurs » are updated at each answer, so nothing is lost if the test is abandoned.
     const opts = { auto: this.settings().auto, errorsMode: q.mode === 'errors' };
-    const rec = (p) => updateErrors(recordAnswer(p, id, ok), id, ok, q.sel, opts);
+    const rec = (p) => updateErrors(recordAnswer(p, id, ok), id, ok, pick, opts);
     if (q.instant) return this.updP((p) => ({ ...rec(p), quiz: { ...q, answers, validated: true } }));
     const nq = { ...q, answers };
     if (q.idx + 1 >= q.qs.length) { this.updP(rec); this.finish(nq); }
@@ -359,16 +376,7 @@ export default class App extends Component {
   // Every finished test is kept in the profile history, with its wrong answers and per-theme score.
   finish(q) {
     clearInterval(this.timer); if (this.state.sheet) this.closeSheet();
-    const bank = this.bank(), now = Date.now();
-    const byId = new Map(q.answers.map((a) => [a.id, a]));
-    const score = q.answers.filter((a) => a.ok).length, total = q.qs.length;
-    const wrong = q.qs.filter((id) => !byId.get(id)?.ok).map((id) => ({ id, chosen: byId.has(id) ? byId.get(id).chosen : null }));
-    const themes = {};
-    q.qs.forEach((id) => { const t = bank.byId.get(id).t; const o = themes[t] || (themes[t] = [0, 0]); o[1]++; if (byId.get(id)?.ok) o[0]++; });
-    const entry = {
-      id: now, at: now, mode: q.mode, title: q.title, lot: q.lot || null, score, total, answered: q.answers.length,
-      used: q.timed ? Math.min(q.limit, Math.round((Math.min(now, q.endsAt) - (q.endsAt - q.limit * 1000)) / 1000)) : null, passed: score >= passMark(total), wrong, themes,
-    };
+    const entry = resultEntry(this.bank(), q);
     this.updP((p) => ({ ...p, quiz: null, history: [entry].concat(p.history).slice(0, 200) }));
     this.replaceTop({ s: 'result', hid: entry.id, fresh: true });
   }
@@ -435,7 +443,8 @@ export default class App extends Component {
       const order = z.orders[q.id], pos = order && chosen != null ? order.indexOf(chosen) : -1;
       return { ...ctx, where: 'test', mode: z.title, chosen, shown: pos >= 0 ? LET[pos] : null, revealed: !!(z.validated && z.instant) };
     }
-    return { ...ctx, where: c.from ? 'question (' + c.from + ')' : 'question', chosen: c.chosen ?? null };
+    const i = c.pick != null ? q.a.indexOf(c.pick) : -1;
+    return { ...ctx, where: c.from ? 'question (' + c.from + ')' : 'question', chosen: i >= 0 ? i : null };
   }
 
   // A question report attaches a screenshot of the current screen, taken before the sheet covers it.
@@ -515,7 +524,7 @@ export default class App extends Component {
     const s = this.state, st = this.settings(), c = this.cur(), bank = this.bank(), P = this.prof();
     const O = this.overviewOf(bank, P), TS = this.themeStatsOf(bank, P), weak = this.memo('weak', [bank, P.stats], () => weakThemes(bank, P));
     const qById = (id) => bank.byId.get(id);
-    const pct = (t) => TS[t.id].pct, chev = ic('chevR', 20), ex = Math.min(st.examLength, O.total), exMin = examMinutes(ex);
+    const pct = (t) => TS[t.id].pct, chev = ic('chevR', 20), ex = Math.min(st.examLength, this.memo('examPool', [bank], () => examPool(bank).length)), exMin = examMinutes(ex);
     const withSep = (rows) => rows.map((r, i) => ({ ...r, sep: i < rows.length - 1 ? '1px solid var(--divider)' : 'none' }));
     const G = (header, rows, action) => ({ header, rows: withSep(rows), action });
     const row = (o) => { const r = { color: 'var(--text)', iconBg: 'var(--tint)', iconColor: 'var(--primary)', op: 1, cursor: o.onClick ? 'pointer' : 'default', role: o.onClick ? 'button' : undefined, tab: o.onClick ? 0 : undefined, ...o }; if (typeof o.icon === 'string') r.icon = ic(o.icon); if (o.chev) r.chev = chev; return r; };
@@ -527,8 +536,8 @@ export default class App extends Component {
     const nErr = P.errors.length, nTraps = this.memo('traps', [bank], () => bank.questions.filter((q) => q.trap).length);
     const themeSub = (t) => (TS[t.id].seen ? pct(t) + ' % maîtrisé · ' + TS[t.id].mastered + ' / ' + TS[t.id].total : plural(TS[t.id].total, 'question') + ' · pas encore commencé');
     const themeRow = (t) => row({ icon: t.icon, title: t.name, sub: themeSub(t), pct: pct(t) + '%', chev: true, onClick: () => this.pushTheme(t.id) });
-    const qRow = (id, sub, from, chosen) => { const q = qById(id); return q && row({ tag: tagN(thById(q.t).short), title: q.q, sub, chev: true, onClick: () => this.push({ s: 'question', id, chosen, from }) }); };
-    const answerSub = (q, chosen, none) => (chosen != null ? 'Ta réponse : ' + q.a[chosen] : none);
+    const qRow = (id, sub, from, pick) => { const q = qById(id); return q && row({ tag: tagN(thById(q.t).short), title: q.q, sub, chev: true, onClick: () => this.push({ s: 'question', id, pick, from }) }); };
+    const answerSub = (pick, none) => (pick != null ? 'Ta réponse : ' + pick : none);
     const verdictBadge = (ok) => ({ label: ok ? 'Réussi' : 'Échoué', icon: ic(ok ? 'check' : 'x', 14, 2.5), bg: ok ? 'var(--successTint)' : 'var(--errorTint)', color: ok ? 'var(--success)' : 'var(--error)' });
     const back = { show: true, backIcon: ic('chevL', 26), backLabel: 'Retour', onBack: () => this.back() };
     let propose = null, bar = { show: false }, largeTitle = null, home = null, testHero = null, progHero = null, profile = null, intro = null, fiche = null, flash = null, qv = null, res = null, chips = null, groups = [], empty = null, sticky = null, quizBar = null;
@@ -583,6 +592,7 @@ export default class App extends Component {
           row({ icon: 'alert', title: 'Questions pièges', value: String(nTraps), chev: true, onClick: () => this.push({ s: 'traps' }) }),
           row({ icon: 'calendar', title: 'Dates à retenir', chev: true, onClick: () => this.push({ s: 'dates' }) }),
           row({ icon: 'layers', title: 'Flashcards', chev: true, onClick: () => this.pushFlash({}) }),
+          row({ icon: 'scroll', title: 'Chiffres romains', sub: 'Ve République, XVe siècle, Louis XIV…', chev: true, onClick: () => this.push({ s: 'roman' }) }),
         ])]; break;
       case 'test': {
         largeTitle = 'Tester';
@@ -592,7 +602,7 @@ export default class App extends Component {
         groups.push(G('Entraînement libre', [
           row({ icon: 'zap', title: 'Quiz rapide', sub: '5 à ' + Math.min(40, O.total) + ' questions au hasard', chev: true, onClick: () => this.openSheet('count') }),
           row({ icon: 'book', title: 'Quiz par thème', sub: '5 thématiques officielles', chev: true, onClick: () => this.openSheet('theme') }),
-          row({ icon: 'flame', title: 'Questions difficiles', sub: nHard ? plural(nHard, 'question') + ' · pièges et questions souvent ratées' : 'Aucune pour l’instant', chev: true, onClick: () => this.startQuiz('hard') }),
+          row({ icon: 'flame', title: 'Questions difficiles', sub: nHard ? Math.min(nHard, MAX_POOL_QUIZ) + ' questions parmi ' + nHard + ' · pièges et questions souvent ratées' : 'Aucune pour l’instant', chev: true, onClick: () => this.startQuiz('hard') }),
         ]));
         groups.push(G('Lots de questions', bank.lots.map((L) => {
           const runs = P.history.filter((h) => h.lot === L.id), best = bestOf(runs);
@@ -675,7 +685,7 @@ export default class App extends Component {
         if (!canNotify) { empty = { icon: ic('bell', 32), iconBg: 'var(--surface2)', iconColor: 'var(--text2)', title: 'Notifications indisponibles', text: 'Ce navigateur ne permet pas les notifications. Sur iPhone, installe d’abord Civi sur l’écran d’accueil (iOS 16.4 ou plus).' }; break; }
         intro = s.notif === 'denied'
           ? 'Les notifications sont bloquées pour ce site. Autorise-les dans les réglages du navigateur, puis réactive les rappels ici.'
-          : 'Les rappels s’affichent quand l’application est ouverte ou en arrière-plan. Sur Android, une fois l’application installée, ils peuvent aussi arriver quand elle est fermée.';
+          : 'Les rappels s’affichent quand l’application est ouverte ou en arrière-plan. Sur Android, une fois l’application installée, ils peuvent aussi arriver quand elle est fermée, à une heure approximative (c’est le téléphone qui décide). Sur iPhone, ils n’arrivent que lorsque l’application est ouverte.';
         groups = [
           G(null, [row({ title: 'Rappel quotidien', ...swRow(remOn, () => this.toggleReminder('reminder'), 'Si ton objectif du jour (' + st.goal + ' questions) n’est pas atteint') }), row({ title: 'Heure du rappel', value: st.time, chev: true, op: remOn ? 1 : 0.45, onClick: remOn ? () => this.openSheet('time') : undefined })]),
           G(null, [row({ title: 'Rappel de reprise', ...swRow(granted && st.streak, () => this.toggleReminder('streak'), 'Si tu n’as pas révisé depuis 2 jours') })]),
@@ -728,7 +738,7 @@ export default class App extends Component {
         const f = c.filter || 'all';
         chips = [{ id: 'all', label: 'Toutes' }].concat(THEMES.map((t) => ({ id: t.id, label: t.short }))).map((ch) => { const a = ch.id === f; return { key: ch.id, label: ch.label, pressed: a ? 'true' : 'false', bg: a ? 'var(--primary)' : 'var(--surface)', color: a ? 'var(--onChip)' : 'var(--text)', border: a ? 'transparent' : 'var(--line)', onClick: () => this.setTop({ filter: ch.id }) }; });
         const list = P.errors.filter((e) => f === 'all' || qById(e.id).t === f);
-        if (list.length) groups = [G(null, list.map((e) => qRow(e.id, answerSub(qById(e.id), e.chosen, 'Marquée « À revoir »'), 'errors', e.chosen)))];
+        if (list.length) groups = [G(null, list.map((e) => qRow(e.id, answerSub(e.pick, 'Marquée « À revoir »'), 'errors', e.pick)))];
         else empty = { icon: ic('check', 32, 2), iconBg: 'var(--surface2)', iconColor: 'var(--text2)', title: 'Rien dans ce thème', text: 'Choisis un autre filtre.' };
         sticky = primary('Revoir en quiz (' + nErr + ')', () => this.startQuiz('errors')); break;
       }
@@ -750,7 +760,7 @@ export default class App extends Component {
       case 'review': {
         const H = P.history.find((h) => h.id === c.hid), list = H ? H.wrong.filter((w) => qById(w.id)) : [];
         if (!H) { empty = { icon: ic('alert', 32), iconBg: 'var(--surface2)', iconColor: 'var(--text2)', title: 'Test introuvable', text: 'Ce test ne fait plus partie de ton historique.' }; break; }
-        if (list.length) groups = [G(null, list.map((w) => qRow(w.id, answerSub(qById(w.id), w.chosen, 'Sans réponse'), 'review', w.chosen)))];
+        if (list.length) groups = [G(null, list.map((w) => qRow(w.id, answerSub(w.pick, 'Sans réponse'), 'review', w.pick)))];
         else empty = { icon: ic('check', 32, 2), iconBg: 'var(--successTint)', iconColor: 'var(--success)', title: 'Aucune erreur', text: 'Tu as tout bon.' };
         break;
       }
@@ -789,14 +799,15 @@ export default class App extends Component {
         // Self-assessment is not an answer: it does not change mastery, spaced repetition or the daily goal.
         // « À revoir » adds the card to « Mes erreurs » when automatic revision is on.
         const next = (ok) => {
-          if (!ok && st.auto && !P.errors.some((e) => e.id === q.id)) this.updP((p) => ({ ...p, errors: p.errors.concat([{ id: q.id, chosen: null }]) }));
+          if (!ok && st.auto && !P.errors.some((e) => e.id === q.id)) this.updP((p) => ({ ...p, errors: p.errors.concat([{ id: q.id, pick: null }]) }));
           this.setState({ fc: s.fc + 1, flip: false });
         };
         sticky = primary('Je savais', () => next(true), { dir: 'row', icon: ic('check', 20, 2), secondary: { label: 'À revoir', icon: ic('x', 20, 2), onClick: () => next(false), order: 0, h: '54px', border: '1.5px solid var(--line)', color: 'var(--text)' } }); break;
       }
       case 'question': {
         const q = qById(c.id); if (!q) break; bar.star = favBtn(q.id);
-        const states = q.a.map((_, i) => (i === q.c ? 'correct' : i === c.chosen ? 'wrong' : 'dim'));
+        const chosen = c.pick != null ? q.a.indexOf(c.pick) : -1;
+        const states = q.a.map((_, i) => (i === q.c ? 'correct' : i === chosen ? 'wrong' : 'dim'));
         qv = buildQv(q, states, () => {}, true, { text: q.x, bulb: ic('bulb', 16) });
         if (c.from === 'errors' && P.errors.some((e) => e.id === q.id)) sticky = primary('J’ai compris', () => { this.updP((p) => ({ ...p, errors: p.errors.filter((e) => e.id !== q.id) })); this.toast('Retiré de mes erreurs'); this.back(); }, { icon: ic('check', 20, 2) });
         break;

@@ -9,7 +9,7 @@ const lotLoaders = import.meta.glob(['./data/*/*.json', '!./data/*/profil.json']
 const lotFiles = Object.fromEntries(await Promise.all(Object.entries(lotLoaders).map(async ([path, load]) => [path, await load()])));
 
 // Bank files (read first). Questions that only appear in a lot-*.json also join the bank, so that everything
-// the learner answers counts in the progress, the smart revision and the mock exam.
+// the learner answers counts in the progress and the revisions — but they are kept out of the mock exam.
 const POOL = { questions: {}, pieges: { piege: true }, situations: { situation: true } };
 
 const THEME_IDS = new Set(THEMES.map((t) => t.id));
@@ -69,6 +69,7 @@ function buildPreps() {
           qs.push(q.id); return;
         }
         q.lot = name; byId.set(q.id, q); qs.push(q.id); questions.push(q);
+        if (!inPool) q.lotOnly = true; // counts in the progress and revisions, but is never drawn in the mock exam
       });
       return qs;
     };

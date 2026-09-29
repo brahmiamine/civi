@@ -7,12 +7,24 @@ import { VitePWA } from 'vite-plugin-pwa';
 const base = process.env.BASE_PATH ?? '/';
 const { version } = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8'));
 
+// The Content-Security-Policy of public/_headers (applied as a header by Cloudflare) is also written as a <meta> tag
+// in the built page, so it applies on GitHub Pages too (which cannot send headers). Build only: the dev server needs
+// inline scripts. frame-ancestors is not allowed in a <meta> CSP and is removed there.
+const csp = readFileSync(new URL('./public/_headers', import.meta.url), 'utf8').match(/Content-Security-Policy: (.*)/)[1]
+  .split(';').map((d) => d.trim()).filter((d) => d && !d.startsWith('frame-ancestors')).join('; ');
+const cspMeta = {
+  name: 'civi-csp-meta',
+  apply: 'build',
+  transformIndexHtml: () => [{ tag: 'meta', attrs: { 'http-equiv': 'Content-Security-Policy', content: csp }, injectTo: 'head-prepend' }],
+};
+
 export default defineConfig({
   base,
   build: { target: 'es2022' },
   define: { __APP_VERSION__: JSON.stringify(version) },
   plugins: [
     react(),
+    cspMeta,
     VitePWA({
       // 'prompt': the new version is applied by src/update.js when no test or form is on screen.
       registerType: 'prompt',

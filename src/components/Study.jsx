@@ -47,12 +47,22 @@ export function Flash({ f, cardRef }) {
   );
 }
 
+// Arrow keys move between the answers, as expected in a group of radio buttons.
+function onArrows(e) {
+  const step = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[e.key];
+  if (!step) return;
+  const items = [...e.currentTarget.querySelectorAll('[role=radio]')], i = items.indexOf(document.activeElement);
+  if (i < 0) return;
+  e.preventDefault();
+  items[(i + step + items.length) % items.length].focus();
+}
+
 export function QuestionView({ qv }) {
   return (
     <div style={{ padding: '12px 20px 0', display: 'flex', flexDirection: 'column', gap: 20 }}>
       <span style={{ alignSelf: 'flex-start', fontSize: 13, fontWeight: 600, padding: '4px 8px', borderRadius: 4, background: 'var(--surface2)', color: 'var(--text2)' }}>{qv.theme}</span>
       <h2 style={{ margin: 0, fontFamily: 'var(--font-heading)', fontWeight: 600, fontSize: qv.fs, lineHeight: 1.2, textWrap: 'pretty' }}>{qv.text}</h2>
-      <div role="radiogroup" aria-label="Réponses" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div role="radiogroup" aria-label="Réponses" onKeyDown={onArrows} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         {qv.answers.map((a) => (
           <button key={a.key} className="p-answer" onClick={a.onClick} disabled={a.disabled} role="radio" aria-checked={a.checked} aria-label={a.aria} style={{ display: 'flex', alignItems: 'center', gap: 14, minHeight: 60, padding: '12px 14px', borderRadius: 10, border: a.border, background: a.bg, opacity: a.op, textAlign: 'left', cursor: a.disabled ? 'default' : 'pointer', transition: 'background .18s,border-color .18s,opacity .18s,transform .1s' }}>
             <span style={{ width: 34, height: 34, flex: 'none', display: 'grid', placeItems: 'center', borderRadius: 8, background: a.badgeBg, color: a.badgeColor, font: '600 18px/1 var(--font-heading)', transition: 'background .18s' }}>{a.badge}</span>
