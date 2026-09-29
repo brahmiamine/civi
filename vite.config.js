@@ -3,8 +3,8 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
-// Served from https://brahmiamine.github.io/civi/
-const base = process.env.BASE_PATH ?? '/civi/';
+// Served from the domain root (Cloudflare); the GitHub Pages workflow sets BASE_PATH=/civi/.
+const base = process.env.BASE_PATH ?? '/';
 const { version } = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8'));
 
 export default defineConfig({
