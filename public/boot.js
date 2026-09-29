@@ -11,5 +11,5 @@
     document.documentElement.style.background = bg;
     var meta = document.querySelector('meta[name="theme-color"]');
     if (meta) meta.setAttribute('content', bg);
-  } catch (e) {}
+  } catch (e) { /* storage unavailable: default theme */ }
 })();

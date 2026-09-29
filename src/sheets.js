@@ -5,6 +5,7 @@ import { PREPS } from './bank.js';
 import { installHelp } from './install.js';
 import { plural, examMinutes } from './utils.js';
 import { BUG_REASONS, REPORT_REASONS } from './feedback.js';
+import { answeredCount } from './quiz.js';
 
 export function sheetData(app) {
   const s = app.state, st = app.settings(), bank = app.bank(), P = app.prof(), TS = app.themeStatsOf(bank, P);
@@ -25,6 +26,15 @@ export function sheetData(app) {
         opt('Reprendre ce test', 'Là où tu t’étais arrêté', false, () => app.resumeQuiz(), ic('rotate')),
         opt('Commencer le nouveau test', 'Le test en cours sera abandonné', false, () => app.startQuiz(...app.pending, true), ic('zap')),
       ] };
+    }
+    case 'finish': {
+      const q = P.quiz; if (!q) return null;
+      const left = q.qs.length - answeredCount(q);
+      return {
+        title: 'Terminer le test ?',
+        sub: left ? plural(left, 'question') + ' sans réponse : ' + (left > 1 ? 'elles compteront' : 'elle comptera') + ' comme ' + (left > 1 ? 'fausses' : 'fausse') + '. Tu peux encore revenir en arrière pour répondre.' : 'Tu as répondu à toutes les questions. Une fois le test terminé, tu ne pourras plus changer tes réponses.',
+        confirm: { alt: { label: 'Terminer et voir le résultat', onClick: () => app.finish(app.prof().quiz) }, cancel: 'Revenir aux questions' },
+      };
     }
     case 'reset': return { title: 'Réinitialiser ma progression ?', sub: 'Les statistiques, l’historique, les erreurs, les favoris et le test en cours du profil « ' + bank.name + ' » seront effacés. Les autres préparations ne sont pas touchées. Cette action est définitive.', confirm: { ok: 'Réinitialiser', cancel: 'Annuler', onOk: () => app.resetProfile() } };
     case 'appearance': return { title: 'Apparence', options: pick('theme', [['system', 'Système', 'Suit le réglage du téléphone'], ['light', 'Clair'], ['dark', 'Sombre']]) };

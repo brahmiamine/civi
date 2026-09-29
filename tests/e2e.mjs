@@ -96,6 +96,46 @@ await step('signalement : fenêtre avec capture, focus dans la fenêtre, Échap 
   await page.getByRole('dialog').waitFor({ state: 'detached', timeout: 2000 });
 });
 
+await step('correction à la fin : revenir en arrière, changer sa réponse, terminer', async () => {
+  await page.goto(URL); await ready();
+  // Switch off the instant correction (Profil → Paramètres), then start a 5-question quick quiz.
+  await page.getByRole('button', { name: 'Profil' }).click();
+  await page.getByText('Paramètres', { exact: true }).click();
+  await page.getByRole('switch', { name: /Afficher immédiatement la correction/ }).click();
+  await page.getByRole('button', { name: 'Tester' }).click();
+  await page.getByText('Quiz rapide', { exact: true }).click();
+  await page.getByRole('dialog').getByText('5 questions').click();
+  await page.getByText('Question 1 / 5').waitFor({ timeout: 3000 });
+  const statsBefore = JSON.stringify((await ls(PROFILE)).stats);
+  expect(!(await page.getByRole('button', { name: 'Précédente' }).count()), 'bouton Précédente sur la 1re question');
+  await page.getByRole('radio').nth(0).click();
+  const firstPick = await page.getByRole('radio').nth(0).getAttribute('aria-label');
+  await page.getByRole('button', { name: 'Question suivante' }).click();
+  await page.getByText('Question 2 / 5').waitFor();
+  await page.getByRole('button', { name: 'Précédente' }).click();
+  await page.getByText('Question 1 / 5').waitFor();
+  expect((await page.getByRole('radio').nth(0).getAttribute('aria-checked')) === 'true', 'réponse de la question 1 perdue : ' + firstPick);
+  await page.getByRole('radio').nth(1).click(); // change the answer
+  expect((await page.getByRole('radio').nth(0).getAttribute('aria-checked')) === 'false', 'ancienne réponse encore cochée');
+  for (let i = 1; i < 5; i++) await page.getByRole('button', { name: 'Question suivante' }).click();
+  await page.getByText('Question 5 / 5').waitFor();
+  expect(JSON.stringify((await ls(PROFILE)).stats) === statsBefore, 'réponses enregistrées avant la fin du test');
+  await page.getByRole('button', { name: 'Terminer le test' }).click();
+  await page.getByRole('dialog', { name: 'Terminer le test ?' }).getByText('4 questions sans réponse', { exact: false }).waitFor();
+  await page.getByRole('button', { name: 'Revenir aux questions' }).click();
+  await page.getByRole('dialog').waitFor({ state: 'detached' });
+  await page.getByRole('button', { name: 'Terminer le test' }).click();
+  await page.getByRole('button', { name: 'Terminer et voir le résultat' }).click();
+  await page.getByText('4 questions sans réponse.', { exact: false }).waitFor({ timeout: 3000 });
+  const p = await ls(PROFILE);
+  expect(p.history[0].answered === 1 && p.history[0].total === 5, 'résultat : ' + JSON.stringify(p.history[0]));
+  // Back to the default setting for the next steps.
+  await page.goto(URL); await ready();
+  await page.getByRole('button', { name: 'Profil' }).click();
+  await page.getByText('Paramètres', { exact: true }).click();
+  await page.getByRole('switch', { name: /Afficher immédiatement la correction/ }).click();
+});
+
 await step('quiz par thème limité à 20 questions', async () => {
   await page.goto(URL); await ready();
   await page.getByRole('button', { name: 'Tester' }).click();

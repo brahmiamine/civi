@@ -12,10 +12,11 @@ npm run dev      # serveur local
 npm run build    # build de production dans dist/
 npm run preview  # sert dist/ sur http://localhost:4173/
 npm run icons    # régénère les icônes PWA dans public/ (à lancer après une modification de brand-icon.svg)
+npm run lint     # ESLint (noms inconnus, variables inutilisées, erreurs JSX)
 npm run validate:data  # vérifie les banques de questions (src/data/)
 npm test         # tests unitaires (logique de progression, stockage)
 npm run e2e      # tests dans Chromium sur le build (npm run build avant)
-npm run check    # validate:data + test + build + e2e, comme la CI
+npm run check    # lint + validate:data + test + build + e2e, comme la CI
 ```
 
 ## Déploiement
@@ -33,6 +34,7 @@ L’app peut aussi être publiée à la racine d’un domaine sur Cloudflare Wor
 - **Tests sauvegardés** : un quiz ou un examen en cours est enregistré à chaque réponse (statistiques et « Mes erreurs » compris) ; il est rouvert après une actualisation ou une fermeture du navigateur. Pour un test chronométré, l’heure de fin est fixe comme à l’examen : le chrono continue quand on quitte le test ou ferme l’app, et un test sauvegardé dont le temps est écoulé est terminé et rangé dans l’historique.
 - **Examen blanc** : répartition officielle par thème (méthode du plus fort reste pour les examens plus courts), 80 % de bonnes réponses pour réussir. Il ne tire que dans la banque (`questions`, `pieges`, `situations`), jamais les questions propres aux lots. Le meilleur score ne compare que les examens de la longueur la plus grande.
 - **Quiz par thème et Questions difficiles** : 20 questions au plus, les moins maîtrisées d’abord.
+- **Deux façons de passer un test** : avec la correction immédiate (entraînement), chaque réponse est validée, corrigée et enregistrée tout de suite ; avec la correction à la fin (examen blanc, lots en conditions d’examen, ou réglage « Afficher immédiatement la correction » désactivé), on passe librement d’une question à l’autre (**Précédente / Question suivante**), on peut changer ses réponses, et tout est enregistré quand on termine le test (une confirmation indique les questions sans réponse). Un examen abandonné n’est pas compté.
 - **Lots de questions** : dans Tester, choisis un lot (fichier de `src/data/`) et lance-le en entraînement ou en conditions d’examen.
 - **Sauvegarde** : Paramètres → Données → Exporter / Importer (fichier JSON de toutes les préparations). L’app demande aussi au navigateur de ne pas effacer ses données (`navigator.storage.persist()`). Des données enregistrées abîmées sont réparées au chargement ; en dernier recours, un écran d’erreur permet d’exporter puis de réinitialiser.
 - **Mises à jour** : une nouvelle version n’est installée (rechargement) que sur l’écran principal d’un onglet, sans fenêtre ouverte (`src/update.js`).
@@ -42,7 +44,12 @@ L’app peut aussi être publiée à la racine d’un domaine sur Cloudflare Wor
 
 ## Structure
 
-- `src/App.jsx` — navigation (pile par onglet, retour Android, Échap), écrans, bottom sheets
+- `src/App.jsx` — coquille de l’app : état, navigation (pile par onglet, retour Android, Échap), minuteries et actions
+- `src/quiz.js` — moteur des tests (création, réponses, fin de test, test expiré, reprise d’un test sauvegardé)
+- `src/view/` — ce qu’affiche chaque écran : `index.js` choisit l’écran, `kit.js` fournit les briques communes (lignes, groupes, boutons, états vides, question), `screens/*.js` un fichier par zone (accueil et révision, tests, progression, étude, profil)
+- `src/components/` — composants React réutilisables (`Screen.jsx` : cadre de l’app ; `Chrome.jsx` : barres, bouton collant, fenêtres ; `Lists.jsx`, `Study.jsx`, `Dashboard.jsx`, `ui.jsx`…)
+- `src/sheets.js` — contenu des fenêtres du bas (choix, confirmations, signalement)
+- `src/content.js` — textes de « À propos » (sources, confidentialité)
 - `src/data/` — banques de questions par type de préparation (voir `src/data/README.md`)
 - `src/bank.js` — chargement et validation des fichiers de `src/data/`
 - `src/stats.js` — statistiques, points faibles, révision intelligente, tirage de l’examen

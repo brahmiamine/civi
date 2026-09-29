@@ -26,6 +26,7 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - run: npm run lint
       # Nothing is published if the question banks or the unit tests fail.
       - run: npm run validate:data
       - run: npm test

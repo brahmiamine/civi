@@ -95,7 +95,7 @@ export function Sheet({ sheet, onClose, onDown, onMove, onUp }) {
         {sheet.confirm && (
           <div style={{ padding: '18px 20px 0', display: 'flex', flexDirection: 'column', gap: 8 }}>
             {sheet.confirm.alt && <button className="p-btn" onClick={sheet.confirm.alt.onClick} style={{ ...btnPrimary, height: 54 }}>{sheet.confirm.alt.label}</button>}
-            <button className="p-danger" onClick={sheet.confirm.onOk} style={{ height: 54, border: 'none', borderRadius: 10, background: 'var(--errorFill)', color: '#fff', font: '600 17px/1 var(--font-body)', cursor: 'pointer' }}>{sheet.confirm.ok}</button>
+            {sheet.confirm.ok && <button className="p-danger" onClick={sheet.confirm.onOk} style={{ height: 54, border: 'none', borderRadius: 10, background: 'var(--errorFill)', color: '#fff', font: '600 17px/1 var(--font-body)', cursor: 'pointer' }}>{sheet.confirm.ok}</button>}
             <button className="p-cancel" onClick={onClose} style={{ height: 52, border: 'none', borderRadius: 10, background: 'var(--surface2)', color: 'var(--text)', font: '600 17px/1 var(--font-body)', cursor: 'pointer' }}>{sheet.confirm.cancel}</button>
           </div>
         )}

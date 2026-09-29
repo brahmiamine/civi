@@ -90,7 +90,10 @@ function normQuiz(q) {
   const answers = arr(q.answers).filter((a) => isObj(a) && typeof a.id === 'string').map((a) => ({ id: a.id, chosen: idx(a.chosen), pick: pick(a.pick), ok: !!a.ok }));
   if (q.validated && !answers.length) return null;
   return {
-    ...q, answers, orders: obj(q.orders), sel: idx(q.sel), validated: !!q.validated, timed: !!q.timed,
+    ...q, answers, orders: obj(q.orders), sel: idx(q.sel),
+    // Correction at the end: answers picked so far (question id → answer index) and those already recorded.
+    picks: q.picks === undefined ? undefined : Object.fromEntries(Object.entries(obj(q.picks)).filter(([, i]) => idx(i) != null)),
+    recorded: Array.isArray(q.recorded) ? q.recorded.filter((id) => typeof id === 'string') : undefined, validated: !!q.validated, timed: !!q.timed,
     title: typeof q.title === 'string' ? q.title : 'Test', limit: isNum(q.limit) ? q.limit : 0,
     timeLeft: isNum(q.timeLeft) ? q.timeLeft : 0, endsAt: isNum(q.endsAt) ? q.endsAt : 0,
   };
