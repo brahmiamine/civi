@@ -1,0 +1,266 @@
+{
+  "titre": "Français célèbres",
+  "description": "20 questions sur les grandes figures françaises à connaître pour le test civique – Carte de résident : histoire, République, droits, littérature, arts et culture.",
+  "questions": [
+    {
+      "id": "cr-hg-001",
+      "theme": "histoire",
+      "question": "Quel était le surnom de Louis XIV ?",
+      "reponses": [
+        "Le Roi Soleil",
+        "Le Grand Roi",
+        "Le Roi Très Chrétien",
+        "Le Roi de France et de Navarre"
+      ],
+      "bonne_reponse": "A",
+      "explication": "Louis XIV (1643-1715) était surnommé 'le Roi Soleil'. Il a régné pendant 72 ans, le plus long règne de l'histoire de France. Il a concentré tous les pouvoirs et fait construire le château de Versailles."
+    },
+    {
+      "id": "cr-hg-003",
+      "theme": "histoire",
+      "question": "En quelle année Napoléon Ier est-il devenu empereur ?",
+      "reponses": [
+        "1799",
+        "1802",
+        "1804",
+        "1815"
+      ],
+      "bonne_reponse": "C",
+      "explication": "Napoléon Ier est devenu empereur des Français le 2 décembre 1804, lors d'une cérémonie au cours de laquelle il s'est couronné lui-même en présence du pape Pie VII à Notre-Dame de Paris."
+    },
+    {
+      "id": "cr-hg-004",
+      "theme": "histoire",
+      "question": "Lequel de ces personnages a un lien avec la République française ?",
+      "reponses": [
+        "Winston Churchill",
+        "Simone Veil",
+        "Nelson Mandela",
+        "Martin Luther King"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Simone Veil (1927-2017) est une figure majeure de la République française. Rescapée de la Shoah, elle a été ministre de la Santé et a fait adopter la loi sur l'IVG en 1975. Elle est entrée au Panthéon en 2018."
+    },
+    {
+      "id": "cr-hg-005",
+      "theme": "histoire",
+      "question": "De quand date l'appel à la résistance du général de Gaulle ?",
+      "reponses": [
+        "Du 18 juin 1940",
+        "Du 8 mai 1945",
+        "Du 6 juin 1944",
+        "Du 11 novembre 1918"
+      ],
+      "bonne_reponse": "A",
+      "explication": "Le 18 juin 1940, le général de Gaulle a lancé depuis Londres son célèbre appel à la résistance contre l'occupation allemande. Cet appel, diffusé par la BBC, est considéré comme l'acte fondateur de la Résistance française."
+    },
+    {
+      "id": "cr-hg-010",
+      "theme": "histoire",
+      "question": "Durant le mandat de quel président la peine de mort a-t-elle été abolie ?",
+      "reponses": [
+        "Charles de Gaulle",
+        "Georges Pompidou",
+        "Valéry Giscard d'Estaing",
+        "François Mitterrand"
+      ],
+      "bonne_reponse": "D",
+      "explication": "La peine de mort a été abolie en France en 1981, durant le premier mandat de François Mitterrand, à l'initiative du garde des Sceaux Robert Badinter. La France est l'un des premiers grands pays à avoir aboli la peine capitale."
+    },
+    {
+      "id": "cr-hg-012",
+      "theme": "histoire",
+      "question": "Qui était une figure de la Résistance française pendant la Seconde Guerre mondiale ?",
+      "reponses": [
+        "Philippe Pétain",
+        "Jean Moulin",
+        "Pierre Laval",
+        "Louis XVI"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Jean Moulin (1899-1943) était l'une des figures emblématiques de la Résistance française. Préfet révoqué par Vichy, il a rejoint de Gaulle à Londres et a unifié les mouvements de résistance intérieure. Il est mort sous la torture."
+    },
+    {
+      "id": "cr-hg-040",
+      "theme": "histoire",
+      "question": "Qui était Marguerite Yourcenar ?",
+      "reponses": [
+        "Une femme politique française du XXe siècle",
+        "La première femme élue à l'Académie française, romancière auteure des Mémoires d'Hadrien",
+        "Une peintre impressionniste française",
+        "Une résistante française pendant la Seconde Guerre mondiale"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Marguerite Yourcenar (1903-1987) est la première femme élue à l'Académie française en 1980. Romancière franco-américaine, elle est notamment l'auteure des Mémoires d'Hadrien."
+    },
+    {
+      "id": "cr-hg-041",
+      "theme": "histoire",
+      "question": "Quel peintre est français ?",
+      "reponses": [
+        "Pablo Picasso",
+        "Leonardo da Vinci",
+        "Claude Monet",
+        "Vincent van Gogh"
+      ],
+      "bonne_reponse": "C",
+      "explication": "Claude Monet (1840-1926) est un peintre français, l'un des fondateurs du mouvement impressionniste. Son tableau Impression, soleil levant a donné son nom à ce courant artistique majeur."
+    },
+    {
+      "id": "cr-hg-043",
+      "theme": "histoire",
+      "question": "Qui était Auguste Rodin ?",
+      "reponses": [
+        "Un peintre impressionniste français du XIXe siècle",
+        "Un sculpteur français célèbre, auteur du Penseur et du Baiser",
+        "Un architecte français du XIXe siècle",
+        "Un compositeur de musique classique française"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Auguste Rodin (1840-1917) était un sculpteur français considéré comme l'un des plus grands sculpteurs de tous les temps. Il est notamment l'auteur du Penseur, du Baiser et des Bourgeois de Calais."
+    },
+    {
+      "id": "cr-hg-046",
+      "theme": "histoire",
+      "question": "Qui était une écrivaine française célèbre ?",
+      "reponses": [
+        "Marie Curie",
+        "Simone Veil",
+        "Simone de Beauvoir",
+        "Joséphine Baker"
+      ],
+      "bonne_reponse": "C",
+      "explication": "Simone de Beauvoir (1908-1986) était une philosophe et écrivaine française, figure majeure du féminisme et de l'existentialisme. Son œuvre Le Deuxième Sexe (1949) est un texte fondateur du féminisme moderne."
+    },
+    {
+      "id": "cr-hg-047",
+      "theme": "histoire",
+      "question": "Qui était un célèbre musicien français ?",
+      "reponses": [
+        "Ludwig van Beethoven",
+        "Wolfgang Amadeus Mozart",
+        "Claude Debussy",
+        "Frédéric Chopin"
+      ],
+      "bonne_reponse": "C",
+      "explication": "Claude Debussy (1862-1918) était un compositeur français, figure majeure de la musique impressionniste. Il est notamment connu pour Clair de lune et La Mer. Beethoven est allemand, Mozart autrichien et Chopin polonais."
+    },
+    {
+      "id": "cr-hg-048",
+      "theme": "histoire",
+      "question": "Qui était Auguste Renoir ?",
+      "reponses": [
+        "Un sculpteur français du XIXe siècle",
+        "Un peintre français impressionniste, auteur du Moulin de la Galette",
+        "Un architecte du château de Versailles",
+        "Un poète symboliste du XIXe siècle"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Auguste Renoir (1841-1919) était un peintre français impressionniste, connu pour ses scènes de la vie quotidienne et ses portraits. Le Moulin de la Galette et Les Grandes Baigneuses sont parmi ses œuvres les plus célèbres."
+    },
+    {
+      "id": "cr-celebre-001",
+      "theme": "histoire",
+      "question": "Quel roi des Francs a fondé la dynastie mérovingienne à la fin du Ve siècle ?",
+      "reponses": [
+        "Clovis",
+        "Charlemagne",
+        "Hugues Capet",
+        "Louis XIV"
+      ],
+      "bonne_reponse": "A",
+      "explication": "Clovis, roi des Francs, fonde la dynastie mérovingienne à la fin du Ve siècle et se convertit au christianisme."
+    },
+    {
+      "id": "cr-celebre-002",
+      "theme": "histoire",
+      "question": "Quel roi carolingien a été couronné empereur en l'an 800 ?",
+      "reponses": [
+        "Clovis",
+        "Charlemagne",
+        "Hugues Capet",
+        "Louis-Philippe"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Charlemagne, roi de la dynastie carolingienne, a été couronné empereur en l'an 800."
+    },
+    {
+      "id": "cr-celebre-003",
+      "theme": "histoire",
+      "question": "Quel roi a fondé la dynastie des Capétiens en 987 ?",
+      "reponses": [
+        "Hugues Capet",
+        "Louis XVIII",
+        "Napoléon Ier",
+        "François Ier"
+      ],
+      "bonne_reponse": "A",
+      "explication": "Hugues Capet a été sacré roi en 987 et a fondé la dynastie des Capétiens."
+    },
+    {
+      "id": "cr-celebre-004",
+      "theme": "histoire",
+      "question": "Quel homme politique est associé au décret du 27 avril 1848 abolissant définitivement l'esclavage dans les colonies françaises ?",
+      "reponses": [
+        "Victor Schœlcher",
+        "Jean Moulin",
+        "Robert Badinter",
+        "Georges Clemenceau"
+      ],
+      "bonne_reponse": "A",
+      "explication": "Victor Schœlcher, sous-secrétaire d'État chargé des colonies, a rédigé le décret du 27 avril 1848 abolissant définitivement l'esclavage dans les colonies françaises."
+    },
+    {
+      "id": "cr-celebre-005",
+      "theme": "histoire",
+      "question": "Sous quel nom Louis-Napoléon Bonaparte est-il devenu empereur des Français en 1852 ?",
+      "reponses": [
+        "Napoléon Ier",
+        "Napoléon II",
+        "Napoléon III",
+        "Louis-Philippe Ier"
+      ],
+      "bonne_reponse": "C",
+      "explication": "Louis-Napoléon Bonaparte est devenu empereur des Français sous le nom de Napoléon III le 2 décembre 1852."
+    },
+    {
+      "id": "cr-celebre-006",
+      "theme": "histoire",
+      "question": "Quel roi de France a rétabli la monarchie après la chute de Napoléon Ier et a régné de 1814 à 1824 ?",
+      "reponses": [
+        "Louis XIV",
+        "Louis XVI",
+        "Louis XVIII",
+        "Charles X"
+      ],
+      "bonne_reponse": "C",
+      "explication": "Louis XVIII a régné de 1814 à 1824 et a cherché à concilier le retour de la royauté avec certains acquis de la Révolution, notamment avec la Charte constitutionnelle de 1814."
+    },
+    {
+      "id": "cr-celebre-007",
+      "theme": "histoire",
+      "question": "Qui a été roi des Français pendant la Monarchie de Juillet, de 1830 à 1848 ?",
+      "reponses": [
+        "Louis-Philippe",
+        "Louis XVIII",
+        "Napoléon III",
+        "Charles de Gaulle"
+      ],
+      "bonne_reponse": "A",
+      "explication": "Louis-Philippe a été roi des Français de 1830 à 1848 pendant la Monarchie de Juillet."
+    },
+    {
+      "id": "cr-celebre-008",
+      "theme": "droits",
+      "question": "Quel ministre de la Justice a soutenu l'abolition de la peine de mort en France en 1981 ?",
+      "reponses": [
+        "Robert Badinter",
+        "Simone Veil",
+        "Jean Moulin",
+        "Victor Schœlcher"
+      ],
+      "bonne_reponse": "A",
+      "explication": "Robert Badinter, ministre de la Justice de François Mitterrand, a soutenu l'abolition de la peine de mort adoptée en 1981."
+    }
+  ]
+}
