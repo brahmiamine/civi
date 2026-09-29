@@ -74,6 +74,7 @@ function normHistory(v) {
     passed: !!h.passed,
     wrong: arr(h.wrong).filter((w) => isObj(w) && typeof w.id === 'string').map((w) => ({ id: w.id, pick: pick(w.pick) })),
     themes: obj(h.themes),
+    sit: Array.isArray(h.sit) && h.sit.length === 2 && h.sit.every(isNum) ? h.sit : undefined,
   }));
 }
 

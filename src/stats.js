@@ -1,6 +1,6 @@
 // Progress computed from what the learner actually answered, per profile.
 // stats[id] = { n: attempts, ok: correct answers, s: current streak of correct answers, b: Leitner box, t: last answer, d: next review }
-import { THEMES, EXAM_DIST, PASS_RATE, shuffle } from './constants.js';
+import { THEMES, EXAM_PLAN, PASS_RATE, shuffle } from './constants.js';
 
 const DAY = 24 * 60 * 60 * 1000;
 // Spaced repetition: days before a question comes back, by box.
@@ -145,26 +145,40 @@ export function hardPool(bank, p) {
   return bank.questions.filter((q) => q.trap || (S[q.id] && S[q.id].n > S[q.id].ok && S[q.id].ok / S[q.id].n < 0.6));
 }
 
-// Number of questions per theme for an exam of n questions: the official split scaled with the largest remainder
-// method, so the counts always add up to n and stay as close as possible to the official proportions.
-export function examSplit(n) {
-  const total = Object.values(EXAM_DIST).reduce((a, b) => a + b, 0);
-  const raw = THEMES.map((t) => ({ id: t.id, x: (EXAM_DIST[t.id] * n) / total }));
-  const out = {}; let used = 0;
-  raw.forEach((r) => { out[r.id] = Math.floor(r.x); used += out[r.id]; });
-  raw.slice().sort((a, b) => (b.x - Math.floor(b.x)) - (a.x - Math.floor(a.x))).slice(0, n - used).forEach((r) => { out[r.id]++; });
+// Composition of an exam of n questions: { theme: { k: knowledge questions, s: mises en situation } }.
+// The official plan (40 questions) is scaled with the largest remainder method, so the counts always add up to n
+// and stay as close as possible to the official proportions.
+export function examPlan(n) {
+  const cells = THEMES.flatMap((t) => EXAM_PLAN[t.id].map((v, i) => ({ t: t.id, kind: i ? 's' : 'k', v })));
+  const total = cells.reduce((a, c) => a + c.v, 0);
+  cells.forEach((c) => { c.x = (c.v * n) / total; c.n = Math.floor(c.x); });
+  const used = cells.reduce((a, c) => a + c.n, 0);
+  cells.slice().sort((a, b) => (b.x - b.n) - (a.x - a.n)).slice(0, n - used).forEach((c) => { c.n++; });
+  const out = {}; THEMES.forEach((t) => { out[t.id] = { k: 0, s: 0 }; });
+  cells.forEach((c) => { out[c.t][c.kind] = c.n; });
   return out;
 }
 
-// Exam: follows the official split by theme, scaled to the requested length; gaps are filled from other themes.
+// Number of questions per theme for an exam of n questions.
+export const examSplit = (n) => Object.fromEntries(Object.entries(examPlan(n)).map(([t, o]) => [t, o.k + o.s]));
+
+// Exam: follows the official composition (themes, knowledge questions / mises en situation), scaled to the requested
+// length. Missing mises en situation are replaced by knowledge questions of the same theme, then gaps are filled
+// from the other themes (knowledge questions first).
 export function pickExam(bank, n) {
   const pool = examPool(bank);
   n = Math.min(n, pool.length);
-  const split = examSplit(n);
-  const by = {}; THEMES.forEach((t) => { by[t.id] = shuffle(pool.filter((q) => q.t === t.id)); });
+  const plan = examPlan(n), kn = {}, sit = {};
+  THEMES.forEach((t) => {
+    kn[t.id] = shuffle(pool.filter((q) => q.t === t.id && !q.situation));
+    sit[t.id] = shuffle(pool.filter((q) => q.t === t.id && q.situation));
+  });
   let pick = [];
-  THEMES.forEach((t) => { pick = pick.concat(by[t.id].splice(0, split[t.id])); });
-  const rest = shuffle(THEMES.flatMap((t) => by[t.id]));
+  THEMES.forEach((t) => {
+    const s = sit[t.id].splice(0, plan[t.id].s);
+    pick = pick.concat(s, kn[t.id].splice(0, plan[t.id].k + plan[t.id].s - s.length));
+  });
+  const rest = shuffle(THEMES.flatMap((t) => kn[t.id])).concat(shuffle(THEMES.flatMap((t) => sit[t.id])));
   pick = pick.concat(rest.slice(0, n - pick.length));
   return shuffle(pick).map((q) => q.id);
 }
@@ -175,9 +189,14 @@ export function resultEntry(bank, q, now = Date.now()) {
   const score = q.answers.filter((a) => a.ok).length, total = q.qs.length;
   const wrong = q.qs.filter((id) => !byId.get(id)?.ok).map((id) => ({ id, pick: byId.get(id)?.pick ?? null }));
   const themes = {};
-  q.qs.forEach((id) => { const t = bank.byId.get(id).t; const o = themes[t] || (themes[t] = [0, 0]); o[1]++; if (byId.get(id)?.ok) o[0]++; });
+  const sit = [0, 0]; // mises en situation: [right, total]
+  q.qs.forEach((id) => {
+    const Q = bank.byId.get(id), ok = !!byId.get(id)?.ok, o = themes[Q.t] || (themes[Q.t] = [0, 0]);
+    o[1]++; if (ok) o[0]++;
+    if (Q.situation) { sit[1]++; if (ok) sit[0]++; }
+  });
   const used = q.timed ? Math.max(0, Math.min(q.limit, Math.round((Math.min(now, q.endsAt) - (q.endsAt - q.limit * 1000)) / 1000))) : null;
-  return { id: now, at: now, mode: q.mode, title: q.title, lot: q.lot || null, score, total, answered: q.answers.length, used, passed: score >= passMark(total), wrong, themes };
+  return { id: now, at: now, mode: q.mode, title: q.title, lot: q.lot || null, score, total, answered: q.answers.length, used, passed: score >= passMark(total), wrong, themes, sit };
 }
 
 // Fingerprint of the answers of the questions of a saved test: if a question file changed since, the saved positions

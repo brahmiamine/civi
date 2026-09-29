@@ -55,7 +55,7 @@ Réordonner les réponses d’une question est sans risque : l’application enr
 
 ## Examen blanc
 
-L’examen tire les questions de toute la préparation en suivant la répartition officielle par thème (sur 40 questions : 11 valeurs, 6 institutions, 11 droits et devoirs, 8 histoire-géographie-culture, 4 société). Pour un examen complet sans doublon, prévoir au moins ce nombre de questions par thème.
+L’examen suit la composition officielle (arrêté du 10 octobre 2025, art. 3) : sur 40 questions, 11 valeurs (dont **6 mises en situation**), 6 institutions, 11 droits et devoirs (dont **6 mises en situation**), 8 histoire-géographie-culture, 4 société. Les mises en situation sont les questions de `situations.json` (ou marquées `"situation": true`) des thèmes `valeurs` et `droits` ; celles des autres thèmes servent à la révision mais ne tombent pas à l’examen. Prévoir au moins 6 mises en situation en `valeurs` et 6 en `droits`, sinon des questions de connaissances les remplacent.
 
 ## Trois fichiers de banque + lots
 

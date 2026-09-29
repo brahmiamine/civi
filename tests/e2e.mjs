@@ -54,6 +54,9 @@ await step('examen : 40 questions, chrono à heure de fin fixe, pas d’écritur
   const q = await ls(QUIZ);
   // Questions that only exist in a lot (dates, famous French people) are not drawn in the mock exam.
   expect(q.qs.every((id) => !/^cr-(date|celebre)-/.test(id)), 'question de lot dans l’examen');
+  // Official composition: 12 mises en situation out of 40.
+  const nSit = q.qs.filter((id) => id.startsWith('cr-sit-')).length;
+  expect(nSit === 12, nSit + ' mises en situation au lieu de 12');
   await patchQuiz('q.endsAt -= 10 * 60e3; return q;');
   await page.reload();
   const t = (await page.getByLabel('Temps restant').innerText()).trim();

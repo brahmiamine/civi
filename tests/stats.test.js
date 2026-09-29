@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   emptyProfile, recordAnswer, isMastered, updateErrors, secondsLeft, streakDays, dayKey, examSplit, pickExam, overview, passMark,
-  pickPool, examPool, resultEntry, answersPrint,
+  pickPool, examPool, resultEntry, answersPrint, examPlan,
 } from '../src/stats.js';
 import { normProfile, normSettings } from '../src/storage.js';
 
@@ -165,4 +165,39 @@ test('invalid settings are dropped', () => {
   assert.deepEqual(normSettings({ goal: 'abc', examLength: 40, theme: 'rose', text: 'Grande', time: '25:00', sound: 'yes', auto: false, prep: 'x', other: 1 }),
     { examLength: 40, text: 'Grande', auto: false, prep: 'x' });
   assert.deepEqual(normSettings(null), {});
+});
+
+test('the exam follows the official composition: 28 knowledge questions and 12 mises en situation', () => {
+  assert.deepEqual(examPlan(40), { valeurs: { k: 5, s: 6 }, institutions: { k: 6, s: 0 }, droits: { k: 5, s: 6 }, histoire: { k: 8, s: 0 }, societe: { k: 4, s: 0 } });
+  for (const n of [10, 20, 40]) {
+    const p = examPlan(n), s = Object.values(p).reduce((a, o) => a + o.s, 0);
+    assert.equal(Object.values(p).reduce((a, o) => a + o.k + o.s, 0), n);
+    assert.equal(s, Math.round((12 * n) / 40));
+  }
+  const b = bank(20);
+  // 8 mises en situation in each theme (the exam must only take them in « valeurs » and « droits »).
+  b.questions.forEach((q, i) => { if (i % 20 < 8) q.situation = true; });
+  for (let r = 0; r < 20; r++) {
+    const ids = pickExam(b, 40), qs = ids.map((id) => b.byId.get(id));
+    const count = (t, sit) => qs.filter((q) => q.t === t && !!q.situation === sit).length;
+    assert.equal(ids.length, 40);
+    assert.equal(count('valeurs', true), 6); assert.equal(count('valeurs', false), 5);
+    assert.equal(count('droits', true), 6); assert.equal(count('droits', false), 5);
+    assert.equal(count('institutions', true) + count('histoire', true) + count('societe', true), 0);
+  }
+});
+
+test('without enough mises en situation, knowledge questions of the same theme replace them', () => {
+  const b = bank(20);
+  b.questions.filter((q) => q.t === 'droits').slice(0, 2).forEach((q) => { q.situation = true; });
+  const qs = pickExam(b, 40).map((id) => b.byId.get(id));
+  assert.equal(qs.filter((q) => q.t === 'droits').length, 11);
+  assert.equal(qs.filter((q) => q.t === 'droits' && q.situation).length, 2);
+});
+
+test('the result counts the mises en situation apart', () => {
+  const b = bank(2);
+  b.byId.get('valeurs0').situation = true;
+  const q = { mode: 'exam', title: 'Examen', qs: ['valeurs0', 'valeurs1', 'droits0'], timed: false, answers: [{ id: 'valeurs0', chosen: 0, pick: 'a', ok: true }, { id: 'droits0', chosen: 1, pick: 'b', ok: false }] };
+  assert.deepEqual(resultEntry(b, q, T0).sit, [1, 1]);
 });

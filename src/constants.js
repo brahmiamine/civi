@@ -7,8 +7,11 @@ export const THEMES = [
   { id: 'societe', name: 'Vivre dans la société française', short: 'Société', icon: 'map' },
 ];
 
-// Répartition officielle des 40 questions de l’examen par thème (mises à l’échelle pour les examens plus courts).
-export const EXAM_DIST = { valeurs: 11, institutions: 6, droits: 11, histoire: 8, societe: 4 };
+// Répartition officielle des 40 questions de l’examen (arrêté du 10 octobre 2025, art. 3), mise à l’échelle pour
+// les examens plus courts : par thème, [questions de connaissances, mises en situation].
+// 28 questions de connaissances et 12 mises en situation (6 en « Principes et valeurs », 6 en « Droits et devoirs »).
+export const EXAM_PLAN = { valeurs: [5, 6], institutions: [6, 0], droits: [5, 6], histoire: [8, 0], societe: [4, 0] };
+export const EXAM_DIST = Object.fromEntries(Object.entries(EXAM_PLAN).map(([t, [k, s]]) => [t, k + s]));
 export const PASS_RATE = 0.8;
 
 export const LET = ['A', 'B', 'C', 'D', 'E', 'F'];

@@ -2,7 +2,7 @@
 import { ic } from '../../Icon.jsx';
 import { THEMES, fmt } from '../../constants.js';
 import { plural, fmtWhen, bestOf, examMinutes } from '../../utils.js';
-import { isMastered, hardPool, passMark, secondsLeft } from '../../stats.js';
+import { isMastered, hardPool, passMark, secondsLeft, examPlan } from '../../stats.js';
 import { MAX_POOL_QUIZ, answeredCount } from '../../quiz.js';
 
 export function test(v, k) {
@@ -45,8 +45,9 @@ export function lot(v, k) {
 export function examIntro(v, k) {
   const { app, st, P, row, ex, exMin } = k;
   v.intro = 'Mets-toi dans les conditions de l’examen officiel. La correction s’affiche à la fin.';
+  const plan = examPlan(ex), nSit = Object.values(plan).reduce((a, o) => a + o.s, 0);
   v.groups = [k.G('Déroulement', [
-    row({ icon: 'clipboard', title: ex + ' questions à choix multiples', sub: 'Réparties selon les 5 thèmes officiels' }),
+    row({ icon: 'clipboard', title: ex + ' questions à choix multiples', sub: plural(ex - nSit, 'question') + ' de connaissances et ' + plural(nSit, 'mise') + ' en situation, réparties selon les 5 thèmes officiels comme à l’examen' }),
     row({ icon: 'clock', title: exMin + ' minutes chronométrées' }),
     row({ icon: 'target', title: passMark(ex) + ' bonnes réponses pour réussir' }),
     row({ icon: 'chevL', title: 'Tu peux revenir en arrière', sub: 'Passe d’une question à l’autre et change tes réponses jusqu’à ce que tu termines le test' }),
@@ -99,7 +100,12 @@ export function result(v, k) {
     stats: [{ v: L.score, l: 'Bonnes réponses' }, { v: L.total - L.score, l: 'Erreurs' }, { v: L.used != null ? fmt(L.used) : Math.round((L.score / L.total) * 100) + ' %', l: L.used != null ? 'Temps' : 'Réussite' }]
       .map((x, i) => ({ ...x, sep: i ? '1px solid var(--divider)' : 'none' })),
   };
-  v.groups = [k.G('Par thème', THEMES.filter((t) => L.themes[t.id]).map((t) => { const [ok, n] = L.themes[t.id]; return row({ title: t.name, value: ok + ' / ' + n, pct: Math.round((ok / n) * 100) + '%' }); }))];
+  const scoreRow = (title, [ok, n]) => row({ title, value: ok + ' / ' + n, pct: Math.round((ok / n) * 100) + '%' });
+  v.groups = [k.G('Par thème', THEMES.filter((t) => L.themes[t.id]).map((t) => scoreRow(t.name, L.themes[t.id])))];
+  if (L.sit && L.sit[1]) {
+    const knowledge = [L.score - L.sit[0], L.total - L.sit[1]];
+    v.groups.push(k.G('Par type de question', [knowledge[1] && scoreRow('Questions de connaissances', knowledge), scoreRow('Mises en situation', L.sit)].filter(Boolean)));
+  }
   const nw = L.wrong.length, review = () => app.push({ s: 'review', hid: L.id });
   if (c.fresh) {
     const home2 = { label: 'Retour à l’accueil', onClick: () => app.goHome(), order: 2, h: '46px', border: 'none', color: 'var(--primaryText)' };
