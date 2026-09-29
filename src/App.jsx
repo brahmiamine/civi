@@ -12,7 +12,8 @@ const DEFAULT_SETTINGS = {
   text: 'Normale', instant: true, shuffle: true, sound: false, vibration: true, examLength: 40,
 };
 const IDENTITY = [0, 1, 2, 3];
-const darkQuery = typeof window !== 'undefined' && window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;\nconst BRAND_ICON = import.meta.env.BASE_URL + 'brand-icon.svg';
+const darkQuery = typeof window !== 'undefined' && window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+const BRAND_ICON = import.meta.env.BASE_URL + 'brand-icon.svg';
 
 export default class App extends Component {
   constructor(p) {
