@@ -469,7 +469,7 @@ export default class App extends Component {
     const primary = (label, onClick, o) => Object.assign({ label, onClick, dir: 'column', op: 1 }, o || {});
     const fsQ = { Petite: '20px', Normale: '23px', Grande: '26px' }[st.text], fsA = { Petite: '15px', Normale: '16px', Grande: '18px' }[st.text];
     const buildQv = (q, states, onPick, disabled, explain, order = q.a.map((_, i) => i)) => ({
-      theme: thById(q.t).short + (q.situation ? ' · Mise en situation' : ''), text: q.q, fs: fsQ, afs: fsA, explain: explain && { ...explain, onReport: () => { this.reportQ = q; this.openSheet('report'); } },
+      theme: thById(q.t).short + (q.situation ? ' · Mise en situation' : ''), text: q.q, fs: fsQ, afs: fsA, explain, onReport: () => { this.reportQ = q; this.openSheet('report'); },
       answers: order.map((orig, i) => {
         const k = states[orig]; const m = {
           normal: { bg: 'var(--surface)', border: '2px solid var(--divider)', badgeBg: 'var(--surface2)', badgeColor: 'var(--text)', op: 1 },
@@ -955,12 +955,12 @@ function QuestionView({ qv }) {
           </button>
         ))}
       </div>
+      <button onClick={qv.onReport} style={{ alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: 6, padding: '4px 0', border: 'none', background: 'none', font: 'inherit', fontSize: 14, color: 'var(--text2)', cursor: 'pointer' }}>{ic('alert', 16)}Signaler une erreur dans cette question</button>
       {qv.explain && (
         <div style={{ ...card, display: 'flex', flexDirection: 'column', gap: 10, padding: 16, animation: 'tcRise .25s ease' }}>
           {qv.explain.verdict && <span style={{ display: 'flex', alignItems: 'center', gap: 8, font: '600 18px/1.2 var(--font-heading)', color: qv.explain.vColor }}>{qv.explain.vIcon}{qv.explain.verdict}</span>}
           <span style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 600, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--primaryText)' }}>{qv.explain.bulb}À retenir</span>
           <span style={{ fontSize: 16, lineHeight: 1.5, textWrap: 'pretty' }}>{qv.explain.text}</span>
-          <button onClick={qv.explain.onReport} style={{ alignSelf: 'flex-start', padding: 0, border: 'none', background: 'none', font: 'inherit', fontSize: 14, color: 'var(--text2)', textDecoration: 'underline', cursor: 'pointer' }}>Signaler un problème avec cette question</button>
         </div>
       )}
     </div>
