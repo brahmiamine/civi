@@ -1,6 +1,15 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ic } from '../Icon.jsx';
 import { centerRegistrationUrl, departmentCode, flattenSessions, formatSessionDate, normalizeCenters } from '../examSessions.js';
+import {
+  findRecommendedJourney,
+  formatTravelDistance,
+  formatTravelMinutes,
+  geocodeCenter,
+  haversineDistanceMeters,
+  recommendationLabel,
+  recommendationScore,
+} from '../sessionRanking.js';
 
 const btn = {
   minHeight: 42, padding: '0 14px', border: 'none', borderRadius: 9,
@@ -21,12 +30,48 @@ const inputStyle = {
   padding: '0 10px', background: 'var(--surface)', color: 'var(--text)', font: 'inherit',
 };
 
-function mapsUrl(address) {
-  return 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(address);
+function mapsUrl(address, origin) {
+  const params = new URLSearchParams({ api: '1', destination: address, travelmode: 'transit' });
+  if (origin) params.set('origin', origin.lat + ',' + origin.lon);
+  return 'https://www.google.com/maps/dir/?' + params.toString();
 }
 
-function citymapperUrl(address) {
-  return 'https://citymapper.com/directions?endaddress=' + encodeURIComponent(address);
+function citymapperUrl(address, origin, destination) {
+  const params = new URLSearchParams({ endaddress: address });
+  if (origin) {
+    params.set('startcoord', origin.lat + ',' + origin.lon);
+    params.set('startname', 'Ma position');
+  }
+  if (destination) {
+    params.set('endcoord', destination.lat + ',' + destination.lon);
+    params.set('endname', destination.label || address);
+  }
+  return 'https://citymapper.com/directions?' + params.toString();
+}
+
+function getCurrentPosition() {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) {
+      reject(new Error('La localisation n’est pas disponible sur cet appareil.'));
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (position) => resolve({
+        lat: position.coords.latitude,
+        lon: position.coords.longitude,
+        accuracy: position.coords.accuracy,
+      }),
+      (error) => {
+        const message = error.code === 1
+          ? 'Localisation refusée. Autorise-la dans les réglages du navigateur ou de la PWA.'
+          : error.code === 2
+            ? 'Position indisponible pour le moment.'
+            : 'La localisation a pris trop de temps. Réessaie.';
+        reject(new Error(message));
+      },
+      { enableHighAccuracy: true, timeout: 12000, maximumAge: 60000 },
+    );
+  });
 }
 
 function placeText(places) {
@@ -71,6 +116,11 @@ export function ExamSessions() {
   const [view, setView] = useState('center');
   const [openCenter, setOpenCenter] = useState('');
   const [limit, setLimit] = useState(30);
+  const [origin, setOrigin] = useState(null);
+  const [locationState, setLocationState] = useState('idle');
+  const [locationError, setLocationError] = useState('');
+  const [rankProgress, setRankProgress] = useState('');
+  const [rankings, setRankings] = useState({});
 
   useEffect(() => {
     let active = true;
@@ -99,6 +149,92 @@ export function ExamSessions() {
     return () => { active = false; };
   }, []);
 
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!navigator.permissions?.query) return undefined;
+    navigator.permissions.query({ name: 'geolocation' })
+      .then((permission) => {
+        if (!cancelled && permission.state === 'granted') {
+          locateAndRank(false);
+        }
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+    // Only checked while this screen is mounted. Permission is never requested elsewhere.
+  }, [centers.length]);
+
+  async function locateAndRank(requestPermission = true) {
+    if (!centers.length || locationState === 'locating' || locationState === 'ranking') return;
+    setLocationError('');
+    setLocationState('locating');
+    setRankProgress('Récupération de ta position…');
+
+    try {
+      // On mobile/PWA, this is intentionally called only from this screen.
+      // If permission is not already granted, the explicit button below provides the user gesture.
+      const position = await getCurrentPosition();
+      setOrigin(position);
+      setLocationState('ranking');
+
+      const uniqueCenters = centers.filter((center, index, all) =>
+        center.address && all.findIndex((item) => item.center_id === center.center_id) === index,
+      );
+
+      const geocoded = [];
+      for (let i = 0; i < uniqueCenters.length; i += 1) {
+        const center = uniqueCenters[i];
+        setRankProgress('Localisation des centres ' + (i + 1) + '/' + uniqueCenters.length + '…');
+        try {
+          const destination = await geocodeCenter(center.address);
+          geocoded.push({
+            center,
+            destination,
+            directDistanceMeters: haversineDistanceMeters(position, destination),
+          });
+        } catch {
+          // A center that cannot be geocoded stays visible, just without a transport ranking.
+        }
+      }
+
+      const candidates = geocoded
+        .sort((a, b) => a.directDistanceMeters - b.directDistanceMeters)
+        .slice(0, 20);
+
+      const next = {};
+      for (let i = 0; i < candidates.length; i += 1) {
+        const item = candidates[i];
+        setRankProgress('Calcul transport ' + (i + 1) + '/' + candidates.length + '…');
+        try {
+          const journey = await findRecommendedJourney(position, item.destination);
+          next[item.center.center_id] = {
+            destination: item.destination,
+            directDistanceMeters: item.directDistanceMeters,
+            journey,
+            score: recommendationScore(journey, item.directDistanceMeters),
+          };
+        } catch {
+          next[item.center.center_id] = {
+            destination: item.destination,
+            directDistanceMeters: item.directDistanceMeters,
+            error: true,
+          };
+        }
+      }
+
+      setRankings(next);
+      setLocationState('ready');
+      setView('recommended');
+      setLimit(30);
+      setRankProgress('');
+    } catch (err) {
+      setLocationState('error');
+      setRankProgress('');
+      setLocationError(err instanceof Error ? err.message : 'Impossible de récupérer la position.');
+      if (!requestPermission) return;
+    }
+  }
+
   const sessions = useMemo(() => flattenSessions(centers), [centers]);
   const departments = useMemo(() => {
     const codes = new Set(centers.map((center) => departmentCode(center.postal_code)).filter(Boolean));
@@ -123,12 +259,22 @@ export function ExamSessions() {
       if (!map.has(key)) map.set(key, { key, center, sessions: [] });
       map.get(key).sessions.push(session);
     });
-    return [...map.values()].sort((a, b) => {
+    const groups = [...map.values()];
+    if (view === 'recommended' && locationState === 'ready') {
+      return groups.sort((a, b) => {
+        const ra = rankings[a.center.center_id];
+        const rb = rankings[b.center.center_id];
+        if (ra?.score == null) return 1;
+        if (rb?.score == null) return -1;
+        return rb.score - ra.score;
+      });
+    }
+    return groups.sort((a, b) => {
       const da = a.sessions[0]?.date || '9999-12-31';
       const db = b.sessions[0]?.date || '9999-12-31';
       return da.localeCompare(db) || a.center.center_name.localeCompare(b.center.center_name, 'fr');
     });
-  }, [filtered]);
+  }, [filtered, view, rankings, locationState]);
 
   if (loading) {
     return (
@@ -154,9 +300,33 @@ export function ExamSessions() {
         </p>
       </div>
 
-      <div role="tablist" aria-label="Classement des sessions" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', padding: 4, borderRadius: 11, background: 'var(--surface)', border: '1px solid var(--line)' }}>
+      <div style={{ padding: 14, borderRadius: 12, background: 'var(--surface)', border: '1px solid var(--line)', display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+          <span style={{ width: 38, height: 38, borderRadius: 9, flex: 'none', display: 'grid', placeItems: 'center', background: 'var(--tint)', color: 'var(--primary)' }}>{ic('target', 19, 1.8)}</span>
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <strong style={{ display: 'block', fontSize: 15 }}>Classer depuis ma position</strong>
+            <span style={{ display: 'block', marginTop: 3, color: 'var(--text2)', fontSize: 13, lineHeight: 1.4 }}>
+              Même logique que l’app Distance : marche, correspondances, temps, transports pris et distance. Ta position n’est pas enregistrée.
+            </span>
+          </div>
+        </div>
+        {locationState === 'ready' ? (
+          <div style={{ fontSize: 13, color: 'var(--text2)' }}>
+            Position utilisée{origin?.accuracy ? ' · précision ≈ ' + Math.round(origin.accuracy) + ' m' : ''} · classement des 20 centres les plus proches.
+          </div>
+        ) : (
+          <button type="button" onClick={() => locateAndRank(true)} disabled={locationState === 'locating' || locationState === 'ranking'} style={{ ...btn, width: '100%', opacity: locationState === 'locating' || locationState === 'ranking' ? 0.65 : 1 }}>
+            {locationState === 'locating' || locationState === 'ranking' ? 'Calcul en cours…' : 'Utiliser ma position'}
+          </button>
+        )}
+        {rankProgress && <div style={{ fontSize: 13, color: 'var(--text2)' }}>{rankProgress}</div>}
+        {locationError && <div role="alert" style={{ fontSize: 13, color: 'var(--red)', lineHeight: 1.4 }}>{locationError}</div>}
+      </div>
+
+      <div role="tablist" aria-label="Classement des sessions" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', padding: 4, borderRadius: 11, background: 'var(--surface)', border: '1px solid var(--line)' }}>
         {[
           ['center', 'Par centre'],
+          ['recommended', 'Recommandé'],
           ['date', 'Par date'],
         ].map(([id, label]) => {
           const active = view === id;
@@ -166,7 +336,14 @@ export function ExamSessions() {
               type="button"
               role="tab"
               aria-selected={active}
-              onClick={() => { setView(id); setLimit(30); }}
+              onClick={() => {
+                if (id === 'recommended' && locationState !== 'ready') {
+                  locateAndRank(true);
+                  return;
+                }
+                setView(id);
+                setLimit(30);
+              }}
               style={{
                 minHeight: 40, border: 0, borderRadius: 8, cursor: 'pointer',
                 background: active ? 'var(--tint)' : 'transparent',
@@ -241,10 +418,11 @@ export function ExamSessions() {
             {filtered.length} session{filtered.length > 1 ? 's' : ''} · {groupedCenters.length} centre{groupedCenters.length > 1 ? 's' : ''}
           </div>
 
-          {view === 'center' ? (
+          {view === 'center' || view === 'recommended' ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {groupedCenters.slice(0, limit).map(({ key, center, sessions: centerSessions }) => {
+              {groupedCenters.slice(0, limit).map(({ key, center, sessions: centerSessions }, index) => {
                 const open = openCenter === key;
+                const rank = rankings[center.center_id];
                 return (
                   <article key={key} style={{ borderRadius: 12, background: 'var(--surface)', boxShadow: 'var(--shadowS)', overflow: 'hidden' }}>
                     <button
@@ -255,11 +433,23 @@ export function ExamSessions() {
                     >
                       <span style={{ width: 42, height: 42, borderRadius: 9, flex: 'none', display: 'grid', placeItems: 'center', background: 'var(--tint)', color: 'var(--primary)' }}>{ic('map', 21, 1.8)}</span>
                       <span style={{ minWidth: 0, flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
-                        <strong style={{ fontSize: 16 }}>{center.center_name}</strong>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                          <strong style={{ fontSize: 16 }}>{center.center_name}</strong>
+                          {view === 'recommended' && rank?.score != null && (
+                            <span style={{ padding: '3px 7px', borderRadius: 999, background: 'var(--tint)', color: 'var(--primaryText)', fontSize: 12, fontWeight: 700 }}>
+                              #{index + 1} · {rank.score}/100
+                            </span>
+                          )}
+                        </span>
                         {center.address && <span style={{ fontSize: 13, color: 'var(--text2)', lineHeight: 1.35 }}>{center.address}</span>}
                         <span style={{ fontSize: 13, color: 'var(--primaryText)', fontWeight: 600 }}>
                           {centerSessions.length} session{centerSessions.length > 1 ? 's' : ''} · dès le {formatSessionDate(centerSessions[0].date)}
                         </span>
+                        {view === 'recommended' && rank?.journey && (
+                          <span style={{ fontSize: 12, color: 'var(--text2)', lineHeight: 1.35 }}>
+                            {recommendationLabel(rank.score)} · {formatTravelMinutes(rank.journey.durationMinutes)} · {formatTravelMinutes(rank.journey.walkingMinutes)} à pied · {rank.journey.transfers} correspondance{rank.journey.transfers > 1 ? 's' : ''}
+                          </span>
+                        )}
                       </span>
                       <span aria-hidden="true" style={{ color: 'var(--text2)', transform: open ? 'rotate(90deg)' : 'none', transition: 'transform .18s ease', marginTop: 8 }}>
                         {ic('chevR', 20, 2)}
@@ -270,12 +460,20 @@ export function ExamSessions() {
                       <div style={{ padding: '0 16px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
                         {center.address && (
                           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-                            <a href={mapsUrl(center.address)} target="_blank" rel="noopener noreferrer" style={{ ...btnSecondary, minHeight: 40, fontSize: 13 }}>
+                            <a href={mapsUrl(center.address, origin)} target="_blank" rel="noopener noreferrer" style={{ ...btnSecondary, minHeight: 40, fontSize: 13 }}>
                               Google Maps
                             </a>
-                            <a href={citymapperUrl(center.address)} target="_blank" rel="noopener noreferrer" style={{ ...btnSecondary, minHeight: 40, fontSize: 13 }}>
+                            <a href={citymapperUrl(center.address, origin, rank?.destination)} target="_blank" rel="noopener noreferrer" style={{ ...btnSecondary, minHeight: 40, fontSize: 13 }}>
                               Citymapper
                             </a>
+                          </div>
+                        )}
+                        {view === 'recommended' && rank?.journey && (
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, padding: 10, borderRadius: 9, background: 'var(--bg)' }}>
+                            <div style={{ fontSize: 12, color: 'var(--text2)' }}>Distance directe<br /><strong style={{ color: 'var(--text)' }}>{formatTravelDistance(rank.directDistanceMeters)}</strong></div>
+                            <div style={{ fontSize: 12, color: 'var(--text2)' }}>Transports pris<br /><strong style={{ color: 'var(--text)' }}>{rank.journey.transportCount}</strong></div>
+                            <div style={{ fontSize: 12, color: 'var(--text2)' }}>Départ → transport<br /><strong style={{ color: 'var(--text)' }}>{formatTravelDistance(rank.journey.startWalkMeters)}</strong></div>
+                            <div style={{ fontSize: 12, color: 'var(--text2)' }}>Transport → centre<br /><strong style={{ color: 'var(--text)' }}>{formatTravelDistance(rank.journey.endWalkMeters)}</strong></div>
                           </div>
                         )}
                         <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -304,8 +502,8 @@ export function ExamSessions() {
                   <SessionLine center={center} session={session} hideDate />
                   {center.address && (
                     <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                      <a href={mapsUrl(center.address)} target="_blank" rel="noopener noreferrer" style={{ ...btnSecondary, minHeight: 38, fontSize: 13 }}>Google Maps</a>
-                      <a href={citymapperUrl(center.address)} target="_blank" rel="noopener noreferrer" style={{ ...btnSecondary, minHeight: 38, fontSize: 13 }}>Citymapper</a>
+                      <a href={mapsUrl(center.address, origin)} target="_blank" rel="noopener noreferrer" style={{ ...btnSecondary, minHeight: 38, fontSize: 13 }}>Google Maps</a>
+                      <a href={citymapperUrl(center.address, origin, rankings[center.center_id]?.destination)} target="_blank" rel="noopener noreferrer" style={{ ...btnSecondary, minHeight: 38, fontSize: 13 }}>Citymapper</a>
                     </div>
                   )}
                 </article>
