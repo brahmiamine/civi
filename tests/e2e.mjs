@@ -68,10 +68,14 @@ await step('sessions d’examen : navigation, recherche, département et erreur 
   expect(await page.getByText('ABC FORMATION').count() === 1, 'recherche adresse non appliquée');
   await page.getByRole('button', { name: 'Accueil' }).click();
 
+  const expectedErrorStart = problems.length;
   sessionApiFails = true;
   await page.getByRole('button', { name: /Sessions d’examen/ }).click();
   await page.getByText('Impossible de charger les disponibilités pour le moment.').waitFor();
   sessionApiFails = false;
+  // The mocked 503 is intentional; do not let that expected browser console message
+  // fail the final "no unexpected console errors" assertion.
+  problems.splice(expectedErrorStart);
   await page.getByRole('button', { name: 'Accueil' }).click();
 });
 
