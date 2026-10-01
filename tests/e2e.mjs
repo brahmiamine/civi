@@ -46,7 +46,7 @@ await page.route('**/data/cci_sessions.json', async (route) => {
   return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(sessionFixture) });
 });
 await page.route('https://data.geopf.fr/geocodage/search**', async (route) => {
-  const q = new URL(route.request().url()).searchParams.get('q') || '';
+  const q = new globalThis.URL(route.request().url()).searchParams.get('q') || '';
   const isParis = q.includes('75010');
   return route.fulfill({
     status: 200,
@@ -60,7 +60,7 @@ await page.route('https://data.geopf.fr/geocodage/search**', async (route) => {
   });
 });
 await page.route('https://api.transitous.org/api/v6/plan**', async (route) => {
-  const url = new URL(route.request().url());
+  const url = new globalThis.URL(route.request().url());
   const to = url.searchParams.get('toPlace') || '';
   const paris = to.includes('48.87');
   return route.fulfill({
