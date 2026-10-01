@@ -35,7 +35,7 @@ function placeText(places) {
   return places + ' place' + (places > 1 ? 's' : '') + ' restante' + (places > 1 ? 's' : '');
 }
 
-function SessionLine({ center, session, compact = false }) {
+function SessionLine({ center, session, compact = false, hideDate = false }) {
   const places = session.remaining_places;
   return (
     <div style={{
@@ -44,9 +44,11 @@ function SessionLine({ center, session, compact = false }) {
       padding: compact ? '10px 0' : 0, borderTop: compact ? '1px solid var(--divider)' : 'none',
     }}>
       <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column', gap: 3 }}>
-        <strong style={{ fontSize: compact ? 15 : 17 }}>
-          {formatSessionDate(session.date)}{session.time ? ' · ' + session.time : ''}
-        </strong>
+        {!hideDate && (
+          <strong style={{ fontSize: compact ? 15 : 17 }}>
+            {formatSessionDate(session.date)}{session.time ? ' · ' + session.time : ''}
+          </strong>
+        )}
         <span style={{ fontSize: 13, fontWeight: 600, color: places === 0 ? 'var(--red)' : 'var(--text2)' }}>
           {placeText(places)}
         </span>
@@ -299,7 +301,7 @@ export function ExamSessions() {
                       {center.address && <span style={{ fontSize: 13, color: 'var(--text2)', lineHeight: 1.35 }}>{center.address}</span>}
                     </div>
                   </div>
-                  <SessionLine center={center} session={session} />
+                  <SessionLine center={center} session={session} hideDate />
                   {center.address && (
                     <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                       <a href={mapsUrl(center.address)} target="_blank" rel="noopener noreferrer" style={{ ...btnSecondary, minHeight: 38, fontSize: 13 }}>Google Maps</a>
