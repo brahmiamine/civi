@@ -12,6 +12,33 @@ const dir = mkdtempSync(join(tmpdir(), 'civi-e2e-'));
 const browser = await chromium.launch();
 const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block', acceptDownloads: true });
 const page = await ctx.newPage();
+const sessionFixture = [
+  {
+    center_id: '980',
+    center_name: 'ABC FORMATION',
+    product: 'Examen civique mention Carte de résident',
+    product_id: '22',
+    address: "82 Avenue de Verdun - 95310 SAINT-OUEN L'AUMONE - France",
+    postal_code: '95310',
+    url_centre: '/inscription-candidat/centre-980/produit-22',
+    sessions: [{ date: '2099-10-07', time: '', remaining_places: 9, session_id: '7147165' }],
+  },
+  {
+    center_id: '200',
+    center_name: 'CENTRE PARIS',
+    product: 'Examen civique mention Carte de résident',
+    product_id: '22',
+    address: '10 rue de Paris - 75010 PARIS - France',
+    postal_code: '75010',
+    url_centre: '/inscription-candidat/centre-200/produit-22',
+    sessions: [{ date: '2099-10-08', time: '09:00', remaining_places: 4, session_id: '7147166' }],
+  },
+];
+let sessionApiFails = false;
+await page.route('**/data/cci_sessions.json', async (route) => {
+  if (sessionApiFails) return route.fulfill({ status: 503, body: 'indisponible' });
+  return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(sessionFixture) });
+});
 const problems = [];
 page.on('console', (m) => { if (m.type() === 'error' || /Content Security Policy|Refused/.test(m.text())) problems.push(m.text()); });
 page.on('pageerror', (e) => problems.push('Exception : ' + e.message));
@@ -28,6 +55,25 @@ const expect = (ok, msg) => { if (!ok) throw new Error(msg); };
 
 await page.goto(URL);
 await step('l’accueil s’affiche', ready);
+
+await step('sessions d’examen : navigation, recherche, département et erreur réseau', async () => {
+  await page.getByRole('button', { name: /Sessions d’examen/ }).click();
+  await page.getByRole('heading', { name: 'Trouver une session' }).waitFor();
+  await page.getByText('ABC FORMATION').waitFor();
+  await page.getByLabel('Filtrer par département').selectOption('75');
+  expect(await page.getByText('CENTRE PARIS').count() === 1, 'centre paris absent après filtre');
+  expect(await page.getByText('ABC FORMATION').count() === 0, 'filtre département non appliqué');
+  await page.getByLabel('Filtrer par département').selectOption('');
+  await page.getByLabel('Rechercher une ville ou un centre').fill('saint-ouen');
+  expect(await page.getByText('ABC FORMATION').count() === 1, 'recherche adresse non appliquée');
+  await page.getByRole('button', { name: 'Accueil' }).click();
+
+  sessionApiFails = true;
+  await page.getByRole('button', { name: /Sessions d’examen/ }).click();
+  await page.getByText('Impossible de charger les disponibilités pour le moment.').waitFor();
+  sessionApiFails = false;
+  await page.getByRole('button', { name: 'Accueil' }).click();
+});
 
 await step('révision : les réponses et les erreurs sont enregistrées à chaque question', async () => {
   await page.getByRole('button', { name: /Commencer ma préparation/ }).click();
