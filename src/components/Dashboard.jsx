@@ -36,7 +36,7 @@ export function Home({ h }) {
         <h2 style={h2s}>Que veux-tu faire ?</h2>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
           {h.tiles.map((t) => (
-            <button key={t.label} className="p-tile" onClick={t.onClick} style={{ position: 'relative', minHeight: 116, padding: 14, border: 'none', borderRadius: 10, background: 'var(--surface)', boxShadow: 'var(--shadowS)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, textAlign: 'left', cursor: 'pointer' }}>
+            <button key={t.label} className="p-tile" onClick={t.onClick} style={{ position: 'relative', gridColumn: t.wide ? '1 / -1' : undefined, minHeight: t.wide ? 104 : 116, padding: 14, border: 'none', borderRadius: 10, background: 'var(--surface)', boxShadow: 'var(--shadowS)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, textAlign: 'left', cursor: 'pointer' }}>
               <span style={{ width: 40, height: 40, borderRadius: 8, display: 'grid', placeItems: 'center', background: 'var(--tint)', color: 'var(--primary)' }}>{t.icon}</span>
               <span style={{ display: 'flex', flexDirection: 'column', gap: 3 }}><span style={{ fontSize: 16, fontWeight: 600, lineHeight: 1.2 }}>{t.label}</span><span style={{ fontSize: 13, color: 'var(--text2)', lineHeight: 1.3 }}>{t.sub}</span></span>
               {t.badge && <span style={{ position: 'absolute', top: 12, right: 12, minWidth: 22, height: 22, padding: '0 6px', borderRadius: 11, background: 'var(--red)', color: '#fff', font: '600 13px/22px var(--font-body)', textAlign: 'center' }}>{t.badge}</span>}
