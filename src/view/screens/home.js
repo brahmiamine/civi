@@ -48,3 +48,7 @@ export function revise(v, k) {
     ]),
   ];
 }
+
+export function sessions(v) {
+  v.examSessions = {};
+}
