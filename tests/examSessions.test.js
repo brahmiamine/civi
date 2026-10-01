@@ -9,6 +9,8 @@ test('todayIso uses local calendar date', () => {
 test('departmentCode supports metropolitan and overseas postal codes', () => {
   assert.equal(departmentCode('95310'), '95');
   assert.equal(departmentCode('97100'), '971');
+  assert.equal(departmentCode('20169'), '2A');
+  assert.equal(departmentCode('20200'), '2B');
   assert.equal(departmentCode('bad'), '');
 });
 
