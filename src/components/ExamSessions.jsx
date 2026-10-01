@@ -13,6 +13,7 @@ export function ExamSessions() {
   const [centers, setCenters] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [dataReady, setDataReady] = useState(false);
   const [query, setQuery] = useState('');
   const [dept, setDept] = useState('');
   const [limit, setLimit] = useState(30);
@@ -28,7 +29,9 @@ export function ExamSessions() {
       })
       .then((data) => {
         if (!active) return;
-        setCenters(normalizeCenters(data));
+        const normalized = normalizeCenters(data);
+        setCenters(normalized);
+        setDataReady(Array.isArray(data) && data.length > 0);
         setError('');
       })
       .catch(() => {
@@ -100,6 +103,13 @@ export function ExamSessions() {
       {error ? (
         <div role="alert" style={{ padding: 14, borderRadius: 10, background: 'var(--surface)', border: '1px solid var(--line)', color: 'var(--text2)', lineHeight: 1.4 }}>
           {error}
+        </div>
+      ) : !dataReady ? (
+        <div style={{ padding: 18, borderRadius: 10, background: 'var(--surface)', border: '1px solid var(--line)', color: 'var(--text2)', textAlign: 'center', lineHeight: 1.45 }}>
+          Les données de sessions ne sont pas encore disponibles sur ce déploiement.
+          <div style={{ marginTop: 12 }}>
+            <a href="https://francais.cci-paris-idf.fr/candidat" target="_blank" rel="noopener noreferrer" style={btn}>Consulter la CCI</a>
+          </div>
         </div>
       ) : filtered.length === 0 ? (
         <div style={{ padding: 18, borderRadius: 10, background: 'var(--surface)', border: '1px solid var(--line)', color: 'var(--text2)', textAlign: 'center' }}>
