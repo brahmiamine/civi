@@ -162,7 +162,6 @@ export function ExamSessions() {
       .catch(() => {});
     return () => { cancelled = true; };
     // Only checked while this screen is mounted. Permission is never requested elsewhere.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [centers.length]);
 
   async function locateAndRank(requestPermission = true) {
