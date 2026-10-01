@@ -4,6 +4,7 @@ import { Home, TestHero, ProgHero, Profile } from './Dashboard.jsx';
 import { Fiche, Flash, QuestionView, Result } from './Study.jsx';
 import { Chips, Group, Empty } from './Lists.jsx';
 import { ProposeForm } from './ProposeForm.jsx';
+import { ExamSessions } from './ExamSessions.jsx';
 
 export function Toast({ t }) {
   return (
@@ -28,6 +29,7 @@ export function Content({ v, cardRef }) {
       {v.qv && <QuestionView qv={v.qv} />}
       {v.propose && <ProposeForm f={v.propose} />}
       {v.res && <Result r={v.res} />}
+      {v.examSessions && <ExamSessions />}
       {v.chips && <Chips chips={v.chips} />}
       {v.groups.map((g, gi) => <Group key={gi} g={g} />)}
       {v.empty && <Empty e={v.empty} />}

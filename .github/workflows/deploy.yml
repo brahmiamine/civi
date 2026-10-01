@@ -4,6 +4,8 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  schedule:
+    - cron: '17 */4 * * *'
 
 permissions:
   contents: read
@@ -21,6 +23,20 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Refresh CCI exam sessions
+        shell: bash
+        run: |
+          python -m pip install --disable-pip-version-check requests
+          if ! python scripts/scrape_cci_sessions.py --france --product 22 --delay 1 --output public/data/cci_sessions.json; then
+            echo "::warning::CCI scraping failed; trying the last deployed JSON."
+            curl --fail --silent --show-error https://brahmiamine.github.io/civi/data/cci_sessions.json -o public/data/cci_sessions.json || {
+              echo "::error::No fresh or previously deployed CCI session data is available."
+              exit 1
+            }
+          fi
       - uses: actions/setup-node@v4
         with:
           node-version: 22

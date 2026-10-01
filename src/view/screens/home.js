@@ -26,6 +26,7 @@ export function home(v, k) {
       { label: 'Quiz rapide', sub: '5 à ' + Math.min(40, O.total) + ' questions', icon: ic('zap'), onClick: () => app.openSheet('count') },
       { label: 'Mes erreurs', sub: nErr ? nErr + ' à revoir' : 'Aucune erreur', icon: ic('rotate'), badge: nErr || null, onClick: () => app.push({ s: 'errors' }) },
       { label: 'Révision intelligente', sub: planSub, icon: ic('sparkles'), onClick: () => app.startQuiz('smart') },
+      { label: 'Sessions d’examen', sub: 'Centres, dates et places disponibles', icon: ic('calendar'), wide: true, onClick: () => app.push({ s: 'sessions' }) },
     ],
   };
   if (k.weak.length) v.groups = [k.G('À travailler aujourd’hui', k.weak.map(k.themeRow))];
@@ -46,4 +47,8 @@ export function revise(v, k) {
       row({ icon: 'scroll', title: 'Chiffres romains', sub: 'Ve République, XVe siècle, Louis XIV…', chev: true, onClick: () => app.push({ s: 'roman' }) }),
     ]),
   ];
+}
+
+export function sessions(v) {
+  v.examSessions = {};
 }
