@@ -41,6 +41,7 @@ L’app peut aussi être publiée à la racine d’un domaine sur Cloudflare Wor
 - **Réponses enregistrées** : « Mes erreurs » et l’historique gardent le **texte** de la réponse choisie ; réordonner les réponses d’un fichier ne fausse donc rien. Un test en cours dont une question a changé garde ses réponses mais repart sans sélection.
 - **Signalements et propositions** : envoyés via Web3Forms (e-mail) et Cloudinary (images, presets non signés). Limite côté app : 20 s entre deux envois, 10 par jour ; les images sont ré-encodées en JPEG et refusées si le navigateur ne peut pas les décoder. À configurer aussi côté services : domaine autorisé sur Web3Forms, formats/taille/dossier sur les presets Cloudinary.
 - **Rappels** : notifications locales (permission du navigateur), gérées par le service worker (`public/sw-reminders.js`). Elles fonctionnent quand l’application est ouverte ou en arrière-plan, et, une fois l’app installée sur Android/Chromium, via la synchronisation périodique. Masquées si le navigateur ne les prend pas en charge.
+- **Sessions d’examen** : l’accueil donne accès aux prochaines sessions CCI « Carte de résident ». Le déploiement exécute `scripts/scrape_cci_sessions.py` et publie le résultat dans `public/data/cci_sessions.json`. Le workflow est aussi planifié toutes les 4 heures ; si le site CCI est temporairement indisponible, il tente de conserver le dernier JSON déjà déployé.
 
 ## Structure
 
