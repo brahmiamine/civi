@@ -10,7 +10,13 @@ const server = await preview({ preview: { port: 4174, strictPort: true }, logLev
 const URL = 'http://localhost:4174/';
 const dir = mkdtempSync(join(tmpdir(), 'civi-e2e-'));
 const browser = await chromium.launch();
-const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block', acceptDownloads: true });
+const ctx = await browser.newContext({
+  viewport: { width: 390, height: 844 },
+  serviceWorkers: 'block',
+  acceptDownloads: true,
+  geolocation: { latitude: 48.8566, longitude: 2.3522 },
+  permissions: ['geolocation'],
+});
 const page = await ctx.newPage();
 const sessionFixture = [
   {
@@ -39,6 +45,40 @@ await page.route('**/data/cci_sessions.json', async (route) => {
   if (sessionApiFails) return route.fulfill({ status: 503, body: 'indisponible' });
   return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(sessionFixture) });
 });
+await page.route('https://data.geopf.fr/geocodage/search**', async (route) => {
+  const q = new URL(route.request().url()).searchParams.get('q') || '';
+  const isParis = q.includes('75010');
+  return route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: JSON.stringify({
+      features: [{
+        geometry: { coordinates: isParis ? [2.36, 48.87] : [2.12, 49.04] },
+        properties: { label: q },
+      }],
+    }),
+  });
+});
+await page.route('https://api.transitous.org/api/v6/plan**', async (route) => {
+  const url = new URL(route.request().url());
+  const to = url.searchParams.get('toPlace') || '';
+  const paris = to.includes('48.87');
+  return route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: JSON.stringify({
+      itineraries: [{
+        duration: paris ? 1500 : 3000,
+        transfers: paris ? 0 : 1,
+        legs: [
+          { mode: 'WALK', duration: paris ? 180 : 420, distance: paris ? 220 : 520 },
+          { mode: 'SUBWAY', duration: paris ? 1140 : 2160, routeShortName: paris ? 'M4' : 'RER C', from: { name: 'Départ' }, to: { name: 'Arrivée' } },
+          { mode: 'WALK', duration: paris ? 180 : 420, distance: paris ? 180 : 460 },
+        ],
+      }],
+    }),
+  });
+});
 const problems = [];
 page.on('console', (m) => { if (m.type() === 'error' || /Content Security Policy|Refused/.test(m.text())) problems.push(m.text()); });
 page.on('pageerror', (e) => problems.push('Exception : ' + e.message));
@@ -59,8 +99,13 @@ await step('l’accueil s’affiche', ready);
 await step('sessions d’examen : centre/date, filtres, accordéon et erreur réseau', async () => {
   await page.getByRole('button', { name: /Sessions d’examen/ }).click();
   await page.getByRole('heading', { name: 'Trouver une session' }).waitFor();
+  await page.getByText(/Position utilisée/).waitFor({ timeout: 5000 });
+  await page.getByRole('tab', { name: 'Recommandé' }).click();
+  await page.getByText(/CENTRE PARIS/).waitFor();
+  await page.getByText(/\/100/).first().waitFor();
 
   // Vue par centre par défaut + accordéon.
+  await page.getByRole('tab', { name: 'Par centre' }).click();
   expect((await page.getByRole('tab', { name: 'Par centre' }).getAttribute('aria-selected')) === 'true', 'la vue par centre n’est pas active par défaut');
   await page.getByText('ABC FORMATION').waitFor();
   await page.getByRole('button', { name: /ABC FORMATION/ }).click();
