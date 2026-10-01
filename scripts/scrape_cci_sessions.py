@@ -192,11 +192,25 @@ def search_centers(session: requests.Session, product: str, token: str, timeout:
     raise RuntimeError("La recherche CCI a renvoyé une réponse vide.")
 
 
-def fetch_sessions(session: requests.Session, path: str, timeout: float) -> tuple[list[dict[str, Any]], str]:
+def fetch_sessions(
+    session: requests.Session,
+    path: str,
+    timeout: float,
+    retries: int = 2,
+) -> tuple[list[dict[str, Any]], str]:
     url = path if path.startswith("http") else BASE_URL + path
-    response = session.get(url, timeout=timeout, allow_redirects=True)
-    response.raise_for_status()
-    return parse_sessions(response.text), parse_address(response.text)
+    last_error: requests.RequestException | None = None
+    for attempt in range(1, retries + 1):
+        try:
+            response = session.get(url, timeout=timeout, allow_redirects=True)
+            response.raise_for_status()
+            return parse_sessions(response.text), parse_address(response.text)
+        except requests.RequestException as exc:
+            last_error = exc
+            if attempt < retries:
+                time.sleep(2 * attempt)
+    assert last_error is not None
+    raise last_error
 
 
 def sleep(delay: float) -> None:
@@ -219,7 +233,11 @@ def collect(product: str, france: bool, delay: float, timeout: float) -> list[di
         if not path:
             continue
         print(f"[{index}/{len(cards)}] {card.get('name') or card.get('center_id')}…", flush=True)
-        sessions, complete_address = fetch_sessions(session, path, timeout)
+        try:
+            sessions, complete_address = fetch_sessions(session, path, timeout)
+        except requests.RequestException as exc:
+            print(f"  ! centre ignoré après échec réseau : {exc}", file=sys.stderr)
+            continue
         output.append({
             "center_id": card.get("center_id"),
             "center_name": card.get("name", ""),
