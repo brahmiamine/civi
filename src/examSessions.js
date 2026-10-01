@@ -10,6 +10,7 @@ export function todayIso(now = new Date()) {
 export function departmentCode(postalCode = '') {
   const code = String(postalCode || '').trim();
   if (!/^\d{5}$/.test(code)) return '';
+  if (code.startsWith('20')) return Number(code) < 20200 ? '2A' : '2B';
   return code.startsWith('97') || code.startsWith('98') ? code.slice(0, 3) : code.slice(0, 2);
 }
 
