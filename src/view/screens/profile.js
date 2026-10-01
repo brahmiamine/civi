@@ -14,6 +14,7 @@ export function profile(v, k) {
   v.groups = [k.G(null, [
     row({ icon: 'target', title: 'Type de préparation', sub: plural(O.total, 'question') + ' · ' + plural(bank.lots.length, 'lot'), value: bank.short, chev: true, onClick: () => app.openSheet('prep') }),
     row({ icon: 'scroll', title: 'Chiffres romains', sub: 'Ve République, XVe siècle, Louis XIV… : savoir les lire', chev: true, onClick: () => app.push({ s: 'roman' }) }),
+    row({ icon: 'calendar', title: 'Sessions d’examen', sub: 'Voir les prochaines dates, centres et places disponibles', chev: true, onClick: () => app.push({ s: 'sessions' }) }),
     row({ icon: 'alert', title: 'Signaler un bug', sub: 'Avec une capture d’écran si besoin', chev: true, onClick: () => app.openReport(null) }),
     row({ icon: 'sparkles', title: 'Proposer une question', sub: 'Texte ou photo, envoyé à l’auteur', chev: true, onClick: () => app.openPropose() }),
     row({ icon: 'sliders', title: 'Paramètres', chev: true, onClick: () => app.push({ s: 'settings' }) }),
