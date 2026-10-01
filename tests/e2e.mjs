@@ -56,16 +56,39 @@ const expect = (ok, msg) => { if (!ok) throw new Error(msg); };
 await page.goto(URL);
 await step('l’accueil s’affiche', ready);
 
-await step('sessions d’examen : navigation, recherche, département et erreur réseau', async () => {
+await step('sessions d’examen : centre/date, filtres, accordéon et erreur réseau', async () => {
   await page.getByRole('button', { name: /Sessions d’examen/ }).click();
   await page.getByRole('heading', { name: 'Trouver une session' }).waitFor();
+
+  // Vue par centre par défaut + accordéon.
+  expect((await page.getByRole('tab', { name: 'Par centre' }).getAttribute('aria-selected')) === 'true', 'la vue par centre n’est pas active par défaut');
   await page.getByText('ABC FORMATION').waitFor();
+  await page.getByRole('button', { name: /ABC FORMATION/ }).click();
+  await page.getByRole('link', { name: 'Google Maps' }).waitFor();
+  await page.getByRole('link', { name: 'Citymapper' }).waitFor();
+
+  // Département.
   await page.getByLabel('Filtrer par département').selectOption('75');
   expect(await page.getByText('CENTRE PARIS').count() === 1, 'centre paris absent après filtre');
   expect(await page.getByText('ABC FORMATION').count() === 0, 'filtre département non appliqué');
   await page.getByLabel('Filtrer par département').selectOption('');
+
+  // Recherche texte.
   await page.getByLabel('Rechercher une ville ou un centre').fill('saint-ouen');
   expect(await page.getByText('ABC FORMATION').count() === 1, 'recherche adresse non appliquée');
+  await page.getByLabel('Rechercher une ville ou un centre').fill('');
+
+  // Filtre date.
+  await page.getByLabel('Filtrer par date').fill('2099-10-07');
+  expect(await page.getByText('ABC FORMATION').count() === 1, 'filtre date : centre attendu absent');
+  expect(await page.getByText('CENTRE PARIS').count() === 0, 'filtre date non appliqué');
+  await page.getByRole('button', { name: 'Effacer' }).click();
+
+  // Vue par date.
+  await page.getByRole('tab', { name: 'Par date' }).click();
+  expect((await page.getByRole('tab', { name: 'Par date' }).getAttribute('aria-selected')) === 'true', 'la vue par date ne s’active pas');
+  await page.getByText('CENTRE PARIS').waitFor();
+
   await page.getByRole('button', { name: 'Accueil' }).click();
 
   const expectedErrorStart = problems.length;
