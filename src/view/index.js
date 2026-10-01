@@ -16,7 +16,7 @@ const SCREENS = { ...homeScreens, ...testScreens, ...progressScreens, ...studySc
 const TITLES = {
   propose: 'Proposer une question', theme: 'Thème', errors: 'Mes erreurs', favs: 'Mes favoris', traps: 'Questions pièges', dates: 'Dates à retenir',
   flash: 'Flashcards', question: 'Question', examIntro: 'Examen blanc', review: 'Correction des erreurs', history: 'Historique', roman: 'Chiffres romains',
-  settings: 'Paramètres', notifications: 'Notifications', about: 'À propos', lot: 'Lot de questions', result: 'Résultat',
+  settings: 'Paramètres', notifications: 'Notifications', about: 'À propos', lot: 'Lot de questions', result: 'Résultat', sessions: 'Sessions d’examen',
 };
 
 export function buildView(app) {
@@ -24,7 +24,7 @@ export function buildView(app) {
   const v = {
     bar: TITLES[c.s] ? { ...k.back, title: TITLES[c.s] } : { show: false },
     quizBar: null, largeTitle: null, home: null, testHero: null, progHero: null, profile: null, intro: null, fiche: null, flash: null,
-    qv: null, propose: null, res: null, chips: null, groups: [], empty: null, sticky: null,
+    qv: null, propose: null, res: null, examSessions: null, chips: null, groups: [], empty: null, sticky: null,
   };
   SCREENS[c.s]?.(v, k);
   v.showNav = !(c.s === 'quiz' || (c.s === 'result' && c.fresh));
