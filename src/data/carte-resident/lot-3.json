@@ -1,0 +1,526 @@
+{
+  "titre": "Révision ciblée : Français célèbres, dates et métropoles",
+  "description": "40 questions pour la carte de résident (CR 10 ans) : grandes figures françaises, dates essentielles et métropoles de France métropolitaine, hors outre-mer.",
+  "questions": [
+    {
+      "id": "cr-cible-001",
+      "theme": "histoire",
+      "question": "Quel souverain français est connu sous le surnom de « Roi-Soleil » ?",
+      "reponses": [
+        "Louis XIV",
+        "Louis XVI",
+        "Napoléon Ier",
+        "François Ier"
+      ],
+      "bonne_reponse": "A",
+      "explication": "Louis XIV est surnommé le Roi-Soleil. Il a régné de 1643 à 1715."
+    },
+    {
+      "id": "cr-cible-002",
+      "theme": "histoire",
+      "question": "Quel roi de France a été exécuté par guillotine le 21 janvier 1793 ?",
+      "reponses": [
+        "Louis XIV",
+        "Louis XVI",
+        "Louis XVIII",
+        "Charles X"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Louis XVI a été exécuté le 21 janvier 1793 pendant la Révolution française."
+    },
+    {
+      "id": "cr-cible-003",
+      "theme": "histoire",
+      "question": "Quel personnage devient empereur des Français sous le nom de Napoléon Ier en 1804 ?",
+      "reponses": [
+        "Louis-Napoléon Bonaparte",
+        "Charles de Gaulle",
+        "Napoléon Bonaparte",
+        "Louis-Philippe"
+      ],
+      "bonne_reponse": "C",
+      "explication": "Napoléon Bonaparte devient Napoléon Ier, empereur des Français, en 1804."
+    },
+    {
+      "id": "cr-cible-004",
+      "theme": "histoire",
+      "question": "Quel général français est à l'origine de l'appel du 18 juin 1940 depuis Londres ?",
+      "reponses": [
+        "Philippe Pétain",
+        "Jean Moulin",
+        "Georges Clemenceau",
+        "Charles de Gaulle"
+      ],
+      "bonne_reponse": "D",
+      "explication": "Charles de Gaulle lance depuis Londres l'appel du 18 juin 1940 pour poursuivre le combat."
+    },
+    {
+      "id": "cr-cible-005",
+      "theme": "histoire",
+      "question": "Quelle figure de la Résistance a contribué à unifier les mouvements résistants et à créer le CNR en 1943 ?",
+      "reponses": [
+        "Jean Moulin",
+        "Pierre Laval",
+        "Philippe Pétain",
+        "Georges Pompidou"
+      ],
+      "bonne_reponse": "A",
+      "explication": "Jean Moulin joue un rôle central dans l'unification de la Résistance et la création du Conseil national de la Résistance en 1943."
+    },
+    {
+      "id": "cr-cible-006",
+      "theme": "histoire",
+      "question": "Sous la présidence de quel chef d'État la peine de mort a-t-elle été abolie en France en 1981 ?",
+      "reponses": [
+        "Valéry Giscard d'Estaing",
+        "François Mitterrand",
+        "Jacques Chirac",
+        "Charles de Gaulle"
+      ],
+      "bonne_reponse": "B",
+      "explication": "La peine de mort est abolie en 1981 sous la présidence de François Mitterrand."
+    },
+    {
+      "id": "cr-cible-007",
+      "theme": "droits",
+      "question": "Quel garde des Sceaux a porté devant le Parlement l'abolition de la peine de mort en 1981 ?",
+      "reponses": [
+        "Jean Moulin",
+        "Simone Veil",
+        "Robert Badinter",
+        "Victor Schœlcher"
+      ],
+      "bonne_reponse": "C",
+      "explication": "Robert Badinter, garde des Sceaux, a défendu le projet d'abolition de la peine de mort adopté en 1981."
+    },
+    {
+      "id": "cr-cible-008",
+      "theme": "droits",
+      "question": "Quelle ministre est associée à la loi de 1975 légalisant l'IVG en France ?",
+      "reponses": [
+        "Édith Cresson",
+        "Marguerite Yourcenar",
+        "Simone de Beauvoir",
+        "Simone Veil"
+      ],
+      "bonne_reponse": "D",
+      "explication": "Simone Veil, alors ministre de la Santé, a porté la loi du 17 janvier 1975 relative à l'IVG."
+    },
+    {
+      "id": "cr-cible-009",
+      "theme": "histoire",
+      "question": "Quelle romancière est devenue en 1980 la première femme élue à l'Académie française ?",
+      "reponses": [
+        "Marguerite Yourcenar",
+        "George Sand",
+        "Colette",
+        "Simone de Beauvoir"
+      ],
+      "bonne_reponse": "A",
+      "explication": "Marguerite Yourcenar est devenue en 1980 la première femme élue à l'Académie française."
+    },
+    {
+      "id": "cr-cible-010",
+      "theme": "histoire",
+      "question": "Quel peintre français est l'un des fondateurs de l'impressionnisme et a peint « Impression, soleil levant » ?",
+      "reponses": [
+        "Auguste Rodin",
+        "Claude Monet",
+        "Paul Cézanne",
+        "Henri Matisse"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Claude Monet est l'un des fondateurs de l'impressionnisme ; son tableau « Impression, soleil levant » a donné son nom au mouvement."
+    },
+    {
+      "id": "cr-cible-011",
+      "theme": "histoire",
+      "question": "Quel artiste français est le sculpteur du « Penseur » et du « Baiser » ?",
+      "reponses": [
+        "Claude Monet",
+        "Auguste Renoir",
+        "Auguste Rodin",
+        "Claude Debussy"
+      ],
+      "bonne_reponse": "C",
+      "explication": "Auguste Rodin est un grand sculpteur français, auteur notamment du « Penseur » et du « Baiser »."
+    },
+    {
+      "id": "cr-cible-012",
+      "theme": "histoire",
+      "question": "Quelle philosophe et écrivaine française a publié « Le Deuxième Sexe » en 1949 ?",
+      "reponses": [
+        "Marguerite Yourcenar",
+        "Marie Curie",
+        "Simone Veil",
+        "Simone de Beauvoir"
+      ],
+      "bonne_reponse": "D",
+      "explication": "Simone de Beauvoir est une philosophe et écrivaine française, auteure du « Deuxième Sexe » publié en 1949."
+    },
+    {
+      "id": "cr-cible-013",
+      "theme": "histoire",
+      "question": "Quel compositeur français est notamment connu pour « Clair de lune » ?",
+      "reponses": [
+        "Claude Debussy",
+        "Ludwig van Beethoven",
+        "Wolfgang Amadeus Mozart",
+        "Frédéric Chopin"
+      ],
+      "bonne_reponse": "A",
+      "explication": "Claude Debussy est un compositeur français, notamment connu pour « Clair de lune »."
+    },
+    {
+      "id": "cr-cible-014",
+      "theme": "histoire",
+      "question": "Quel peintre impressionniste français est l'auteur du « Bal du moulin de la Galette » ?",
+      "reponses": [
+        "Claude Monet",
+        "Auguste Renoir",
+        "Auguste Rodin",
+        "Eugène Delacroix"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Auguste Renoir est un peintre impressionniste français, auteur du « Bal du moulin de la Galette »."
+    },
+    {
+      "id": "cr-cible-015",
+      "theme": "histoire",
+      "question": "Quel grand texte a été adopté le 26 août 1789 ?",
+      "reponses": [
+        "Le Code civil",
+        "La Constitution de la Ve République",
+        "La Déclaration des droits de l'homme et du citoyen",
+        "Le traité de Rome"
+      ],
+      "bonne_reponse": "C",
+      "explication": "La Déclaration des droits de l'homme et du citoyen a été adoptée le 26 août 1789."
+    },
+    {
+      "id": "cr-cible-016",
+      "theme": "histoire",
+      "question": "En quelle année la Première République française a-t-elle été proclamée ?",
+      "reponses": [
+        "1789",
+        "1791",
+        "1804",
+        "1792"
+      ],
+      "bonne_reponse": "D",
+      "explication": "La Première République est proclamée en septembre 1792."
+    },
+    {
+      "id": "cr-cible-017",
+      "theme": "histoire",
+      "question": "En quelle année Napoléon Bonaparte est-il devenu Napoléon Ier, empereur des Français ?",
+      "reponses": [
+        "1804",
+        "1799",
+        "1815",
+        "1848"
+      ],
+      "bonne_reponse": "A",
+      "explication": "Napoléon Bonaparte devient empereur des Français sous le nom de Napoléon Ier en 1804."
+    },
+    {
+      "id": "cr-cible-018",
+      "theme": "valeurs",
+      "question": "Quelle année faut-il associer à la loi de séparation des Églises et de l'État ?",
+      "reponses": [
+        "1901",
+        "1905",
+        "1882",
+        "1958"
+      ],
+      "bonne_reponse": "B",
+      "explication": "La loi de séparation des Églises et de l'État est adoptée en 1905."
+    },
+    {
+      "id": "cr-cible-019",
+      "theme": "histoire",
+      "question": "Quelle année marque le début de la Première Guerre mondiale ?",
+      "reponses": [
+        "1918",
+        "1939",
+        "1914",
+        "1940"
+      ],
+      "bonne_reponse": "C",
+      "explication": "La Première Guerre mondiale commence en 1914."
+    },
+    {
+      "id": "cr-cible-020",
+      "theme": "histoire",
+      "question": "Quelle date correspond à l'armistice mettant fin aux combats de la Première Guerre mondiale ?",
+      "reponses": [
+        "8 mai 1945",
+        "14 juillet 1789",
+        "18 juin 1940",
+        "11 novembre 1918"
+      ],
+      "bonne_reponse": "D",
+      "explication": "L'armistice de la Première Guerre mondiale est signé le 11 novembre 1918."
+    },
+    {
+      "id": "cr-cible-021",
+      "theme": "histoire",
+      "question": "Quelle date faut-il associer à l'appel du général de Gaulle depuis Londres ?",
+      "reponses": [
+        "18 juin 1940",
+        "6 juin 1944",
+        "8 mai 1945",
+        "11 novembre 1918"
+      ],
+      "bonne_reponse": "A",
+      "explication": "L'appel du général de Gaulle est prononcé le 18 juin 1940 depuis Londres."
+    },
+    {
+      "id": "cr-cible-022",
+      "theme": "droits",
+      "question": "À quelle date l'ordonnance accordant aux femmes françaises le droit de vote et d'éligibilité a-t-elle été prise ?",
+      "reponses": [
+        "8 mai 1945",
+        "21 avril 1944",
+        "4 octobre 1958",
+        "6 juin 1944"
+      ],
+      "bonne_reponse": "B",
+      "explication": "L'ordonnance du 21 avril 1944 accorde aux femmes françaises le droit de vote et d'éligibilité."
+    },
+    {
+      "id": "cr-cible-023",
+      "theme": "histoire",
+      "question": "Quelle date correspond au débarquement allié en Normandie ?",
+      "reponses": [
+        "18 juin 1940",
+        "15 août 1944",
+        "6 juin 1944",
+        "8 mai 1945"
+      ],
+      "bonne_reponse": "C",
+      "explication": "Le débarquement allié en Normandie a lieu le 6 juin 1944."
+    },
+    {
+      "id": "cr-cible-024",
+      "theme": "histoire",
+      "question": "Quelle date commémore en France la victoire sur l'Allemagne nazie en Europe ?",
+      "reponses": [
+        "11 novembre 1918",
+        "6 juin 1944",
+        "18 juin 1940",
+        "8 mai 1945"
+      ],
+      "bonne_reponse": "D",
+      "explication": "Le 8 mai commémore la victoire de 1945 et la fin de la Seconde Guerre mondiale en Europe."
+    },
+    {
+      "id": "cr-cible-025",
+      "theme": "institutions",
+      "question": "En quelle année le traité de Paris a-t-il créé la Communauté européenne du charbon et de l'acier (CECA) ?",
+      "reponses": [
+        "1951",
+        "1957",
+        "1992",
+        "2002"
+      ],
+      "bonne_reponse": "A",
+      "explication": "Le traité de Paris de 1951 crée la CECA, première grande étape de la construction européenne."
+    },
+    {
+      "id": "cr-cible-026",
+      "theme": "institutions",
+      "question": "Quelle est la date de promulgation de la Constitution de la Ve République ?",
+      "reponses": [
+        "28 septembre 1958",
+        "4 octobre 1958",
+        "18 juin 1940",
+        "6 novembre 1962"
+      ],
+      "bonne_reponse": "B",
+      "explication": "La Constitution de la Ve République est promulguée le 4 octobre 1958."
+    },
+    {
+      "id": "cr-cible-027",
+      "theme": "droits",
+      "question": "En quelle année la peine de mort a-t-elle été abolie en France ?",
+      "reponses": [
+        "1975",
+        "2007",
+        "1981",
+        "1989"
+      ],
+      "bonne_reponse": "C",
+      "explication": "La peine de mort est abolie en France en 1981."
+    },
+    {
+      "id": "cr-cible-028",
+      "theme": "histoire",
+      "question": "Combien la France métropolitaine compte-t-elle de régions ?",
+      "reponses": [
+        "18",
+        "12",
+        "15",
+        "13"
+      ],
+      "bonne_reponse": "D",
+      "explication": "La France compte 18 régions au total, dont 13 en métropole et 5 en outre-mer."
+    },
+    {
+      "id": "cr-cible-029",
+      "theme": "histoire",
+      "question": "Combien de départements se trouvent en France métropolitaine ?",
+      "reponses": [
+        "96",
+        "101",
+        "95",
+        "98"
+      ],
+      "bonne_reponse": "A",
+      "explication": "La France compte 101 départements au total, dont 96 en métropole et 5 en outre-mer."
+    },
+    {
+      "id": "cr-cible-030",
+      "theme": "histoire",
+      "question": "Comment appelle-t-on aussi le territoire français situé en Europe, par opposition aux territoires d'outre-mer ?",
+      "reponses": [
+        "La France ultramarine",
+        "La France hexagonale ou la métropole",
+        "La collectivité européenne",
+        "La France insulaire"
+      ],
+      "bonne_reponse": "B",
+      "explication": "Le territoire français situé en Europe est appelé France hexagonale ou métropole."
+    },
+    {
+      "id": "cr-cible-031",
+      "theme": "histoire",
+      "question": "Quelle est la plus grande métropole française selon la liste de référence de la formation civique ?",
+      "reponses": [
+        "Métropole du Grand Lyon",
+        "Métropole d'Aix-Marseille-Provence",
+        "Métropole du Grand Paris",
+        "Métropole européenne de Lille"
+      ],
+      "bonne_reponse": "C",
+      "explication": "La Métropole du Grand Paris arrive en tête de la liste des dix plus grandes métropoles françaises."
+    },
+    {
+      "id": "cr-cible-032",
+      "theme": "histoire",
+      "question": "Quelle métropole arrive en deuxième position parmi les dix plus grandes métropoles françaises ?",
+      "reponses": [
+        "Métropole européenne de Lille",
+        "Métropole du Grand Lyon",
+        "Bordeaux Métropole",
+        "Métropole d'Aix-Marseille-Provence"
+      ],
+      "bonne_reponse": "D",
+      "explication": "La Métropole d'Aix-Marseille-Provence est classée deuxième, derrière le Grand Paris."
+    },
+    {
+      "id": "cr-cible-033",
+      "theme": "histoire",
+      "question": "Quelle métropole est classée troisième dans la liste des dix plus grandes métropoles françaises ?",
+      "reponses": [
+        "Métropole du Grand Lyon",
+        "Toulouse Métropole",
+        "Métropole Nice Côte d'Azur",
+        "Nantes Métropole"
+      ],
+      "bonne_reponse": "A",
+      "explication": "La Métropole du Grand Lyon est classée troisième dans la liste de référence."
+    },
+    {
+      "id": "cr-cible-034",
+      "theme": "histoire",
+      "question": "Quelle métropole est classée quatrième, après Grand Paris, Aix-Marseille-Provence et Grand Lyon ?",
+      "reponses": [
+        "Bordeaux Métropole",
+        "Métropole européenne de Lille",
+        "Toulouse Métropole",
+        "Eurométropole de Strasbourg"
+      ],
+      "bonne_reponse": "B",
+      "explication": "La Métropole européenne de Lille est classée quatrième."
+    },
+    {
+      "id": "cr-cible-035",
+      "theme": "histoire",
+      "question": "Quelle place Bordeaux Métropole occupe-t-elle dans la liste des dix plus grandes métropoles françaises ?",
+      "reponses": [
+        "3e",
+        "4e",
+        "5e",
+        "6e"
+      ],
+      "bonne_reponse": "C",
+      "explication": "Bordeaux Métropole occupe la 5e place dans la liste de référence."
+    },
+    {
+      "id": "cr-cible-036",
+      "theme": "histoire",
+      "question": "Quelle place Toulouse Métropole occupe-t-elle dans la liste des dix plus grandes métropoles françaises ?",
+      "reponses": [
+        "4e",
+        "5e",
+        "7e",
+        "6e"
+      ],
+      "bonne_reponse": "D",
+      "explication": "Toulouse Métropole occupe la 6e place dans la liste de référence."
+    },
+    {
+      "id": "cr-cible-037",
+      "theme": "histoire",
+      "question": "Quelle place Nantes Métropole occupe-t-elle dans la liste des dix plus grandes métropoles françaises ?",
+      "reponses": [
+        "7e",
+        "5e",
+        "8e",
+        "10e"
+      ],
+      "bonne_reponse": "A",
+      "explication": "Nantes Métropole occupe la 7e place dans la liste de référence."
+    },
+    {
+      "id": "cr-cible-038",
+      "theme": "histoire",
+      "question": "Quelle place la Métropole Nice Côte d'Azur occupe-t-elle dans la liste des dix plus grandes métropoles françaises ?",
+      "reponses": [
+        "6e",
+        "8e",
+        "9e",
+        "10e"
+      ],
+      "bonne_reponse": "B",
+      "explication": "La Métropole Nice Côte d'Azur occupe la 8e place dans la liste de référence."
+    },
+    {
+      "id": "cr-cible-039",
+      "theme": "histoire",
+      "question": "Quelle place Montpellier Méditerranée Métropole occupe-t-elle dans la liste des dix plus grandes métropoles françaises ?",
+      "reponses": [
+        "7e",
+        "8e",
+        "9e",
+        "10e"
+      ],
+      "bonne_reponse": "C",
+      "explication": "Montpellier Méditerranée Métropole occupe la 9e place dans la liste de référence."
+    },
+    {
+      "id": "cr-cible-040",
+      "theme": "histoire",
+      "question": "Quelle place l'Eurométropole de Strasbourg occupe-t-elle dans la liste des dix plus grandes métropoles françaises ?",
+      "reponses": [
+        "7e",
+        "8e",
+        "9e",
+        "10e"
+      ],
+      "bonne_reponse": "D",
+      "explication": "L'Eurométropole de Strasbourg occupe la 10e place dans la liste de référence."
+    }
+  ]
+}
